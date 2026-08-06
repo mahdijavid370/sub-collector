@@ -1,12 +1,32 @@
 import base64
 import json
+import logging
 import math
 import os
+import re
 import urllib.request
+from typing import Optional
 from urllib.parse import parse_qs, unquote, urlparse
 
+# تنظیمات logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
-def fetch_and_decode(url):
+
+def is_valid_vless_url(url: str) -> bool:
+    """بررسی اعتبار لینک vless"""
+    if not url or not url.startswith('vless://'):
+        return False
+    # بررسی ساختار کلی URL
+    pattern = r'^vless://[a-f0-9\-]{36}@[a-zA-Z0-9\.\-]+:\d+.*$'
+    return bool(re.match(pattern, url))
+
+
+def fetch_and_decode(url: str) -> list[str]:
     """دریافت و دکود کردن محتوای لینک ساب"""
     try:
         req = urllib.request.Request(
@@ -17,17 +37,26 @@ def fetch_and_decode(url):
             content = response.read().decode('utf-8').strip()
             try:
                 decoded = base64.b64decode(content).decode('utf-8')
+                logger.info(f'Successfully decoded base64 content from {url}')
                 return decoded.splitlines()
             except Exception:
+                logger.info(f'Content from {url} is plain text (not base64)')
                 return content.splitlines()
+    except urllib.error.URLError as e:
+        logger.error(f'Network error fetching {url}: {e}')
+        return []
     except Exception as e:
-        print(f'Error fetching {url}: {e}')
+        logger.error(f'Unexpected error fetching {url}: {e}')
         return []
 
 
-def parse_vless_to_outbound(vless_url, tag_name):
+def parse_vless_to_outbound(vless_url: str, tag_name: str) -> Optional[dict]:
     """تبدیل لینک vless:// به آبجکت outbound در Xray"""
     try:
+        if not is_valid_vless_url(vless_url):
+            logger.warning(f'Invalid VLESS URL format: {vless_url[:50]}...')
+            return None
+
         parsed = urlparse(vless_url)
         if parsed.scheme != 'vless':
             return None
@@ -35,6 +64,11 @@ def parse_vless_to_outbound(vless_url, tag_name):
         uuid = parsed.username
         address = parsed.hostname
         port = parsed.port or 443
+
+        if not uuid or not address:
+            logger.warning(f'Missing UUID or address in URL: {vless_url[:50]}...')
+            return None
+
         params = parse_qs(parsed.query)
 
         network = params.get('type', ['tcp'])[0]
@@ -44,16 +78,26 @@ def parse_vless_to_outbound(vless_url, tag_name):
         sni = params.get('sni', [''])[0]
         fp = params.get('fp', ['chrome'])[0]
         alpn_raw = params.get('alpn', [''])[0]
-        alpn = alpn_raw.split(',') if alpn_raw else []
+        alpn = [x.strip() for x in alpn_raw.split(',') if x.strip()] if alpn_raw else []
 
-        outbound = {
+        # اعتبارسنجی پورت
+        try:
+            port_num = int(port)
+            if not (1 <= port_num <= 65535):
+                logger.warning(f'Invalid port number: {port}')
+                return None
+        except ValueError:
+            logger.warning(f'Port is not a number: {port}')
+            return None
+
+        outbound: dict = {
             'mux': {'concurrency': -1, 'enabled': False},
             'protocol': 'vless',
             'settings': {
                 'vnext': [
                     {
                         'address': address,
-                        'port': int(port),
+                        'port': port_num,
                         'users': [{'encryption': 'none', 'id': uuid, 'level': 8}],
                     }
                 ]
@@ -62,36 +106,58 @@ def parse_vless_to_outbound(vless_url, tag_name):
             'tag': tag_name,
         }
 
-        # تنظیمات Stream
+        # تنظیمات Stream بر اساس نوع شبکه
         if network == 'ws':
-            ws_settings = {'headers': {}}
+            ws_settings: dict = {'headers': {}}
             if host:
                 ws_settings['headers']['Host'] = host
             if path:
                 ws_settings['path'] = path
             outbound['streamSettings']['wsSettings'] = ws_settings
+        elif network == 'grpc':
+            grpc_service_name = params.get('serviceName', [''])[0]
+            if grpc_service_name:
+                outbound['streamSettings']['grpcSettings'] = {
+                    'serviceName': grpc_service_name
+                }
 
-        # تنظیمات TLS
+        # تنظیمات TLS/Reality
         if security == 'tls':
             outbound['streamSettings']['security'] = 'tls'
-            tls_settings = {'allowInsecure': False, 'show': False}
+            tls_settings: dict = {'allowInsecure': False, 'show': False}
             if sni:
                 tls_settings['serverName'] = sni
+            else:
+                tls_settings['serverName'] = address
             if fp:
                 tls_settings['fingerprint'] = fp
             if alpn:
                 tls_settings['alpn'] = alpn
             outbound['streamSettings']['tlsSettings'] = tls_settings
+        elif security == 'reality':
+            outbound['streamSettings']['security'] = 'reality'
+            reality_settings: dict = {
+                'show': False,
+                'publicKey': params.get('pbk', [''])[0],
+                'shortId': params.get('sid', [''])[0],
+            }
+            if sni:
+                reality_settings['serverName'] = sni
+            else:
+                reality_settings['serverName'] = address
+            if fp:
+                reality_settings['fingerprint'] = fp
+            outbound['streamSettings']['realitySettings'] = reality_settings
 
         return outbound
     except Exception as e:
-        print(f'Error parsing link {vless_url}: {e}')
+        logger.error(f'Error parsing link {vless_url[:50]}...: {e}')
         return None
 
 
-def generate_full_json_config(outbound_proxies):
+def generate_full_json_config(outbound_proxies: list[dict]) -> dict:
     """تولید ساختار کامل JSON نهایی"""
-    base_config = {
+    base_config: dict = {
         'dns': {
             'hosts': {
                 'domain:googleapis.cn': 'googleapis.com',
@@ -259,28 +325,37 @@ def generate_full_json_config(outbound_proxies):
 
 
 def main():
+    """تابع اصلی برنامه"""
     raw_urls = os.environ.get('SUB_URLS', '')
     urls = [u.strip() for u in raw_urls.splitlines() if u.strip()]
 
     if not urls:
-        print('No URLs found in SUB_URLS secret!')
+        logger.error('No URLs found in SUB_URLS environment variable!')
         return
 
-    all_raw_configs = []
+    all_raw_configs: list[str] = []
+    seen_urls: set[str] = set()
 
-    # ۱. دریافت تمام لینک‌ها
+    # ۱. دریافت تمام لینک‌ها و حذف تکراری‌ها
     for url in urls:
+        logger.info(f'Processing subscription URL: {url[:50]}...')
         lines = fetch_and_decode(url)
         for line in lines:
             line = line.strip()
-            if line.startswith('vless://') and line not in all_raw_configs:
+            if is_valid_vless_url(line) and line not in seen_urls:
+                seen_urls.add(line)
                 all_raw_configs.append(line)
 
-    print(f'Total valid VLESS configs found: {len(all_raw_configs)}')
+    logger.info(f'Total valid VLESS configs found (unique): {len(all_raw_configs)}')
+
+    if not all_raw_configs:
+        logger.warning('No valid VLESS configurations found!')
+        return
 
     # ۲. ذخیره فایل خام متنی javidsub
     with open('javidsub', 'w', encoding='utf-8') as f:
         f.write('\n'.join(all_raw_configs))
+    logger.info('Saved raw configs to javidsub file')
 
     # ۳. ذخیره بسته‌های ۱۰۰۰ تایی
     chunk_size = 1000
@@ -294,17 +369,21 @@ def main():
             'total_configs': len(chunk),
             'configs': chunk,
         }
-        with open(
-            f'json_configs/configs_{i + 1}.json', 'w', encoding='utf-8'
-        ) as f:
+        output_file = f'json_configs/configs_{i + 1}.json'
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=2)
+        logger.info(f'Saved chunk {i + 1}/{total_chunks} to {output_file}')
 
     # ۴. تبدیل لینک‌ها به Outbound برای فایل JSON نهایی
-    parsed_outbounds = []
+    parsed_outbounds: list[dict] = []
     for idx, link in enumerate(all_raw_configs, start=1):
         outbound = parse_vless_to_outbound(link, tag_name=f'proxy-{idx}')
         if outbound:
             parsed_outbounds.append(outbound)
+        else:
+            logger.warning(f'Failed to parse config #{idx}: {link[:50]}...')
+
+    logger.info(f'Successfully parsed {len(parsed_outbounds)} out of {len(all_raw_configs)} configs')
 
     # ۵. ساخت ساختار کامل JSON
     final_json_structure = generate_full_json_config(parsed_outbounds)
@@ -312,6 +391,7 @@ def main():
     # ذخیره مستقیم JSON درون final_sub.txt
     with open('final_sub.txt', 'w', encoding='utf-8') as f:
         json.dump(final_json_structure, f, ensure_ascii=False, indent=2)
+    logger.info('Saved final JSON configuration to final_sub.txt')
 
 
 if __name__ == '__main__':
