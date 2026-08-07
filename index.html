@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>VLESS ⇢ Xray | تبدیلگر و استودیو کانفیگ</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/vazirmatn/400.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/vazirmatn/700.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono/400.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono/700.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 /* ═══ CSS VARIABLES & THEMES ═══ */
@@ -94,7 +90,7 @@ body.theme-light .stat-box { background: #fff; }
 
 .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
 button, select, input[type="text"], input[type="number"] { font-family: var(--font-body); background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: var(--transition); font-size: 0.9rem; width: 100%; min-height: 44px; }
-body.theme-light button:not(.primary):not(.danger), body.theme-light select, body.theme-light input { background: #fff; }
+body.theme-light button:not(.primary, .danger), body.theme-light select, body.theme-light input { background: #fff; }
 button:hover:not(:disabled), select:hover, input:hover { border-color: var(--cyan); }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -169,7 +165,7 @@ textarea.input-box { width: 100%; min-height: 120px; background: var(--code-bg);
 
 /* ── NODES GRID ── */
 .node-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 4px; }
-.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: var(--transition); cursor: pointer; animation: popIn 0.25s ease; }
+.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: var(--transition); cursor: pointer; }
 body.theme-light .node-card { background: #fff; }
 .node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
 .node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); }
@@ -199,10 +195,9 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 /* QR MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
 .modal-overlay.active { display: grid; }
-.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--glass-shadow); animation: popIn 0.25s ease; }
-#qrcode { margin: 20px auto; display: flex; justify-content: center; align-items: center; background: #fff; padding: 10px; border-radius: 10px; min-height: 120px; }
+.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--glass-shadow); }
+#qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
 #qrcode img { width: 200px !important; height: 200px !important; max-width: 100%; }
-.qr-hint { font-size: 0.7rem; color: var(--text-secondary); margin-top: 6px; }
 
 /* TOASTS */
 #toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: 92%; max-width: 380px; }
@@ -278,7 +273,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
   <div class="tpl-bar">
     <span class="tpl-lbl">🧩 قالب‌های کاربردی:</span>
-    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هوشمند)</button>
+    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هووشمند)</button>
     <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ / وب</button>
     <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (بدون فیلتر)</button>
   </div>
@@ -304,7 +299,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
             <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="flex:1; min-width:120px;">
             <button class="primary" id="btnFetch" style="width:auto; flex:0 1 auto;">⬇ دریافت</button>
           </div>
-          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا کپی و پیست کنید..." spellcheck="false"></textarea>
+          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا کپی و پِیست کنید..." spellcheck="false"></textarea>
         </div>
       </section>
 
@@ -369,7 +364,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
               </div>
               <div class="setting-row" style="margin-top:10px;">
                 <label class="opt"><span class="switch"><input type="checkbox" id="swQuic"><span class="slider"></span></span>بلاک پروتکل QUIC شبکه</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیم</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیـم</label>
               </div>
             </div>
           </details>
@@ -385,7 +380,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
                 <label class="fld" style="margin-top:10px;">پیشوند گره‌ها<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
               </div>
               <div class="setting-row" style="margin-top:10px;">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسیرها)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسـیرها)</label>
                 <label class="opt"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS (حذف گواهی)</label>
               </div>
             </div>
@@ -463,7 +458,6 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
   <div class="modal">
     <h3 style="margin-bottom:10px; color:var(--cyan); font-size:1.1rem;" id="qrModalTitle">اسکن QR Code</h3>
     <div id="qrcode"></div>
-    <p class="qr-hint" id="qrHint"></p>
     <button class="danger" style="margin-top:20px; width:100%; min-height:44px;" onclick="document.getElementById('qrModal').classList.remove('active')">بستن پنجره</button>
   </div>
 </div>
@@ -500,21 +494,62 @@ function toast(msg, type=''){
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
 }
 
-/** SAFE CLIPBOARD COPY **/
+/** 🔧 FIXED: SAFE CLIPBOARD COPY WITH FALLBACK **/
 function copyToClipboard(text, onSuccess) {
+  if (!text) {
+    toast('متن برای کپی خالی است', 'err');
+    return;
+  }
+
+  // Method 1: Modern Clipboard API (requires HTTPS or localhost)
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopyTextToClipboard(text, onSuccess));
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        if (onSuccess) onSuccess();
+        toast('متن با موفقیت کپی شد ✅', '');
+      })
+      .catch((err) => {
+        console.warn('Clipboard API failed:', err);
+        // Fallback to execCommand
+        fallbackCopy(text, onSuccess);
+      });
   } else {
-    fallbackCopyTextToClipboard(text, onSuccess);
+    // Method 2: Fallback using execCommand
+    fallbackCopy(text, onSuccess);
   }
 }
-function fallbackCopyTextToClipboard(text, onSuccess) {
-  let textArea = document.createElement("textarea");
+
+function fallbackCopy(text, onSuccess) {
+  // Create a temporary textarea
+  const textArea = document.createElement('textarea');
   textArea.value = text;
-  textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed"; textArea.style.opacity = "0";
+  // Make it invisible but part of the DOM
+  textArea.style.position = 'fixed';
+  textArea.style.top = '-9999px';
+  textArea.style.left = '-9999px';
+  textArea.style.width = '2em';
+  textArea.style.height = '2em';
+  textArea.style.opacity = '0';
+  textArea.style.pointerEvents = 'none';
   document.body.appendChild(textArea);
-  textArea.focus(); textArea.select();
-  try { document.execCommand('copy'); if (onSuccess) onSuccess(); } catch (err) { toast('خطایی در سیستم کپی پیش آمد', 'err'); }
+
+  // Select and copy
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      if (onSuccess) onSuccess();
+      toast('متن با موفقیت کپی شد ✅', '');
+    } else {
+      toast('عملیات کپی با شکست مواجه شد. لطفاً دستی کپی کنید.', 'err');
+    }
+  } catch (err) {
+    console.error('Fallback copy error:', err);
+    toast('خطا در کپی. لطفاً متن را دستی انتخاب و کپی کنید.', 'err');
+  }
+
   document.body.removeChild(textArea);
 }
 
@@ -556,7 +591,6 @@ const BUILTIN_TPLS = {
 let nodes = [], invalidCount = 0;
 let curFmt = 'xray', curTab = 'pretty';
 let textCache = {}, prevTexts = {};
-let analyzeTimer = null;
 
 /** PARSER ENGINE **/
 function tryB64(raw){
@@ -783,7 +817,7 @@ function analyzeInput(){
   nodes = []; invalidCount = 0;
   const seen = new Set();
 
-  lines.forEach((ln) => {
+  lines.forEach((ln, i) => {
     const candidate = cleanExtractedUri(ln);
     if(!candidate || seen.has(candidate)) return;
 
@@ -810,16 +844,16 @@ function analyzeInput(){
 /** NODE RENDERING **/
 function renderNodes(){
   const list = $('nodeList');
-  const q = ($('nodeSearch').value || '').toLowerCase();
+  const q = $('nodeSearch').value.toLowerCase();
   
-  const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || (n.address||'').toLowerCase().includes(q));
+  const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
   
   if(!filtered.length) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">' + (nodes.length ? 'گره‌ای مطابق فیلتر یافت نشد.' : 'لطفا متن ساب‌اسکریپشن را وارد کنید.') + '</div>';
+    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">گره‌ای مطابق فیلتر یافت نشد.</div>';
     return;
   }
   
-  list.innerHTML = filtered.map((n) => {
+  list.innerHTML = filtered.map((n, index) => {
     const uriSafe = encodeURIComponent(n.raw);
     return `
     <div class="node-card">
@@ -829,13 +863,13 @@ function renderNodes(){
       </div>
       <div class="node-remark" title="${escHtml(n.remark)}">${escHtml(n.remark||n.address)}</div>
       <div class="node-meta">
-        <span class="badge">${escHtml(n.address)}:${n.port}</span>
+        <span class="badge">${n.address}:${n.port}</span>
         <span class="badge b-${n.network||'tcp'}">${(n.network||'tcp').toUpperCase()}</span>
         ${n.security==='tls'?'<span class="badge b-tls">TLS</span>':''}
         ${n.security==='reality'?'<span class="badge b-reality">REALITY</span>':''}
       </div>
       <div class="node-actions" style="margin-top:6px;">
-        <button class="primary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمایش QR</button>
+        <button class="primary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمـایش QR</button>
         <button class="danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeNode('${n.id}')">🗑</button>
       </div>
     </div>`;
@@ -845,14 +879,13 @@ function renderNodes(){
 function removeNode(id) { 
   nodes = nodes.filter(n => n.id !== id); 
   renderNodes(); 
-  $('statValid').textContent = faNum(nodes.length);
   $('finalCount').textContent = faNum(nodes.length);
   if(nodes.length === 0) $('stickyBar').style.display = 'none';
 }
 
-$('inputLinks').addEventListener('input', () => { clearTimeout(analyzeTimer); analyzeTimer = setTimeout(analyzeInput, 500); });
+$('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 500); });
 $('nodeSearch').addEventListener('input', renderNodes);
-$('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; deleteTempFile(); });
+$('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; analyzeInput(); });
 
 /** DNS PING TESTER (No-CORS) **/
 const dnsURLs = {
@@ -879,6 +912,7 @@ async function testDnsPings() {
 }
 
 /** TEMP FILE SYSTEM **/
+let tempFileTimer = null;
 let tempFileInterval = null;
 
 function startTempFileTimer(durationMinutes = 5) {
@@ -968,8 +1002,7 @@ $('btnFetch').addEventListener('click', async () => {
 });
 
 function pasteFromClipboard() {
-  if(!navigator.clipboard || !navigator.clipboard.readText) return toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err');
-  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); startTempFileTimer(5); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err'));
+  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err'));
 }
 
 /** ═════ THE CORE: GENERATORS (Xray, Sing-Box, Clash) ═════ **/
@@ -1019,7 +1052,7 @@ function buildXray(list, s) {
       if(n.security === 'reality') {
          ob.streamSettings.realitySettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", publicKey: n.pbk, shortId: n.sid, spiderX: n.spx };
       } else if (n.security === 'tls') {
-         ob.streamSettings.tlsSettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", alpn: n.alpn && n.alpn.length?n.alpn:["http/1.1"] };
+         ob.streamSettings.tlsSettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", alpn: n.alpn.length?n.alpn:["http/1.1"] };
       }
       if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
       else if(n.network === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.serviceName||'grpc' };
@@ -1155,10 +1188,10 @@ function buildClash(list, s) {
 /** DIFF WORKER **/
 function lcsLocal(a,b){
   const n=a.length, m=b.length; if(n*m>4000000) return {tooBig:true};
-  const Wd=m+1, dp=new Uint32Array((n+1)*Wd);
-  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i*Wd+j]=a[i]===b[j]?dp[(i+1)*Wd+j+1]+1:Math.max(dp[(i+1)*Wd+j],dp[i*Wd+j+1]);
+  const W=m+1, dp=new Uint32Array((n+1)*W);
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
   const out=[]; let i=0, j=0;
-  while(i<n&&j<m){ if(a[i]===b[j]){ out.push([0,a[i]]); i++; j++; } else if(dp[(i+1)*Wd+j]>=dp[i*Wd+j+1]){ out.push([-1,a[i]]); i++; } else { out.push([1,b[j]]); j++; } }
+  while(i<n&&j<m){ if(a[i]===b[j]){ out.push([0,a[i]]); i++; j++; } else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){ out.push([-1,a[i]]); i++; } else { out.push([1,b[j]]); j++; } }
   while(i<n) out.push([-1,a[i++]]); while(j<m) out.push([1,b[j++]]);
   return {rows:out};
 }
@@ -1206,6 +1239,7 @@ function processGenerate() {
     $('plainOut').value = outStr;
     renderDiff();
     
+    // Use the fixed copy function
     copyToClipboard(outStr, () => {
       toast('کانفیگ ' + curFmt.toUpperCase() + ' تولید و در کلیپ‌بورد کپی شد ✓');
     });
@@ -1220,7 +1254,7 @@ function processGenerate() {
 
 $('btnConvert').addEventListener('click', processGenerate);
 $('fmtSel').addEventListener('change', processGenerate);
-$('btnCopy').addEventListener('click', (e) => copyConfig(e));
+$('btnCopy').addEventListener('click', copyConfig);
 
 /** TABS **/
 function setTab(t) {
@@ -1243,23 +1277,27 @@ document.querySelectorAll('[data-tpl]').forEach(btn => {
     if(tpl.routing) { $('swAds').checked = !!tpl.routing.blockAds; $('swQuic').checked = !!tpl.routing.blockQuic; $('swIR').checked = tpl.routing.directIR!==false; }
     if(tpl.dns) $('dnsPreset').value = tpl.dns.preset;
     if(tpl.proxy) $('swMux').checked = !!tpl.proxy.mux;
-    toast(`قالب «${btn.textContent.trim()}» با موفقیت اعمال شد.`);
+    toast(`قالب «${btn.textContent}» با موفقیت اعمال شد.`);
   });
 });
 
-/** COPY & MODAL **/
-function copyConfig(e) {
-  if(!textCache[curFmt]) return processGenerate();
+/** 🔧 FIXED: COPY CONFIG WITH PROPER EVENT HANDLING **/
+function copyConfig(event) {
+  const button = event?.currentTarget || $('btnCopy');
+  if (!textCache[curFmt]) {
+    toast('ابتدا کانفیگ را تولید کنید', 'warn');
+    return processGenerate();
+  }
+  const oldText = button.textContent;
   copyToClipboard(textCache[curFmt], () => {
-     const btn = e.currentTarget; const old = btn.textContent;
-     btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 1500);
+    button.textContent = '✅ کپی شد';
+    setTimeout(() => { button.textContent = oldText; }, 2000);
   });
 }
 
 function downloadConfig() {
   if(!textCache[curFmt]) processGenerate();
   const content = textCache[curFmt] || '';
-  if(!content) return toast('محتوایی برای دانلود وجود ندارد', 'warn');
   const meta = {
     xray: ['json', 'application/json'],
     singbox: ['json', 'application/json'],
@@ -1276,40 +1314,15 @@ function downloadConfig() {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  toast('فایل کانفیگ دانلود شد ✓');
 }
 
 function showQrModal(uri = '') {
-  let qrText = '', hint = '';
-
-  if(uri) {
-    try { qrText = decodeURIComponent(uri); } catch(e) { qrText = uri; }
-    hint = 'لینک تک‌گره — قابل اسکن در کلاینت‌ها';
-  } else {
-    if(!nodes.length) return toast('ابتدا گره‌ها را بارگذاری کنید', 'warn');
-    const subText = encodeBase64Safe(nodes.map(n=>n.raw).join('\n'));
-    if(subText.length <= 2500) {
-      qrText = subText;
-      hint = `ساب‌اسکریپشن کامل (${faNum(nodes.length)} گره) — Base64`;
-    } else {
-      qrText = nodes[0].raw;
-      hint = 'حجم لیست زیاد است — QR گره اول نمایش داده می‌شود';
-    }
+  if(!uri) { 
+     if(!textCache[curFmt]) processGenerate(); 
+     uri = encodeURIComponent(textCache[curFmt]); 
   }
-
-  if(!qrText) return toast('محتوایی برای ساخت QR وجود ندارد', 'err');
-  if(typeof QRCode === 'undefined') return toast('کتابخانه QR بارگذاری نشده است', 'err');
-
-  $('qrModalTitle').textContent = uri ? 'اسکن QR گره' : 'اسکن QR ساب‌اسکریپشن';
-  $('qrHint').textContent = hint;
-  $('qrModal').classList.add('active');
-  $('qrcode').innerHTML = '';
-  try {
-    new QRCode($('qrcode'), { text: qrText, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
-  } catch(e) {
-    $('qrcode').innerHTML = '<span style="color:#000;font-size:0.7rem;padding:20px;">خطا در ساخت QR</span>';
-    toast('ساخت QR Code با خطا مواجه شد', 'err');
-  }
+  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
+  new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
 
 // Initial Loading Fallback
