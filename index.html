@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>VLESS ⇢ Xray | تبدیلگر و استودیو کانفیگ</title>
-<!-- Google Fonts & QRCode Lib -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 /* ═══ CSS VARIABLES & THEMES ═══ */
@@ -124,7 +121,7 @@ button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
 .dot-node { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
 .card-body { padding: 16px; display: flex; flex-direction: column; gap: 15px; }
 
-/* ── ACCORDIONS ── */
+/* ── ACCORDIONS (SETTINGS) ── */
 .acc { border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(0,0,0,0.1); overflow: hidden; }
 body.theme-light .acc { background: #f8fafc; }
 .acc summary { cursor: pointer; padding: 12px 14px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; user-select: none; transition: var(--transition); }
@@ -153,8 +150,8 @@ textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); bor
 @keyframes popIn { from{transform:scale(0.95); opacity:0} to{transform:scale(1); opacity:1} }
 
 /* ── OUTPUT SECTION ── */
-.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 99px; padding: 4px; flex-wrap: wrap; width: 100%;}
-.tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 99px; padding: 6px 12px; cursor: pointer; transition: .2s; flex: 1; text-align: center;}
+.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; flex-wrap: wrap; width: 100%;}
+.tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: .2s; flex: 1; text-align: center;}
 .tab.active { color: #fff; background: var(--accent); font-weight: 700; }
 .out-wrap { position: relative; min-height: 380px; flex: 1; display: flex; flex-direction: column; }
 #prettyOut, #plainOut, #diffOut { width: 100%; height: 380px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
@@ -171,6 +168,7 @@ textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); bor
 .node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: var(--transition); cursor: pointer; }
 body.theme-light .node-card { background: #fff; }
 .node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
+.node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); }
 
 .node-head { display: flex; justify-content: space-between; align-items: center; }
 .node-flag { font-size: 1.2rem; }
@@ -196,7 +194,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
 .modal-overlay.active { display: grid; }
 .modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--glass-shadow); }
-#qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; min-height: 200px; align-items: center; }
+#qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
 
 /* TOASTS */
 #toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: 90%; max-width: 340px; }
@@ -204,13 +202,15 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 .toast.show { opacity: 1; transform: none; }
 .toast.warn { border-color: var(--warning); } .toast.err { border-color: var(--danger); }
 
-/* RESPONSIVE */
+/* ── RESPONSIVE MOBILE TWEAKS ── */
 @media (max-width: 850px) {
   header { flex-direction: column; align-items: stretch; gap: 15px; }
   .live-stats { justify-content: space-between; }
   .controls { width: 100%; flex-wrap: wrap; justify-content: stretch; }
+  .controls select { flex: 1; }
   .grid-layout { grid-template-columns: 1fr; }
   .card-header { flex-direction: column; align-items: stretch; }
+  .card-header .controls { flex-direction: row; }
   .setting-row { flex-direction: column; align-items: stretch; }
   .sticky-bar { flex-direction: column; text-align: center; border-radius: 12px; bottom: 10px; padding: 14px; }
   .sticky-buttons { flex-direction: column; width: 100%; }
@@ -247,14 +247,14 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
   <div class="tpl-bar">
     <span class="tpl-lbl">🧩 قالب‌های کاربردی:</span>
-    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هوشمند)</button>
+    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هووشمند)</button>
     <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ / وب</button>
     <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (بدون فیلتر)</button>
   </div>
 
   <div class="grid-layout">
     
-    <!-- LEFT COLUMN -->
+    <!-- ══ INPUT & SETTINGS (LEFT) ══ -->
     <div class="left-col">
       <section class="card">
         <div class="card-header">
@@ -273,7 +273,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
             <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="flex:1;">
             <button class="primary" id="btnFetch" style="width: auto;">⬇ دریافت</button>
           </div>
-          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا trojan:// یا محتوای Base64 را اینجا کپی و پِیست کنید..." spellcheck="false"></textarea>
+          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا کپی و پِیست کنید..." spellcheck="false"></textarea>
         </div>
       </section>
 
@@ -312,7 +312,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
               <div class="setting-row">
                 <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>روشن بودن Observatory</label>
                 <label class="fld">استراتژی تست
-                  <select id="obsStrategy"><option value="leastPing" selected>leastPing (کمترین پینگ)</option><option value="random">random (تصادفی)</option></select>
+                  <select id="obsStrategy"><option value="leastPing" selected>leastPing (اتصال به کمترین پینگ)</option><option value="random">random (تصادفی)</option></select>
                 </label>
               </div>
               <div class="setting-row" style="margin-top:10px;">
@@ -333,12 +333,12 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
             <summary>🧭 قوانین مسیریابی (Routing)</summary>
             <div class="acc-body">
               <div class="setting-row">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی تبلیغات</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی دامنه‌های تبلیغات</label>
                 <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>اتصال سایت‌های ایران به اینترنت</label>
               </div>
               <div class="setting-row" style="margin-top:10px;">
                 <label class="opt"><span class="switch"><input type="checkbox" id="swQuic"><span class="slider"></span></span>بلاک پروتکل QUIC شبکه</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیم</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیـم</label>
               </div>
             </div>
           </details>
@@ -354,7 +354,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
                 <label class="fld" style="margin-top:10px;">پیشوند گره‌ها<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
               </div>
               <div class="setting-row" style="margin-top:10px;">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسیرها)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسـیرها)</label>
                 <label class="opt"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS (حذف گواهی)</label>
               </div>
             </div>
@@ -366,11 +366,11 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
       </section>
     </div>
 
-    <!-- RIGHT COLUMN -->
+    <!-- ══ OUTPUT & NODES (RIGHT) ══ -->
     <div class="right-col">
       <section class="card">
         <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-out"></span> خروجی پردازش شده</span>
+          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته پردازش شده</span>
           <div class="controls" style="flex-direction: column; width: 100%;">
             <div class="tabs">
               <button class="tab active" id="tabPretty">نمایش کد</button>
@@ -382,9 +382,9 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
                 <option value="xray">Xray-core JSON</option>
                 <option value="singbox">Sing-Box JSON</option>
                 <option value="clash">Clash Meta YAML</option>
-                <option value="v2rayn">لیست استاندارد Base64</option>
+                <option value="v2rayn">لیست استاندارد</option>
               </select>
-              <button class="primary" id="btnCopy" style="flex: 1; font-size:0.8rem;" onclick="copyConfig()">📋 کپی متن</button>
+              <button class="primary" id="btnCopy" style="flex: 1; font-size:0.8rem;">📋 کپی متن</button>
             </div>
           </div>
         </div>
@@ -415,10 +415,10 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
   </div>
 </div>
 
-<!-- STICKY ACTION BAR -->
+<!-- STICKY ACTION BAR FOR FAST EXECUTION ON MOBILE DOWN BELOW -->
 <div id="stickyBar" class="sticky-bar">
   <div class="selection-info" style="font-size: 0.95rem;">
-    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره آماده پردازش
+    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره در لیست بازسازی وجود دارد
   </div>
   <div class="sticky-buttons">
     <button onclick="document.getElementById('btnConvert').click();">⚡ ساخت و کپی</button>
@@ -440,18 +440,9 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
 <script>
 "use strict";
-
 const $ = id => document.getElementById(id);
 const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
-const escHtml = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-function safeDecodeURIComponent(str) {
-  try { return decodeURIComponent(str); }
-  catch(e) {
-    try { return unescape(str); }
-    catch(e2) { return str; }
-  }
-}
+const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /** PARTICLES BACKGROUND **/
 const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
@@ -459,10 +450,8 @@ let W, H, particles = [];
 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
 window.addEventListener('resize', resize); resize();
 for(let i=0; i<35; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
-
 function animate() {
-  ctx.clearRect(0,0,W,H); 
-  const accentColor = getComputedStyle(document.body).getPropertyValue('--cyan').trim() || '#22d3ee';
+  ctx.clearRect(0,0,W,H); const accentColor = getComputedStyle(document.body).getPropertyValue('--cyan').trim();
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = accentColor; ctx.globalAlpha = p.a; ctx.fill(); ctx.globalAlpha = 1;
@@ -473,7 +462,7 @@ function animate() {
 function toast(msg, type=''){
   const t = document.createElement('div');
   t.className = 'toast ' + type;
-  t.textContent = (type==='err'?'❌ ': (type==='warn'?'⚠️ ':'✅ ')) + msg;
+  t.textContent = (type==='err'?'❌ ':'') + (type==='warn'?'⚠️ ':'✅ ') + msg;
   $('toasts').appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
@@ -493,13 +482,11 @@ function fallbackCopyTextToClipboard(text, onSuccess) {
   textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed"; textArea.style.opacity = "0";
   document.body.appendChild(textArea);
   textArea.focus(); textArea.select();
-  try { 
-    if(document.execCommand('copy') && onSuccess) onSuccess();
-  } catch (err) { toast('خطایی در سیستم کپی پیش آمد', 'err'); }
+  try { document.execCommand('copy'); if (onSuccess) onSuccess(); } catch (err) { toast('خطایی در سیستم کپی پیش آمد', 'err'); }
   document.body.removeChild(textArea);
 }
 
-/** SAFE BASE64 ENCODE & DECODE **/
+/** SAFE BASE64 ENCODE (Supports UTF-8/Persian remarks) **/
 function encodeBase64Safe(str) {
   const bytes = new TextEncoder().encode(str);
   let bin = '';
@@ -507,25 +494,18 @@ function encodeBase64Safe(str) {
   return btoa(bin);
 }
 
-function tryB64(raw){
-  if(!raw) return null;
-  let s = raw.trim().replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
-  if(!s || !/^[A-Za-z0-9+/=]+$/.test(s)) return null;
-  while(s.length % 4 !== 0) s += '=';
-  try { 
-    return new TextDecoder('utf-8').decode(Uint8Array.from(atob(s), c => c.charCodeAt(0))); 
-  } catch(e){ return null; }
-}
-
 /** THEME **/
 function applyTheme(theme) {
   document.body.className = theme;
   try{ localStorage.setItem('vx_theme', theme); }catch(e){}
 }
-if(localStorage.getItem('vx_theme')) {
-  const t = localStorage.getItem('vx_theme');
-  $('themeSelect').value = t; applyTheme(t);
-}
+try {
+  const savedTheme = localStorage.getItem('vx_theme');
+  if (savedTheme && ['theme-glass','theme-cyber','theme-light'].includes(savedTheme)) {
+    $('themeSelect').value = savedTheme;
+    applyTheme(savedTheme);
+  }
+} catch (e) {}
 
 /** CONSTANTS & PRESETS **/
 const DNS_PRESETS = {
@@ -546,76 +526,216 @@ let curFmt = 'xray', curTab = 'pretty';
 let textCache = {}, prevTexts = {};
 
 /** PARSER ENGINE **/
+function tryB64(raw){
+  const s = String(raw || '').trim().replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
+  if(!s || s.length % 4 === 1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(s)) return null;
+  try {
+    const padded = s + '='.repeat((4 - (s.length % 4)) % 4);
+    const bin = atob(padded);
+    return new TextDecoder('utf-8', { fatal: false }).decode(
+      Uint8Array.from(bin, c => c.charCodeAt(0))
+    );
+  } catch(e) {
+    return null;
+  }
+}
+
+function decodeUriPart(value){
+  try { return decodeURIComponent(value || ''); } catch(e) { return value || ''; }
+}
+
+function cleanExtractedUri(value){
+  let v = String(value || '').trim();
+  v = v.replace(/\\\//g, '/');
+  v = v.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  // Remove surrounding markdown/JSON punctuation, but keep # inside URI.
+  v = v.replace(/^[`"'([{<]+/, '').replace(/[`"')\]}>.,;]+$/g, '');
+  return v.trim();
+}
+
+function extractConfigUris(text){
+  const source = String(text || '').replace(/\r?\n/g, '\n');
+  const found = [];
+  const seen = new Set();
+  const protocols = '(?:vless|vmess|trojan|ss)://';
+  const re = new RegExp(protocols + "[^\\s<>\"\'`]+", "gi");
+
+  for(const match of source.matchAll(re)){
+    const uri = cleanExtractedUri(match[0]);
+    if(!uri || seen.has(uri)) continue;
+    const parsed = parseNodeLine(uri);
+    if(!parsed.error){
+      seen.add(uri);
+      found.push(uri);
+    }
+  }
+  return found;
+}
+
 function resolveInput(raw){
   if(!raw) return '';
-  if(raw.includes('://')) return raw;
-  const d = tryB64(raw); 
-  return (d && d.includes('://')) ? d : raw;
+  const source = String(raw).trim();
+
+  // Important: users may paste prose, JSON, HTML, logs, or a subscription
+  // containing URLs on the same line. Extract the actual configs first.
+  const extracted = extractConfigUris(source);
+  if(extracted.length) return extracted.join('\n');
+
+  // If the whole input is Base64-encoded, decode it and extract again.
+  const decoded = tryB64(source.replace(/^\s+|\s+$/g, ''));
+  if(decoded){
+    const nested = extractConfigUris(decoded);
+    if(nested.length) return nested.join('\n');
+    if(decoded.includes('://')) return decoded;
+  }
+
+  // Plain line-based subscription text as a final fallback.
+  return source;
+}
+
+function parseHostPort(value){
+  const raw = String(value || '').trim();
+  if(!raw) return { address:'', port:0 };
+
+  // IPv6 in [2001:db8::1]:443 form.
+  const m6 = raw.match(/^\[([^\]]+)\](?::(\d+))?$/);
+  if(m6) return { address:m6[1], port: parseInt(m6[2] || '443', 10) || 443 };
+
+  const idx = raw.lastIndexOf(':');
+  if(idx > -1 && /^\d+$/.test(raw.slice(idx + 1))) {
+    return { address: raw.slice(0, idx), port: parseInt(raw.slice(idx + 1), 10) || 443 };
+  }
+  return { address: raw, port: 443 };
 }
 
 function parseNodeLine(line){
   try {
+    line = String(line || '').trim();
+    if(!line) return {error:true};
+
     if(line.startsWith('vless://')){
-      const u = new URL(line); const p = u.searchParams;
-      return { 
-        proto: 'vless', raw: line, uuid: u.username, address: u.hostname, port: parseInt(u.port)||443, 
-        network: p.get('type')||'tcp', security: p.get('security')||'none', path: p.get('path')||'/', 
-        host: p.get('host')||'', sni: p.get('sni')||'', fp: p.get('fp')||'chrome', 
-        alpn: (p.get('alpn')||'').split(',').filter(Boolean), flow: p.get('flow')||'', 
-        pbk: p.get('pbk')||'', sid: p.get('sid')||'', spx: p.get('spx')||'', serviceName: p.get('serviceName')||'', 
-        remark: safeDecodeURIComponent(u.hash.slice(1)) 
+      const u = new URL(line);
+      const p = u.searchParams;
+      const network = (p.get('type') || 'tcp').toLowerCase();
+      const security = (p.get('security') || 'none').toLowerCase();
+
+      return {
+        proto: 'vless',
+        raw: line,
+        uuid: decodeUriPart(u.username),
+        address: u.hostname,
+        port: parseInt(u.port, 10) || 443,
+        network,
+        security,
+        path: p.get('path') || '/',
+        host: p.get('host') || '',
+        sni: p.get('sni') || '',
+        fp: p.get('fp') || 'chrome',
+        alpn: (p.get('alpn') || '').split(',').map(x => x.trim()).filter(Boolean),
+        flow: p.get('flow') || '',
+        pbk: p.get('pbk') || '',
+        sid: p.get('sid') || '',
+        spx: p.get('spx') || '',
+        serviceName: p.get('serviceName') || '',
+        remark: decodeUriPart(u.hash.slice(1))
       };
     }
-    else if(line.startsWith('vmess://')){
-      const decoded = tryB64(line.slice(8));
-      if(!decoded) return {error:true};
-      const json = JSON.parse(decoded);
-      return { 
-        proto: 'vmess', raw: line, uuid: json.id, address: json.add, port: parseInt(json.port), 
-        network: json.net||'tcp', security: json.tls==='tls'?'tls':'none', 
-        sni: json.sni||json.host||json.add, host: json.host||'', path: json.path||'/', remark: json.ps||'' 
+
+    if(line.startsWith('vmess://')){
+      const jsonText = tryB64(line.slice(8));
+      if(!jsonText) return {error:true};
+      const json = JSON.parse(jsonText);
+      if(!json.add || !json.id) return {error:true};
+
+      return {
+        proto: 'vmess',
+        raw: line,
+        uuid: json.id,
+        address: json.add,
+        port: parseInt(json.port, 10) || 443,
+        network: (json.net || 'tcp').toLowerCase(),
+        security: String(json.tls || '').toLowerCase() === 'tls' ? 'tls' : 'none',
+        sni: json.sni || json.host || json.add,
+        host: json.host || '',
+        path: json.path || '/',
+        fp: json.fp || 'chrome',
+        alpn: String(json.alpn || '').split(',').map(x => x.trim()).filter(Boolean),
+        remark: json.ps || ''
       };
     }
-    else if(line.startsWith('trojan://')){
-      const u = new URL(line); const p = u.searchParams;
-      return { 
-        proto: 'trojan', raw: line, uuid: u.username, address: u.hostname, port: parseInt(u.port)||443, 
-        network: p.get('type')||'tcp', security: 'tls', sni: p.get('sni')||u.hostname, 
-        path: p.get('path')||'/', host: p.get('host')||'', remark: safeDecodeURIComponent(u.hash.slice(1)) 
+
+    if(line.startsWith('trojan://')){
+      const u = new URL(line);
+      const p = u.searchParams;
+      return {
+        proto: 'trojan',
+        raw: line,
+        uuid: decodeUriPart(u.username),
+        address: u.hostname,
+        port: parseInt(u.port, 10) || 443,
+        network: (p.get('type') || 'tcp').toLowerCase(),
+        security: 'tls',
+        sni: p.get('sni') || u.hostname,
+        path: p.get('path') || '/',
+        host: p.get('host') || '',
+        remark: decodeUriPart(u.hash.slice(1))
       };
     }
-    else if(line.startsWith('ss://')){
-      const temp = line.slice(5), hashIdx = temp.indexOf('#');
-      const remark = hashIdx > -1 ? safeDecodeURIComponent(temp.slice(hashIdx+1)) : '';
-      let main = hashIdx > -1 ? temp.slice(0, hashIdx) : temp, auth, rest;
-      
-      if(main.includes('@')) {
-        [auth, rest] = main.split('@');
-      } else { 
-        const d = tryB64(main); 
-        if(d && d.includes('@')) [auth, rest] = d.split('@'); 
-        else return {error:true}; 
-      }
-      
-      let method = '', password = '';
-      if(auth.includes(':')) {
-        const firstColon = auth.indexOf(':');
-        method = auth.slice(0, firstColon);
-        password = auth.slice(firstColon + 1);
+
+    if(line.startsWith('ss://')){
+      const temp = line.slice(5);
+      const hashIdx = temp.indexOf('#');
+      const remark = hashIdx > -1 ? decodeUriPart(temp.slice(hashIdx + 1)) : '';
+      const main = hashIdx > -1 ? temp.slice(0, hashIdx) : temp;
+
+      let method = '', password = '', serverPart = '';
+      if(main.includes('@')){
+        // SIP002: ss://method:password@host:port
+        const at = main.lastIndexOf('@');
+        const auth = main.slice(0, at);
+        serverPart = main.slice(at + 1);
+
+        const colon = auth.indexOf(':');
+        if(colon < 1) return {error:true};
+
+        method = decodeUriPart(auth.slice(0, colon));
+        password = decodeUriPart(auth.slice(colon + 1));
+
+        // Some clients still percent/base64 encode the whole userinfo.
+        if(!method || !serverPart) return {error:true};
       } else {
-        const decodedAuth = tryB64(auth);
-        if(decodedAuth && decodedAuth.includes(':')) {
-          const firstColon = decodedAuth.indexOf(':');
-          method = decodedAuth.slice(0, firstColon);
-          password = decodedAuth.slice(firstColon + 1);
-        } else return {error:true};
+        const decoded = tryB64(main);
+        if(!decoded || !decoded.includes('@')) return {error:true};
+
+        const at = decoded.lastIndexOf('@');
+        const auth = decoded.slice(0, at);
+        serverPart = decoded.slice(at + 1);
+
+        const colon = auth.indexOf(':');
+        if(colon < 1) return {error:true};
+
+        method = auth.slice(0, colon);
+        password = auth.slice(colon + 1);
       }
-      
-      const [addr, portStr] = rest.split(':');
-      return { proto: 'ss', raw: line, method, uuid: password, address: addr, port: parseInt(portStr), remark };
+
+      const hp = parseHostPort(serverPart);
+      if(!hp.address || !hp.port || !method) return {error:true};
+
+      return {
+        proto: 'ss',
+        raw: line,
+        method,
+        uuid: password,
+        address: hp.address,
+        port: hp.port,
+        remark
+      };
     }
+
     return {error:true};
-  } catch(e) { return {error:true}; }
+  } catch(e) {
+    return {error:true};
+  }
 }
 
 function detectCountry(remark) {
@@ -623,28 +743,42 @@ function detectCountry(remark) {
   const r = remark.toUpperCase();
   const flags = { 'IR':'🇮🇷', 'DE':'🇩🇪', 'US':'🇺🇸', 'NL':'🇳🇱', 'GB':'🇬🇧', 'FR':'🇫🇷', 'JP':'🇯🇵', 'SG':'🇸🇬', 'TR':'🇹🇷', 'CA':'🇨🇦', 'FI':'🇫🇮' };
   for(const [k,f] of Object.entries(flags)) if(r.includes(k)) return f;
-  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u); return emoji ? emoji[0] : '🌐';
+  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u);
+  return emoji ? emoji[0] : '🌐';
 }
 
 function analyzeInput(){
-  const raw = $('inputLinks').value.trim();
+  const raw = $('inputLinks').value || '';
   const text = resolveInput(raw);
-  const lines = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  
+  const candidates = extractConfigUris(text);
+  const lines = candidates.length
+    ? candidates
+    : text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+
   nodes = []; invalidCount = 0;
-  
+  const seen = new Set();
+
   lines.forEach((ln, i) => {
-    const pr = parseNodeLine(ln);
+    const candidate = cleanExtractedUri(ln);
+    if(!candidate || seen.has(candidate)) return;
+
+    const pr = parseNodeLine(candidate);
     if(pr.error) { invalidCount++; return; }
-    pr.id = 'node_' + i;
+
+    seen.add(candidate);
+    pr.raw = candidate;
+    pr.id = 'node_' + nodes.length;
     pr.flag = detectCountry(pr.remark);
     nodes.push(pr);
   });
 
-  $('statLines').textContent = faNum(lines.length);
+  // If text contained non-config lines, count them as ignored rather than
+  // pretending they are broken configs.
+  const sourceLineCount = raw.split(/\r?\n/).filter(x=>x.trim()).length;
+  $('statLines').textContent = faNum(candidates.length || sourceLineCount);
   $('statValid').textContent = faNum(nodes.length);
   $('statInvalid').textContent = faNum(invalidCount);
-  
+
   renderNodes();
   $('finalCount').textContent = faNum(nodes.length);
   $('stickyBar').style.display = nodes.length > 0 ? 'flex' : 'none';
@@ -654,6 +788,7 @@ function analyzeInput(){
 function renderNodes(){
   const list = $('nodeList');
   const q = $('nodeSearch').value.toLowerCase();
+  
   const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
   
   if(!filtered.length) {
@@ -661,7 +796,7 @@ function renderNodes(){
     return;
   }
   
-  list.innerHTML = filtered.map((n) => {
+  list.innerHTML = filtered.map((n, index) => {
     const uriSafe = encodeURIComponent(n.raw);
     return `
     <div class="node-card">
@@ -676,7 +811,7 @@ function renderNodes(){
         ${n.security==='tls'?'<span class="badge b-tls">TLS</span>':''}
         ${n.security==='reality'?'<span class="badge b-reality">REALITY</span>':''}
       </div>
-      <div class="node-actions">
+      <div class="node-actions" style="margin-top:6px;">
         <button class="primary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمـایش QR</button>
         <button class="danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeNode('${n.id}')">🗑</button>
       </div>
@@ -691,49 +826,47 @@ function removeNode(id) {
   if(nodes.length === 0) $('stickyBar').style.display = 'none';
 }
 
-$('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 400); });
+$('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 500); });
 $('nodeSearch').addEventListener('input', renderNodes);
 $('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; analyzeInput(); });
 
-/** DNS PING TESTER **/
+/** DNS PING TESTER (No-CORS) **/
 const dnsURLs = {
   'Cloudflare': 'https://cloudflare-dns.com/dns-query', 'Google': 'https://dns.google/resolve', 'Quad9': 'https://dns.quad9.net/dns-query',
   'Shecan': 'https://shecan.ir/favicon.ico', 'Electro': 'https://electrotm.org/favicon.ico', 'Radar': 'https://radar.game/favicon.ico'
 };
-
 async function testDnsPings() {
   const btn = $('btnPingDns'); btn.textContent = '⏳ ...'; btn.disabled = true;
   const promises = Object.keys(dnsURLs).map(async (key) => {
     const start = Date.now();
     try {
-      const controller = new AbortController(); 
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 3500);
       await fetch(dnsURLs[key] + "?t=" + start, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-      clearTimeout(timeoutId); 
-      const ping = Date.now() - start;
+      clearTimeout(timeoutId); const ping = Date.now() - start;
       const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
       if(opt) opt.textContent = `${key} (${ping<150?'🟢':(ping<300?'🟡':'🟠')} ${ping}ms)`;
     } catch (e) {
       const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
-      if(opt) opt.textContent = `${key} (❌ مسدود/خطا)`;
+      if(opt) opt.textContent = `${key} (❌ مسدود)`;
     }
   });
-  
   await Promise.allSettled(promises);
-  btn.textContent = '📡 تست DNS'; btn.disabled = false; 
-  toast('تست پینگ سرورهای DNS تمام شد.');
+  btn.textContent = '📡 تست DNS'; btn.disabled = false; toast('تست پینگ سرورهای DNS تمام شد.');
 }
 
 /** TEMP FILE SYSTEM **/
+let tempFileTimer = null;
 let tempFileInterval = null;
 
 function startTempFileTimer(durationMinutes = 5) {
   const expireTime = Date.now() + durationMinutes * 60 * 1000;
+  try { localStorage.setItem('sc_temp_expire', expireTime.toString()); } catch(e) {}
   $('tempFileStatus').style.display = 'flex';
   
   clearInterval(tempFileInterval);
   tempFileInterval = setInterval(() => {
-    const left = expireTime - Date.now();
+    const now = Date.now();
+    const left = expireTime - now;
     if (left <= 0) deleteTempFile(true);
     else {
       const mins = Math.floor(left / 60000).toString().padStart(2, '0');
@@ -743,21 +876,50 @@ function startTempFileTimer(durationMinutes = 5) {
   }, 1000);
 }
 
+function restoreTempFileTimer(){
+  try {
+    const expire = parseInt(localStorage.getItem('sc_temp_expire') || '0', 10);
+    if(!expire) return;
+    const remaining = expire - Date.now();
+    if(remaining <= 0){
+      localStorage.removeItem('sc_temp_expire');
+      return;
+    }
+    $('tempFileStatus').style.display = 'flex';
+    clearInterval(tempFileInterval);
+    tempFileInterval = setInterval(() => {
+      const left = expire - Date.now();
+      if(left <= 0) deleteTempFile(true);
+      else {
+        const mins = Math.floor(left / 60000).toString().padStart(2, '0');
+        const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
+        $('tempTime').textContent = `${mins}:${secs}`;
+      }
+    }, 1000);
+  } catch(e) {}
+}
+
 function deleteTempFile(isAuto = false) {
   clearInterval(tempFileInterval);
   $('tempFileStatus').style.display = 'none';
+  try { localStorage.removeItem('sc_temp_expire'); } catch(e) {}
   $('inputLinks').value = '';
   analyzeInput();
-  if(isAuto) toast("⏰ مهلت فایل موقت ساب‌اسکریپشن به پایان رسید.", 'warn');
+  if(isAuto) toast("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت پاک شد.", 'warn');
 }
 
-/** FETCH SUBSCRIPTION **/
+/** FETCH FROM URL **/
 $('btnFetch').addEventListener('click', async () => {
-  const url = $('subUrl').value.trim(); 
-  if(!url) return toast('آدرس ساب‌اسکریپشن خالی است', 'warn');
+  const url = $('subUrl').value.trim(); if(!url) return toast('آدرس ساب‌اسکریپشن خالی است', 'warn');
+  const btn = $('btnFetch'); btn.textContent = '⏳ در حال دریافت...'; btn.disabled = true;
   
-  const btn = $('btnFetch'); btn.textContent = '⏳ ...'; btn.disabled = true;
-  const proxies = ['', 'https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+  const proxies = [
+    '', 
+    'https://api.allorigins.win/raw?url=',
+    'https://api.codetabs.com/v1/proxy?quest=',
+    'https://corsproxy.io/?'
+  ];
+
   let success = false;
 
   for (let proxy of proxies) {
@@ -767,7 +929,7 @@ $('btnFetch').addEventListener('click', async () => {
       if (!res.ok) continue; 
       
       let text = await res.text();
-      if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html')) {
+      if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html') && !text.trim().toLowerCase().startsWith('<!doctype')) {
         $('inputLinks').value = text;
         analyzeInput();
         startTempFileTimer(5);
@@ -775,24 +937,18 @@ $('btnFetch').addEventListener('click', async () => {
         success = true;
         break; 
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
-  if (!success) toast('دریافت با خطا مواجه شد. لطفاً متن را دستی وارد کنید.', 'err');
+  if (!success) toast('دریافت با خطا مواجه شد. لطفاً متن ساب را دستی پیست کنید.', 'err');
   btn.textContent = '⬇ دریافت'; btn.disabled = false;
 });
 
 function pasteFromClipboard() {
-  if (navigator.clipboard && navigator.clipboard.readText) {
-    navigator.clipboard.readText().then(text => { 
-      $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); 
-    }).catch(() => toast('دسترسی به کلیپ‌بورد محدود است.', 'err'));
-  } else {
-    toast('مرورگر شما از پیست مستقیم پشتیبانی نمی‌کند.', 'err');
-  }
+  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err'));
 }
 
-/** ═════ GENERATORS (Xray, Sing-Box, Clash) ═════ **/
+/** ═════ THE CORE: GENERATORS (Xray, Sing-Box, Clash) ═════ **/
 function getSettings() {
   return {
     prefix: $('prefix').value.trim()||'proxy-', mux: $('swMux').checked, allowInsecure: $('swInsecure').checked,
@@ -805,11 +961,8 @@ function getSettings() {
 
 function buildXray(list, s) {
   const rules = [];
-  const defaultOutbound = list.length > 0 ? (s.prefix + '1') : 'direct';
-  const targetRule = s.obs.enabled ? { balancerTag: 'proxy-round' } : { outboundTag: defaultOutbound };
-
   if(s.routing.blockQuic) rules.push({network:'udp', outboundTag:'block', port:'443', type:'field'});
-  rules.push({...targetRule, domain:['geosite:google'], type:'field'});
+  rules.push({balancerTag:'proxy-round', domain:['geosite:google'], type:'field'});
   
   if(s.routing.directPrivate) {
      rules.push({ip:['geoip:private'], outboundTag:'direct', type:'field'});
@@ -821,20 +974,19 @@ function buildXray(list, s) {
   }
   
   rules.push({inboundTag:['domestic-dns'], outboundTag:'direct', type:'field'});
-  rules.push({...targetRule, inboundTag:['dns-module'], type:'field'});
-  rules.push({...targetRule, network:'tcp,udp', type:'field'});
+  rules.push({balancerTag:'proxy-round', inboundTag:['dns-module'], type:'field'});
+  rules.push({balancerTag:'proxy-round', network:'tcp,udp', type:'field'});
 
   const primaryDns = s.dns[0] || "1.1.1.1";
 
   const outbounds = list.map((n, i) => {
     const ob = { 
+      mux: { concurrency: s.mux ? 8 : -1, enabled: !!s.mux },
       protocol: n.proto, 
       settings: {}, 
       streamSettings: { network: n.network||'tcp', security: n.security||'none' },
       tag: s.prefix + (i + 1)
     };
-
-    if (s.mux) ob.mux = { enabled: true, concurrency: 8 };
     
     if(n.proto === 'vless'){
       ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ encryption: "none", id: n.uuid, level: 8 }] }];
@@ -849,7 +1001,7 @@ function buildXray(list, s) {
       else if(n.network === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.serviceName||'grpc' };
     } 
     else if(n.proto === 'vmess'){
-      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, alterId: 0, security: "auto", level: 8 }] }];
+      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, alterId: 0, level: 8 }] }];
       if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp||"chrome" };
       if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
     }
@@ -858,16 +1010,17 @@ function buildXray(list, s) {
       if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp||"chrome" };
       if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
     }
-    else if(n.proto === 'ss'){ 
-      ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.uuid, level: 8 }]; 
-    }
+    else if(n.proto === 'ss'){ ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.uuid, level: 8 }]; }
     
     return ob;
   });
 
   const dnsHosts = {
-    "dns.cloudflare.com": ["104.16.132.229", "104.16.133.229"],
-    "dns.google": ["8.8.8.8", "8.8.4.4"]
+    "domain:googleapis.cn": "googleapis.com",
+    "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
+    "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
+    "dns.cloudflare.com": ["104.16.132.229", "104.16.133.229", "2606:4700::6810:84e5", "2606:4700::6810:85e5"],
+    "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"]
   };
 
   const cfg = {
@@ -876,23 +1029,24 @@ function buildXray(list, s) {
       servers: [
         primaryDns,
         { address: primaryDns, domains: ["geosite:google"] },
-        { address: "223.5.5.5", domains: ["geosite:cn"], expectIPs: ["geoip:cn"], skipFallback: true, tag: "domestic-dns" }
+        { address: "223.5.5.5", domains: ["domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "geosite:cn"], expectIPs: ["geoip:cn"], skipFallback: true, tag: "domestic-dns" }
       ],
       tag: "dns-module"
     },
     inbounds: [
-      { listen: '127.0.0.1', port: s.inbound.socksPort, protocol: 'socks', settings: { auth: "noauth", udp: true }, sniffing: { destOverride: ['http','tls'], enabled: true }, tag: 'socks' },
+      { listen: '127.0.0.1', port: s.inbound.socksPort, protocol: 'socks', settings: { auth: "noauth", udp: true, userLevel: 8 }, sniffing: { destOverride: ['http','tls'], enabled: true, routeOnly: false }, tag: 'socks' },
       { listen: '127.0.0.1', port: s.inbound.httpPort, protocol: 'http', tag: 'http-in' }
     ],
     log: { loglevel: "warning" },
+    observatory: { enableConcurrency: true, probeInterval: s.obs.interval, probeUrl: s.obs.probe, subjectSelector: [s.prefix] },
     outbounds: [...outbounds, {protocol:'freedom', settings:{domainStrategy:"UseIP"}, tag:'direct'}, {protocol:'blackhole', settings:{response:{type:"http"}}, tag:'block'}],
-    routing: { domainStrategy: 'AsIs', rules: rules }
+    policy: { levels: { "8": { connIdle: 300, downlinkOnly: 1, handshake: 4, uplinkOnly: 1 } }, system: { statsOutboundDownlink: true, statsOutboundUplink: true } },
+    remarks: "V⇢X Intelligent Config",
+    routing: { balancers: [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }], domainStrategy: 'AsIs', rules: rules },
+    stats: {}
   };
   
-  if (s.obs.enabled) {
-    cfg.observatory = { enableConcurrency: true, probeInterval: s.obs.interval, probeUrl: s.obs.probe, subjectSelector: [s.prefix] };
-    cfg.routing.balancers = [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }];
-  }
+  if(!s.obs.enabled) delete cfg.observatory;
   
   return cfg;
 }
@@ -902,14 +1056,16 @@ function buildSingBox(list, s) {
   const outbounds = list.map((n,i) => {
     const ob = { type: n.proto, tag: s.prefix + (i+1), server: n.address, server_port: n.port };
     if(n.proto === 'vless' || n.proto === 'vmess') ob.uuid = n.uuid;
-    if(n.proto === 'trojan' || n.proto === 'ss') ob.password = n.uuid;
-    if(n.proto === 'ss') ob.method = n.method;
+    if(n.proto === 'trojan') ob.password = n.uuid;
+    if(n.proto === 'ss') { ob.method = n.method; ob.password = n.uuid; }
     
     if(n.flow) ob.flow = n.flow;
     if(n.security === 'tls' || n.security === 'reality') {
       ob.tls = { enabled: true, server_name: n.sni, insecure: s.allowInsecure };
       if(n.security === 'reality') ob.tls.reality = { enabled: true, public_key: n.pbk, short_id: n.sid };
-      if(n.fp) ob.tls.utls = { enabled: true, fingerprint: n.fp };
+      if(n.fp && (n.security === 'tls' || n.security === 'reality')) {
+        ob.tls.utls = { enabled: true, fingerprint: n.fp };
+      }
     }
     if(n.network === 'ws') ob.transport = { type: 'ws', path: n.path||'/', headers: {Host: n.host||n.sni||n.address} };
     else if(n.network === 'grpc') ob.transport = { type: 'grpc', service_name: n.serviceName||'grpc' };
@@ -919,48 +1075,51 @@ function buildSingBox(list, s) {
   return {
     log: { level: "warn" },
     dns: { servers: [{ address: s.dns[0], tag: 'dns-main' }], rules: [{ outbound: 'any', server: 'dns-main' }] },
-    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: s.inbound.socksPort }],
+    inbounds: [{
+      type: 'mixed',
+      tag: 'mixed-in',
+      listen: '127.0.0.1',
+      listen_port: s.inbound.socksPort
+    }, {
+      type: 'http',
+      tag: 'http-in',
+      listen: '127.0.0.1',
+      listen_port: s.inbound.httpPort
+    }],
     outbounds: [
       ...outbounds,
-      ...(tags.length ? [{ type: 'urltest', tag: 'auto', outbounds: tags, url: s.obs.probe, interval: s.obs.interval }] : []),
+      { type: 'urltest', tag: 'auto', outbounds: tags, url: s.obs.probe, interval: s.obs.interval },
       { type: 'direct', tag: 'direct' }, { type: 'block', tag: 'block' }
     ],
     route: { rules: [
       { protocol: 'dns', outbound: 'direct' },
-      ...(s.routing.blockAds ? [{ geosite: 'category-ads-all', outbound: 'block' }] : []),
-      ...(s.routing.directIR ? [{ geoip: ['ir'], geosite: ['ir'], outbound: 'direct' }] : []),
+      ...(s.routing.blockAds ? [{ rule_set: 'geosite-category-ads-all', outbound: 'block' }] : []),
+      ...(s.routing.directIR ? [{ rule_set: ['geoip-ir', 'geosite-ir'], outbound: 'direct' }] : []),
       { network: 'udp', port: 443, outbound: 'block' }
-    ], final: tags.length ? 'auto' : 'direct' }
+    ], final: 'auto' }
   };
 }
 
 function buildClash(list, s) {
   const L = []; const p = x => L.push(x);
-  p('port: ' + s.inbound.httpPort);
-  p('socks-port: ' + s.inbound.socksPort);
-  p('mode: rule'); 
-  p('allow-lan: false');
+  p('mixed-port: ' + s.inbound.socksPort); p('mode: rule'); p('allow-lan: false');
   p('dns:\n  enable: true\n  enhanced-mode: fake-ip\n  nameserver:\n    - '+s.dns[0]);
   p('proxies:');
-  
   list.forEach((n,i) => {
     const tag = s.prefix + (i+1);
-    p(`  - name: "${tag}"\n    type: ${n.proto}\n    server: ${n.address}\n    port: ${n.port}\n    ${n.proto==='ss'?'password':'uuid'}: "${n.uuid}"`);
-    if(n.proto==='ss') p(`    cipher: ${n.method}`);
-    if(n.proto==='vless') p(`    network: ${n.network==='grpc'?'grpc':(n.network==='ws'?'ws':'tcp')}`);
-    if(n.flow) p(`    flow: ${n.flow}`);
+    p('  - name: "'+tag+'"\n    type: '+n.proto+'\n    server: '+n.address+'\n    port: '+n.port+'\n    '+(n.proto==='ss'?'password':'uuid')+': "'+n.uuid+'"');
+    if(n.proto==='vless') p('    network: '+(n.network==='grpc'?'grpc':(n.network==='ws'?'ws':'tcp')));
+    if(n.flow) p('    flow: '+n.flow);
     if(n.security==='tls' || n.security==='reality'){
-      p(`    tls: true\n    servername: "${n.sni}"`);
+      p('    tls: true\n    servername: "'+n.sni+'"');
       if(s.allowInsecure) p('    skip-cert-verify: true');
-      if(n.security==='reality') p(`    reality-opts:\n      public-key: ${n.pbk}${n.sid?'\n      short-id: '+n.sid:''}`);
+      if(n.security==='reality') p('    reality-opts:\n      public-key: '+n.pbk+(n.sid?'\n      short-id: '+n.sid:''));
     }
-    if(n.network==='ws') p(`    ws-opts:\n      path: "${n.path||'/'}"\n      headers:\n        Host: "${n.host||n.sni||n.address}"`);
-    else if(n.network==='grpc') p(`    grpc-opts:\n      grpc-service-name: "${n.serviceName||'grpc'}"`);
+    if(n.network==='ws') p('    ws-opts:\n      path: "'+(n.path||'/')+'"'+'\n      headers:\n        Host: '+(n.host||n.sni||n.address));
+    else if(n.network==='grpc') p('    grpc-opts:\n      grpc-service-name: "'+(n.serviceName||'grpc')+'"');
   });
-  
   p('proxy-groups:\n  - name: AUTO\n    type: url-test\n    url: '+s.obs.probe+'\n    interval: 180\n    proxies:');
   list.forEach((n,i) => p('      - "'+(s.prefix + (i+1))+'"'));
-  
   p('rules:');
   if(s.routing.blockAds) p('  - GEOSITE,category-ads-all,REJECT');
   if(s.routing.directIR) { p('  - GEOIP,IR,DIRECT'); p('  - GEOSITE,IR,DIRECT'); }
@@ -969,9 +1128,9 @@ function buildClash(list, s) {
   return L.join('\n');
 }
 
-/** DIFF ENGINE **/
+/** DIFF WORKER **/
 function lcsLocal(a,b){
-  const n=a.length, m=b.length; if(n*m>1000000) return {tooBig:true};
+  const n=a.length, m=b.length; if(n*m>4000000) return {tooBig:true};
   const W=m+1, dp=new Uint32Array((n+1)*W);
   for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
   const out=[]; let i=0, j=0;
@@ -979,28 +1138,28 @@ function lcsLocal(a,b){
   while(i<n) out.push([-1,a[i++]]); while(j<m) out.push([1,b[j++]]);
   return {rows:out};
 }
-
 function renderDiff(){
   const box=$('diffOut'), cur=textCache[curFmt]||'', prev=prevTexts[curFmt];
   if(!cur){ box.innerHTML = '<span class="d-ctx">// خروجی فعلی خالی است</span>'; return; }
-  if(!prev){ box.innerHTML = '<span class="d-ctx">// برای مقایسه: تغییراتی در تنظیمات دهید و دوباره تولید کنید.</span>'; return; }
+  if(!prev){ box.innerHTML = '<span class="d-ctx">// برای مقایسه: تنظیمات را تغییر دهید و دوباره تولید کنید. <br> <span style="color:#86efac">سبز = اضافه شده</span> | <span style="color:#fda4af">قرمز = حذف شده</span></span>'; return; }
   if(cur === prev){ box.innerHTML = '<span style="color:#86efac">✔ هیچ تغییری نسبت به نسخه قبل وجود ندارد.</span>'; return; }
   const res = lcsLocal(prev.split('\n'), cur.split('\n'));
   if(res.tooBig){ box.innerHTML='<span style="color:#f59e0b">⚠ حجم فایل برای مقایسه بیش از حد بزرگ است.</span>'; return; }
-  box.innerHTML = res.rows.slice(0, 2000).map(r => {
+  box.innerHTML = res.rows.slice(0, 4000).map(r => {
     const t = escHtml(r[1])||'&nbsp;';
     return r[0]===0 ? '<span class="d-ctx">  '+t+'</span>' : (r[0]===1 ? '<span class="d-add">+ '+t+'</span>' : '<span class="d-del">- '+t+'</span>');
   }).join('');
 }
 
-/** SYNTAX HIGHLIGHT **/
+/** GENERATE & RENDER **/
 function syntaxHighlight(str, fmt) {
   let esc = escHtml(str);
-  if(fmt==='xray' || fmt==='singbox') {
-    return esc.replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?)/g, m => {
-      return `<span class="${m.startsWith('"') ? (/"\s*:$/.test(m) ? 'tok-key' : 'tok-str') : (/[a-z]/.test(m) ? 'tok-bool' : 'tok-num')}">${m}</span>`;
-    });
-  }
+  if(fmt==='xray' || fmt==='singbox') return esc.replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g, m => {
+    return `<span class="${m.startsWith('"') ? (/"\s*:$/.test(m) ? 'tok-key' : 'tok-str') : (/[a-z]/.test(m) ? 'tok-bool' : 'tok-num')}">${m}</span>`;
+  });
+  if(fmt==='clash') return esc.replace(/^(\s*-\s)|^([A-Za-z][\w-]*:)|(\s{2,})([A-Za-z][\w-]*:)/gm, (m,a,b,i,d) => {
+    if(a) return `<span class="tok-bool">${a}</span>`; if(b) return `<span class="tok-key">${b}</span>`; return `${i}<span class="tok-key">${d}</span>`;
+  });
   return `<span style="color:#86efac">${esc}</span>`;
 }
 
@@ -1024,17 +1183,21 @@ function processGenerate() {
     renderDiff();
     
     copyToClipboard(outStr, () => {
-      toast('کانفیگ ' + curFmt.toUpperCase() + ' تولید و کپی شد ✓');
+      toast('کانفیگ ' + curFmt.toUpperCase() + ' تولید و در کلیپ‌بورد کپی شد ✓');
     });
+    
+    // Auto scroll down for user logic tracking in small screens
+    if (window.innerWidth <= 850) $('fmtSel').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch(e) {
-    toast('خطایی در تولید کانفیگ پیش آمد.', 'err');
+    toast('خطایی در تولید کانفیگ پیش آمد. مجدداً ساب خود را وارد کنید.', 'err');
     console.error(e);
   }
 }
 
 $('btnConvert').addEventListener('click', processGenerate);
 $('fmtSel').addEventListener('change', processGenerate);
+$('btnCopy').addEventListener('click', (e) => copyConfig(e));
 
 /** TABS **/
 function setTab(t) {
@@ -1049,7 +1212,7 @@ $('tabPretty').addEventListener('click',()=>setTab('pretty'));
 $('tabPlain').addEventListener('click',()=>setTab('plain'));
 $('tabDiff').addEventListener('click',()=>setTab('diff'));
 
-/** TEMPLATES **/
+/** APPLY TEMPLATES **/
 document.querySelectorAll('[data-tpl]').forEach(btn => {
   btn.addEventListener('click', () => {
     const tpl = BUILTIN_TPLS[btn.dataset.tpl];
@@ -1057,40 +1220,52 @@ document.querySelectorAll('[data-tpl]').forEach(btn => {
     if(tpl.routing) { $('swAds').checked = !!tpl.routing.blockAds; $('swQuic').checked = !!tpl.routing.blockQuic; $('swIR').checked = tpl.routing.directIR!==false; }
     if(tpl.dns) $('dnsPreset').value = tpl.dns.preset;
     if(tpl.proxy) $('swMux').checked = !!tpl.proxy.mux;
-    toast(`قالب «${btn.textContent}» اعمال شد.`);
+    toast(`قالب «${btn.textContent}» با موفقیت اعمال شد.`);
   });
 });
 
-/** ACTIONS & MODAL **/
-function copyConfig() {
-  if(!textCache[curFmt]) processGenerate();
-  else copyToClipboard(textCache[curFmt], () => toast('کپی شد ✓'));
+/** COPY & MODAL **/
+function copyConfig(e) {
+  if(!textCache[curFmt]) return processGenerate();
+  copyToClipboard(textCache[curFmt], () => {
+     const btn = e.target; const old = btn.textContent;
+     btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 1500);
+  });
 }
 
 function downloadConfig() {
   if(!textCache[curFmt]) processGenerate();
-  const blob = new Blob([textCache[curFmt]], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  const ext = (curFmt==='clash'?'yaml':(curFmt==='v2rayn'?'txt':'json'));
-  a.download = `config_${curFmt}_${Date.now()}.${ext}`; a.click(); URL.revokeObjectURL(a.href);
+  const content = textCache[curFmt] || '';
+  const meta = {
+    xray: ['json', 'application/json'],
+    singbox: ['json', 'application/json'],
+    clash: ['yaml', 'text/yaml;charset=utf-8'],
+    v2rayn: ['txt', 'text/plain;charset=utf-8']
+  }[curFmt] || ['txt', 'text/plain;charset=utf-8'];
+
+  const blob = new Blob([content], { type: meta[1] });
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `config_${curFmt}_${Date.now()}.${meta[0]}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function showQrModal(uri = '') {
-  let textToQr = uri;
-  if(!textToQr) { 
+  if(!uri) { 
      if(!textCache[curFmt]) processGenerate(); 
-     textToQr = textCache[curFmt]; 
+     uri = encodeURIComponent(textCache[curFmt]); 
   }
-  
-  if(textToQr.length > 1200) {
-    toast('حجم کانفیگ برای اسکن QR بسیار زیاد است. از دکمه کپی استفاده کنید.', 'warn');
-    return;
-  }
-  
-  $('qrModal').classList.add('active'); 
-  $('qrcode').innerHTML = '';
-  new QRCode($('qrcode'), { text: decodeURIComponent(textToQr), width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff" });
+  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
+  new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
+
+// Initial Loading Fallback
+$('plainOut').value = '';
+restoreTempFileTimer();
 </script>
 </body>
 </html>
