@@ -2,13 +2,13 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VLESS ⇢ Xray | استودیو خروجی‌گیر کانفیگ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VLESS ⇢ Xray | تبدیلگر و استودیو کانفیگ</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 /* ═══ CSS VARIABLES & THEMES ═══ */
 :root {
-  --font-body: 'Vazirmatn', system-ui, sans-serif;
+  --font-body: 'Vazirmatn', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -68,7 +68,7 @@ body.theme-light {
 body { font-family: var(--font-body); background: var(--bg-color); background-image: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; }
 #canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
@@ -76,21 +76,21 @@ body { font-family: var(--font-body); background: var(--bg-color); background-im
 .container { max-width: 1280px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
 /* ── HEADER ── */
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px 24px; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); flex-wrap: wrap; gap: 15px;}
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px 24px; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); flex-wrap: wrap; gap: 15px;}
 .brand { display: flex; align-items: center; gap: 12px; }
-.logo { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--success)); display: grid; place-items: center; font-weight: bold; color: #fff; font-family: var(--font-mono); font-size: 1.1rem; box-shadow: 0 0 15px rgba(34,211,238,.3); }
-.brand h1 { font-size: 1.3rem; font-weight: 700; line-height: 1.2; }
-.brand .tag { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+.logo { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--success)); display: grid; place-items: center; font-weight: bold; color: #fff; font-family: var(--font-mono); font-size: 1.1rem; box-shadow: 0 0 15px rgba(34,211,238,.3); flex-shrink: 0;}
+.brand h1 { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+.brand .tag { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
 
-.live-stats { display: flex; gap: 10px; flex-wrap: wrap; }
-.stat-box { padding: 8px 12px; border-radius: 12px; text-align: center; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); min-width: 80px; }
+.live-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat-box { padding: 6px 12px; border-radius: 10px; text-align: center; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); flex: 1; min-width: 70px; }
 body.theme-light .stat-box { background: #fff; }
-.stat-box b { display: block; font-family: var(--font-mono); font-size: 1.1rem; color: var(--cyan); }
-.stat-box span { font-size: 0.7rem; color: var(--text-secondary); }
+.stat-box b { display: block; font-family: var(--font-mono); font-size: 1rem; color: var(--cyan); }
+.stat-box span { font-size: 0.65rem; color: var(--text-secondary); }
 
-.controls { display: flex; gap: 10px; align-items: center; }
-button, select, input[type="text"], input[type="number"] { font-family: var(--font-body); background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.85rem; }
-body.theme-light button:not(.primary), body.theme-light select, body.theme-light input { background: #fff; }
+.controls { display: flex; gap: 10px; align-items: center; width: auto; }
+button, select, input[type="text"], input[type="number"] { font-family: var(--font-body); background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.85rem; width: 100%; }
+body.theme-light button:not(.primary, .danger), body.theme-light select, body.theme-light input { background: #fff; }
 button:hover:not(:disabled), select:hover, input:hover { border-color: var(--cyan); }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -105,54 +105,53 @@ button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
 
 /* ── TEMPLATES ── */
 .tpl-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 18px; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 14px; margin-bottom: 20px; backdrop-filter: blur(20px); }
-.tpl-lbl { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
-.tpl-chip { font-size: 0.75rem; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--glass-border); background: var(--code-bg); color: var(--text-primary); cursor: pointer; transition: var(--transition); }
+.tpl-lbl { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); width: auto; }
+.tpl-chip { font-size: 0.75rem; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--glass-border); background: var(--code-bg); color: var(--text-primary); cursor: pointer; transition: var(--transition); flex-grow: 1; text-align: center; }
 .tpl-chip:hover { border-color: var(--cyan); color: var(--cyan); }
 
 /* ── MAIN LAYOUT ── */
 .grid-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
-@media (max-width: 1000px) { .grid-layout { grid-template-columns: 1fr; } }
 
 .card { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--glass-shadow); margin-bottom: 20px; }
 .card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--glass-border); background: rgba(128,160,200,.04); flex-wrap: wrap; gap: 10px; }
-.card-title { font-weight: 700; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.card-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
 .p-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .dot-in { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
 .dot-out { background: var(--success); box-shadow: 0 0 10px var(--success); }
 .dot-node { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
-.card-body { padding: 18px; display: flex; flex-direction: column; gap: 15px; }
+.card-body { padding: 16px; display: flex; flex-direction: column; gap: 15px; }
 
 /* ── ACCORDIONS (SETTINGS) ── */
 .acc { border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(0,0,0,0.1); overflow: hidden; }
 body.theme-light .acc { background: #f8fafc; }
-.acc summary { cursor: pointer; padding: 12px 16px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; user-select: none; transition: var(--transition); }
+.acc summary { cursor: pointer; padding: 12px 14px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; user-select: none; transition: var(--transition); }
 .acc summary:hover { color: var(--cyan); }
-.acc-body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
-.setting-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
-.fld { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); flex: 1; min-width: 120px; }
-.opt { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; }
+.acc-body { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.setting-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.fld { display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); flex: 1; min-width: 130px; }
+.opt { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; flex: 1; min-width: 140px;}
 
 /* CSS Toggle Switch */
-.switch { position: relative; width: 40px; height: 22px; display: inline-block; }
+.switch { position: relative; width: 40px; height: 22px; display: inline-block; flex-shrink: 0; }
 .switch input { display: none; }
 .slider { position: absolute; inset: 0; background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border); border-radius: 99px; transition: .3s; }
 .slider::before { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; top: 3px; right: 4px; background: var(--text-secondary); transition: .3s; }
 .switch input:checked + .slider { background: rgba(34,211,238,.2); border-color: var(--cyan); }
 .switch input:checked + .slider::before { transform: translateX(-18px); background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
 
-textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; resize: vertical; direction: ltr; line-height: 1.5; }
+textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.75rem; resize: vertical; direction: ltr; line-height: 1.5; }
 
 #tempFileStatus {
   display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger);
-  color: var(--danger); padding: 10px 16px; border-radius: 8px; margin-bottom: 8px;
-  align-items: center; justify-content: space-between; font-size: 0.9rem; font-weight: 600;
+  color: var(--danger); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;
+  align-items: center; justify-content: space-between; font-size: 0.8rem; font-weight: 600;
   animation: popIn 0.3s ease;
 }
 @keyframes popIn { from{transform:scale(0.95); opacity:0} to{transform:scale(1); opacity:1} }
 
 /* ── OUTPUT SECTION ── */
-.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; }
-.tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 4px 12px; cursor: pointer; transition: .2s; }
+.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; flex-wrap: wrap; width: 100%;}
+.tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: .2s; flex: 1; text-align: center;}
 .tab.active { color: #fff; background: var(--accent); font-weight: 700; }
 .out-wrap { position: relative; min-height: 380px; flex: 1; display: flex; flex-direction: column; }
 #prettyOut, #plainOut, #diffOut { width: 100%; height: 380px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
@@ -165,7 +164,7 @@ textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); bor
 .d-ctx { display: block; opacity: 0.6; }
 
 /* ── NODES GRID ── */
-.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
+.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
 .node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: var(--transition); cursor: pointer; }
 body.theme-light .node-card { background: #fff; }
 .node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
@@ -175,7 +174,7 @@ body.theme-light .node-card { background: #fff; }
 .node-flag { font-size: 1.2rem; }
 .node-remark { font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
 .node-meta { display: flex; gap: 5px; flex-wrap: wrap; font-size: 0.65rem; font-family: var(--font-mono); align-items: center; }
-.badge { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--glass-border); }
+.badge { padding: 3px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--glass-border); }
 
 .b-ws { color: var(--cyan); border-color: rgba(34,211,238,.4); }
 .b-grpc { color: #a78bfa; border-color: rgba(167,139,250,.4); }
@@ -187,20 +186,36 @@ body.theme-light .node-card { background: #fff; }
 body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
 /* STICKY BAR */
-.sticky-bar { position: sticky; bottom: 20px; z-index: 50; background: var(--bg-color); backdrop-filter: blur(20px); border: 1px solid var(--accent); border-radius: 16px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; }
+.sticky-bar { position: sticky; bottom: 15px; z-index: 50; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--accent); border-radius: 16px; padding: 12px 20px; display: none; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.sticky-buttons { display: flex; gap: 10px; }
 @keyframes slideUp { from{transform:translateY(100%); opacity:0} to{transform:none; opacity:1} }
 
 /* QR MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
 .modal-overlay.active { display: grid; }
-.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: var(--glass-shadow); }
+.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--glass-shadow); }
 #qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
 
 /* TOASTS */
-#toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none;}
-.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 10px 20px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; transform: translateY(15px); transition: all 0.3s; }
+#toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: 90%; max-width: 340px; }
+.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; transform: translateY(15px); transition: all 0.3s; width: 100%; text-align: center; }
 .toast.show { opacity: 1; transform: none; }
 .toast.warn { border-color: var(--warning); } .toast.err { border-color: var(--danger); }
+
+/* ── RESPONSIVE MOBILE TWEAKS ── */
+@media (max-width: 850px) {
+  header { flex-direction: column; align-items: stretch; gap: 15px; }
+  .live-stats { justify-content: space-between; }
+  .controls { width: 100%; flex-wrap: wrap; justify-content: stretch; }
+  .controls select { flex: 1; }
+  .grid-layout { grid-template-columns: 1fr; }
+  .card-header { flex-direction: column; align-items: stretch; }
+  .card-header .controls { flex-direction: row; }
+  .setting-row { flex-direction: column; align-items: stretch; }
+  .sticky-bar { flex-direction: column; text-align: center; border-radius: 12px; bottom: 10px; padding: 14px; }
+  .sticky-buttons { flex-direction: column; width: 100%; }
+  .sticky-buttons button { width: 100%; padding: 12px; font-size: 1rem; }
+}
 </style>
 </head>
 <body class="theme-glass">
@@ -213,28 +228,28 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
       <div class="logo">V⇢X</div>
       <div>
         <h1>VLESS ⇢ Xray Studio</h1>
-        <p class="tag">تبدیل‌گر قدرتمند با ساختار اختصاصی Xray</p>
+        <p class="tag">تبدیل‌گر قدرتمند با خروجی اختصاصی</p>
       </div>
     </div>
     <div class="live-stats">
-      <div class="stat-box"><b id="statLines">۰</b><span>خط ورودی</span></div>
-      <div class="stat-box"><b id="statValid" style="color:var(--success)">۰</b><span>معتبر</span></div>
+      <div class="stat-box"><b id="statLines">۰</b><span>ورودی</span></div>
+      <div class="stat-box"><b id="statValid" style="color:var(--success)">۰</b><span>سالم</span></div>
       <div class="stat-box"><b id="statInvalid" style="color:var(--danger)">۰</b><span>نامعتبر</span></div>
     </div>
     <div class="controls">
       <select id="themeSelect" onchange="applyTheme(this.value)">
-        <option value="theme-glass">🌙 Glass Dark</option>
-        <option value="theme-cyber">🤖 Cyberpunk</option>
-        <option value="theme-light">☀️ Clean Light</option>
+        <option value="theme-glass">🌙 تم تیره شیشه‌ای</option>
+        <option value="theme-cyber">🤖 تم سایبرپانک</option>
+        <option value="theme-light">☀️ تم روز (روشن)</option>
       </select>
     </div>
   </header>
 
   <div class="tpl-bar">
-    <span class="tpl-lbl">🧩 قالب‌های آماده:</span>
-    <button class="tpl-chip" data-tpl="intelligent">🧠 انتخاب هوشمند (تعادل)</button>
-    <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ</button>
-    <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (ساده)</button>
+    <span class="tpl-lbl">🧩 قالب‌های کاربردی:</span>
+    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هووشمند)</button>
+    <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ / وب</button>
+    <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (بدون فیلتر)</button>
   </div>
 
   <div class="grid-layout">
@@ -245,25 +260,25 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
         <div class="card-header">
           <span class="card-title"><span class="p-dot dot-in"></span> ورودی ساب‌اسکریپشن</span>
           <div class="controls">
-            <button class="danger" id="btnClear" style="font-size:0.75rem; padding:4px 8px">🗑 پاک‌کردن</button>
-            <button class="primary" onclick="pasteFromClipboard()" style="font-size:0.75rem; padding:4px 8px">📋 Paste</button>
+            <button class="danger" id="btnClear" style="font-size:0.75rem; padding:6px; flex:1;">🗑 پاک‌کردن</button>
+            <button class="primary" onclick="pasteFromClipboard()" style="font-size:0.75rem; padding:6px; flex:1;">📋 پیست مستقیم</button>
           </div>
         </div>
         <div class="card-body">
           <div id="tempFileStatus">
-            <span>⏳ داده‌های موقت تا <b id="tempTime">05:00</b> دیگر پاک می‌شوند.</span>
-            <button class="danger" style="padding: 4px 8px; font-size: 0.75rem; background:transparent;" onclick="deleteTempFile()">حذف</button>
+            <span>⏳ حافظه موقت امنیتی (<b id="tempTime">05:00</b>)</span>
+            <button class="danger" style="padding: 4px 8px; font-size: 0.75rem; background:transparent;" onclick="deleteTempFile()">حذف فـوری</button>
           </div>
           <div style="display:flex; gap:8px;">
             <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="flex:1;">
-            <button class="primary" id="btnFetch">⬇ دریافت لینک</button>
+            <button class="primary" id="btnFetch" style="width: auto;">⬇ دریافت</button>
           </div>
-          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا وارد کنید..." spellcheck="false"></textarea>
+          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا کپی و پِیست کنید..." spellcheck="false"></textarea>
         </div>
       </section>
 
       <section class="card">
-        <div class="card-header"><span class="card-title">⚙️ تنظیمات مسیریابی و Xray</span></div>
+        <div class="card-header"><span class="card-title">⚙️ منوی تنظیمات</span></div>
         <div class="card-body" style="padding: 10px;">
           
           <details class="acc" open>
@@ -284,7 +299,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
                         <option value="Radar">رادار بازی (10.202.10.10)</option>
                       </optgroup>
                     </select>
-                    <button id="btnPingDns" class="primary" style="padding:4px 8px; font-size:0.75rem;" onclick="testDnsPings()">📡 تست</button>
+                    <button id="btnPingDns" class="primary" style="padding:4px 8px; font-size:0.75rem; width: auto;" onclick="testDnsPings()">📡 تست DNS</button>
                   </div>
                 </label>
               </div>
@@ -295,19 +310,19 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
             <summary>📡 تست خودکار گره‌ها (Observatory)</summary>
             <div class="acc-body">
               <div class="setting-row">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>فعال‌سازی Observatory</label>
-                <label class="fld">استراتژی
+                <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>روشن بودن Observatory</label>
+                <label class="fld">استراتژی تست
                   <select id="obsStrategy"><option value="leastPing" selected>leastPing (اتصال به کمترین پینگ)</option><option value="random">random (تصادفی)</option></select>
                 </label>
               </div>
               <div class="setting-row" style="margin-top:10px;">
-                <label class="fld">آدرس تست
+                <label class="fld">آدرس تست سرور
                   <select id="probeSel">
                     <option value="gstatic" selected>Google gstatic 204</option>
                     <option value="cloudflare">Cloudflare 204</option>
                   </select>
                 </label>
-                <label class="fld">فاصله زمانی
+                <label class="fld">فاصله زمانی تست
                   <select id="obsInterval"><option value="1m">۱ دقیقه</option><option value="3m" selected>۳ دقیقه</option><option value="5m">۵ دقیقه</option></select>
                 </label>
               </div>
@@ -318,27 +333,34 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
             <summary>🧭 قوانین مسیریابی (Routing)</summary>
             <div class="acc-body">
               <div class="setting-row">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی تبلیغات</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>ایران مستقیـم (Direct)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی دامنه‌های تبلیغات</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>اتصال سایت‌های ایران به اینترنت</label>
               </div>
               <div class="setting-row" style="margin-top:10px;">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swQuic"><span class="slider"></span></span>بلاک QUIC</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>شبکه خصوصی مستقیـم</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swQuic"><span class="slider"></span></span>بلاک پروتکل QUIC شبکه</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیـم</label>
               </div>
             </div>
           </details>
 
           <details class="acc">
-            <summary>⚙️ تنظیمات تکمیلی</summary>
+            <summary>⚙️ تنظیمات تکمیلی Inbounds و MUX</summary>
             <div class="acc-body">
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="fld">پورت Socks<input type="number" id="socksPort" value="10808" dir="ltr"></label>
+                <label class="fld">پورت HTTP<input type="number" id="httpPort" value="10809" dir="ltr"></label>
+              </div>
               <div class="setting-row">
-                <label class="opt" style="margin-top:10px;"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX</label>
-                <label class="opt" style="margin-top:10px;"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS</label>
+                <label class="fld" style="margin-top:10px;">پیشوند گره‌ها<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسـیرها)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS (حذف گواهی)</label>
               </div>
             </div>
           </details>
 
-          <button class="primary" id="btnConvert" style="width:100%; padding:12px; margin-top:10px; font-size:1rem;">⚡ شروع تبدیل و کپی کانفیگ</button>
+          <button class="primary" id="btnConvert" style="width:100%; padding:14px; margin-top:15px; font-size:1.1rem; box-shadow: 0 4px 15px rgba(34,211,238,.3);">⚡ شروع تبدیل و کپی کانفیگ</button>
 
         </div>
       </section>
@@ -348,20 +370,22 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
     <div class="right-col">
       <section class="card">
         <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته</span>
-          <div class="controls">
+          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته پردازش شده</span>
+          <div class="controls" style="flex-direction: column; width: 100%;">
             <div class="tabs">
-              <button class="tab active" id="tabPretty">کدنویسی</button>
+              <button class="tab active" id="tabPretty">نمایش کد</button>
               <button class="tab" id="tabPlain">متن خام</button>
-              <button class="tab" id="tabDiff">مقایسه تغییرات</button>
+              <button class="tab" id="tabDiff">تغییرات Δ</button>
             </div>
-            <select id="fmtSel" style="font-size:0.75rem;">
-              <option value="xray">Xray-core JSON</option>
-              <option value="singbox">Sing-Box JSON</option>
-              <option value="clash">Clash Meta YAML</option>
-              <option value="v2rayn">لیست استاندارد</option>
-            </select>
-            <button class="primary" id="btnCopy" style="font-size:0.75rem;">📋 کپی</button>
+            <div style="display:flex; gap:10px; width: 100%; margin-top:5px;">
+              <select id="fmtSel" style="flex: 2; font-size:0.8rem;">
+                <option value="xray">Xray-core JSON</option>
+                <option value="singbox">Sing-Box JSON</option>
+                <option value="clash">Clash Meta YAML</option>
+                <option value="v2rayn">لیست استاندارد</option>
+              </select>
+              <button class="primary" id="btnCopy" style="flex: 1; font-size:0.8rem;">📋 کپی متن</button>
+            </div>
           </div>
         </div>
         <div class="card-body" style="padding:10px;">
@@ -375,15 +399,13 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
       <section class="card">
         <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-node"></span> مدیریت گره‌ها</span>
-          <div class="controls">
-            <input type="text" id="nodeSearch" placeholder="🔍 جستجوی گره..." style="width: 150px; font-size:0.75rem;">
-          </div>
+          <span class="card-title"><span class="p-dot dot-node"></span> گره‌های شناسایی شده</span>
         </div>
         <div class="card-body">
+          <input type="text" id="nodeSearch" placeholder="🔍 جستجوی گره (نام، سرور)..." style="width: 100%; margin-bottom: 10px;">
           <div class="node-grid" id="nodeList">
             <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary); font-size:0.9rem;">
-              صبر کنید... در حال پردازش لینک‌ها
+              لطفا متن ساب‌اسکریپشن را وارد کنید.
             </div>
           </div>
         </div>
@@ -393,13 +415,13 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
   </div>
 </div>
 
-<!-- STICKY ACTION BAR -->
+<!-- STICKY ACTION BAR FOR FAST EXECUTION ON MOBILE DOWN BELOW -->
 <div id="stickyBar" class="sticky-bar">
   <div class="selection-info" style="font-size: 0.95rem;">
-    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره در لیست نهایی وجود دارد
+    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره در لیست بازسازی وجود دارد
   </div>
-  <div>
-    <button onclick="copyConfig(event)">📋 کپی کانفیگ</button>
+  <div class="sticky-buttons">
+    <button onclick="document.getElementById('btnConvert').click();">⚡ ساخت و کپی</button>
     <button onclick="downloadConfig()">⬇ دانلود فایل</button>
     <button class="primary" onclick="showQrModal()">📷 نمایش QR</button>
   </div>
@@ -427,7 +449,7 @@ const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
 let W, H, particles = [];
 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
 window.addEventListener('resize', resize); resize();
-for(let i=0; i<40; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
+for(let i=0; i<35; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
 function animate() {
   ctx.clearRect(0,0,W,H); const accentColor = getComputedStyle(document.body).getPropertyValue('--cyan').trim();
   particles.forEach(p => {
@@ -444,6 +466,32 @@ function toast(msg, type=''){
   $('toasts').appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+/** SAFE CLIPBOARD COPY **/
+function copyToClipboard(text, onSuccess) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopyTextToClipboard(text, onSuccess));
+  } else {
+    fallbackCopyTextToClipboard(text, onSuccess);
+  }
+}
+function fallbackCopyTextToClipboard(text, onSuccess) {
+  let textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed"; textArea.style.opacity = "0";
+  document.body.appendChild(textArea);
+  textArea.focus(); textArea.select();
+  try { document.execCommand('copy'); if (onSuccess) onSuccess(); } catch (err) { toast('خطایی در سیستم کپی پیش آمد', 'err'); }
+  document.body.removeChild(textArea);
+}
+
+/** SAFE BASE64 ENCODE (Supports UTF-8/Persian remarks) **/
+function encodeBase64Safe(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for(let i=0; i<bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
 }
 
 /** THEME **/
@@ -556,7 +604,7 @@ function renderNodes(){
   const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
   
   if(!filtered.length) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary);">هیچ گره‌ای هماهنگ با فیلتر یافت نشد.</div>';
+    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">گره‌ای مطابق فیلتر یافت نشد.</div>';
     return;
   }
   
@@ -576,8 +624,8 @@ function renderNodes(){
         ${n.security==='reality'?'<span class="badge b-reality">REALITY</span>':''}
       </div>
       <div class="node-actions" style="margin-top:6px;">
-        <button class="primary" style="padding:2px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمـایش QR</button>
-        <button class="danger" style="padding:2px 8px; font-size:0.7rem;" onclick="removeNode('${n.id}')">🗑</button>
+        <button class="primary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمـایش QR</button>
+        <button class="danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeNode('${n.id}')">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -615,7 +663,7 @@ async function testDnsPings() {
     }
   });
   await Promise.allSettled(promises);
-  btn.textContent = '📡 تست'; btn.disabled = false; toast('تست پینگ سرورهای DNS تمام شد.');
+  btn.textContent = '📡 تست DNS'; btn.disabled = false; toast('تست پینگ سرورهای DNS تمام شد.');
 }
 
 /** TEMP FILE SYSTEM **/
@@ -646,13 +694,13 @@ function deleteTempFile(isAuto = false) {
   localStorage.removeItem('sc_temp_expire');
   $('inputLinks').value = '';
   analyzeInput();
-  if(isAuto) toast("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت ۵ دقیقه‌ای پاک شد.", 'warn');
+  if(isAuto) toast("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت پاک شد.", 'warn');
 }
 
 /** FETCH FROM URL **/
 $('btnFetch').addEventListener('click', async () => {
   const url = $('subUrl').value.trim(); if(!url) return toast('آدرس ساب‌اسکریپشن خالی است', 'warn');
-  const btn = $('btnFetch'); btn.textContent = '⏳ در حال فرخوانی...'; btn.disabled = true;
+  const btn = $('btnFetch'); btn.textContent = '⏳ در حال دریافت...'; btn.disabled = true;
   
   const proxies = [
     '', 
@@ -674,7 +722,7 @@ $('btnFetch').addEventListener('click', async () => {
         $('inputLinks').value = text;
         analyzeInput();
         startTempFileTimer(5);
-        toast('ساب‌اسکریپشن دریافت شد ✓');
+        toast('ساب‌اسکریپشن به درستی دریافت شد ✓');
         success = true;
         break; 
       }
@@ -682,11 +730,11 @@ $('btnFetch').addEventListener('click', async () => {
   }
 
   if (!success) toast('دریافت با خطا مواجه شد. لطفاً متن ساب را دستی پیست کنید.', 'err');
-  btn.textContent = '⬇ دریافت لینک'; btn.disabled = false;
+  btn.textContent = '⬇ دریافت'; btn.disabled = false;
 });
 
 function pasteFromClipboard() {
-  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد مقدور نیست.', 'err'));
+  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err'));
 }
 
 /** ═════ THE CORE: GENERATORS (Xray, Sing-Box, Clash) ═════ **/
@@ -694,6 +742,7 @@ function getSettings() {
   return {
     prefix: $('prefix').value.trim()||'proxy-', mux: $('swMux').checked, allowInsecure: $('swInsecure').checked,
     dns: DNS_PRESETS[$('dnsPreset').value] || DNS_PRESETS.Cloudflare,
+    inbound: { socksPort: parseInt($('socksPort').value)||10808, httpPort: parseInt($('httpPort').value)||10809 },
     obs: { enabled: $('swObs').checked, strategy: $('obsStrategy').value, probe: PROBES[$('probeSel').value]||PROBES.gstatic, interval: $('obsInterval').value },
     routing: { blockAds: $('swAds').checked, directIR: $('swIR').checked, blockQuic: $('swQuic').checked, directPrivate: $('swPriv').checked }
   };
@@ -774,13 +823,14 @@ function buildXray(list, s) {
       tag: "dns-module"
     },
     inbounds: [
-      { listen: '127.0.0.1', port: 10808, protocol: 'socks', settings: { auth: "noauth", udp: true, userLevel: 8 }, sniffing: { destOverride: ['http','tls'], enabled: true, routeOnly: false }, tag: 'socks' }
+      { listen: '127.0.0.1', port: s.inbound.socksPort, protocol: 'socks', settings: { auth: "noauth", udp: true, userLevel: 8 }, sniffing: { destOverride: ['http','tls'], enabled: true, routeOnly: false }, tag: 'socks' },
+      { listen: '127.0.0.1', port: s.inbound.httpPort, protocol: 'http', tag: 'http-in' }
     ],
     log: { loglevel: "warning" },
     observatory: { enableConcurrency: true, probeInterval: s.obs.interval, probeUrl: s.obs.probe, subjectSelector: [s.prefix] },
     outbounds: [...outbounds, {protocol:'freedom', settings:{domainStrategy:"UseIP"}, tag:'direct'}, {protocol:'blackhole', settings:{response:{type:"http"}}, tag:'block'}],
     policy: { levels: { "8": { connIdle: 300, downlinkOnly: 1, handshake: 4, uplinkOnly: 1 } }, system: { statsOutboundDownlink: true, statsOutboundUplink: true } },
-    remarks: "javidsub Intelligent Selection",
+    remarks: "V⇢X Intelligent Config",
     routing: { balancers: [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }], domainStrategy: 'AsIs', rules: rules },
     stats: {}
   };
@@ -804,7 +854,7 @@ function buildSingBox(list, s) {
       if(n.security === 'reality') ob.tls.reality = { enabled: true, public_key: n.pbk, short_id: n.sid };
       if(n.fp) ob.tls.utls = { enabled: true, fingerprint: n.fp };
     }
-    if(n.network === 'ws') ob.transport = { type: 'ws', path: n.path, headers: {Host: n.host||n.sni||n.address} };
+    if(n.network === 'ws') ob.transport = { type: 'ws', path: n.path||'/', headers: {Host: n.host||n.sni||n.address} };
     else if(n.network === 'grpc') ob.transport = { type: 'grpc', service_name: n.serviceName||'grpc' };
     return ob;
   });
@@ -812,7 +862,7 @@ function buildSingBox(list, s) {
   return {
     log: { level: "warn" },
     dns: { servers: [{ address: s.dns[0], tag: 'dns-main' }], rules: [{ outbound: 'any', server: 'dns-main' }] },
-    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: 10808 }],
+    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: s.inbound.socksPort }],
     outbounds: [
       ...outbounds,
       { type: 'urltest', tag: 'auto', outbounds: tags, url: s.obs.probe, interval: s.obs.interval },
@@ -829,7 +879,7 @@ function buildSingBox(list, s) {
 
 function buildClash(list, s) {
   const L = []; const p = x => L.push(x);
-  p('mixed-port: 10808'); p('mode: rule'); p('allow-lan: false');
+  p('mixed-port: ' + s.inbound.socksPort); p('mode: rule'); p('allow-lan: false');
   p('dns:\n  enable: true\n  enhanced-mode: fake-ip\n  nameserver:\n    - '+s.dns[0]);
   p('proxies:');
   list.forEach((n,i) => {
@@ -842,7 +892,7 @@ function buildClash(list, s) {
       if(s.allowInsecure) p('    skip-cert-verify: true');
       if(n.security==='reality') p('    reality-opts:\n      public-key: '+n.pbk+(n.sid?'\n      short-id: '+n.sid:''));
     }
-    if(n.network==='ws') p('    ws-opts:\n      path: "'+n.path+'"'+'\n      headers:\n        Host: '+(n.host||n.sni||n.address));
+    if(n.network==='ws') p('    ws-opts:\n      path: "'+(n.path||'/')+'"'+'\n      headers:\n        Host: '+(n.host||n.sni||n.address));
     else if(n.network==='grpc') p('    grpc-opts:\n      grpc-service-name: "'+(n.serviceName||'grpc')+'"');
   });
   p('proxy-groups:\n  - name: AUTO\n    type: url-test\n    url: '+s.obs.probe+'\n    interval: 180\n    proxies:');
@@ -896,20 +946,30 @@ function processGenerate() {
   curFmt = $('fmtSel').value;
   if(textCache[curFmt]) prevTexts[curFmt] = textCache[curFmt];
   
-  let outStr = '';
-  if(curFmt === 'xray') outStr = JSON.stringify(buildXray(nodes, s), null, 2);
-  else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(nodes, s), null, 2);
-  else if(curFmt === 'clash') outStr = buildClash(nodes, s);
-  else if(curFmt === 'v2rayn') outStr = btoa(nodes.map(n=>n.raw).join('\n'));
-  
-  textCache[curFmt] = outStr;
-  
-  $('prettyOut').innerHTML = syntaxHighlight(outStr, curFmt);
-  $('plainOut').value = outStr;
-  renderDiff();
-  
-  toast('کانفیگ با فرمت ' + curFmt.toUpperCase() + ' تولید شد ✓');
-  navigator.clipboard.writeText(outStr);
+  try {
+    let outStr = '';
+    if(curFmt === 'xray') outStr = JSON.stringify(buildXray(nodes, s), null, 2);
+    else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(nodes, s), null, 2);
+    else if(curFmt === 'clash') outStr = buildClash(nodes, s);
+    else if(curFmt === 'v2rayn') outStr = encodeBase64Safe(nodes.map(n=>n.raw).join('\n'));
+    
+    textCache[curFmt] = outStr;
+    
+    $('prettyOut').innerHTML = syntaxHighlight(outStr, curFmt);
+    $('plainOut').value = outStr;
+    renderDiff();
+    
+    copyToClipboard(outStr, () => {
+      toast('کانفیگ ' + curFmt.toUpperCase() + ' تولید و در کلیپ‌بورد کپی شد ✓');
+    });
+    
+    // Auto scroll down for user logic tracking in small screens
+    if (window.innerWidth <= 850) $('fmtSel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(e) {
+    toast('خطایی در تولید کانفیگ پیش آمد. مجدداً ساب خود را وارد کنید.', 'err');
+    console.error(e);
+  }
 }
 
 $('btnConvert').addEventListener('click', processGenerate);
@@ -943,10 +1003,10 @@ document.querySelectorAll('[data-tpl]').forEach(btn => {
 /** COPY & MODAL **/
 function copyConfig(e) {
   if(!textCache[curFmt]) return processGenerate();
-  navigator.clipboard.writeText(textCache[curFmt]).then(()=>{
-    const btn = e.target; const old = btn.textContent;
-    btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 2000);
-  }).catch(()=>toast('خطا در کپی', 'err'));
+  copyToClipboard(textCache[curFmt], () => {
+     const btn = e.target; const old = btn.textContent;
+     btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 1500);
+  });
 }
 
 function downloadConfig() {
@@ -957,13 +1017,16 @@ function downloadConfig() {
 }
 
 function showQrModal(uri = '') {
-  if(!uri) { if(!textCache[curFmt]) processGenerate(); uri = encodeURIComponent(textCache[curFmt]); }
+  if(!uri) { 
+     if(!textCache[curFmt]) processGenerate(); 
+     uri = encodeURIComponent(textCache[curFmt]); 
+  }
   $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
   new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
 
-// Initial Call
-analyzeInput();
+// Initial Loading Fallback
+$('plainOut').value = '';
 </script>
 </body>
 </html>
