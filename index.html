@@ -3,837 +3,1331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>VLESS ⇢ Xray | Studio</title>
+<title>VLESS ⇢ Xray | تبدیلگر و استودیو کانفیگ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/*! ===== RESET & BASE ===== */
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-body { font-family: 'Vazirmatn', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: all .3s; }
+/* ═══ CSS VARIABLES & THEMES ═══ */
 :root {
-  --font: 'Vazirmatn', system-ui, sans-serif;
-  --bg: radial-gradient(circle at 50% 0%, #1a1a2e, #0f0f1e);
-  --panel: rgba(14,22,40,.85); --border: rgba(255,255,255,.08);
-  --text: #e2e8f0; --text2: #94a3b8; --accent: #6366f1; --cyan: #22d3ee;
-  --success: #10b981; --danger: #fb7185; --warning: #f59e0b;
+  --font-body: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-body.light { --bg: #f8fafc; --panel: #fff; --border: rgba(0,0,0,.1); --text: #1e293b; --text2: #64748b; }
-body.cyber { --bg: #0a0118; --panel: rgba(10,1,24,.75); --border: rgba(0,255,159,.3); --accent: #00ff9f; --cyan: #00ff9f; --success: #00ff9f; --danger: #ff0080; --warning: #ffee00; }
-body { background: var(--bg); backdrop-filter: blur(0); }
-.container { max-width: 1400px; margin: 0 auto; padding: 12px; }
-/*! ===== LAYOUT ===== */
-.grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; }
-@media(max-width:850px){ .grid { grid-template-columns:1fr; } }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 14px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,.3); margin-bottom: 16px; }
-.card-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-/*! ===== CONTROLS ===== */
-button, select, input, textarea { font-family: var(--font); background: rgba(0,0,0,.15); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 10px; font-size: .85rem; transition: .2s; min-height: 44px; width: 100%; }
-body.light button, body.light select, body.light input, body.light textarea { background: #fff; }
+
+body.theme-glass {
+  --bg-color: rgba(15, 15, 30, 0.6);
+  --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #0f0f1e 100%);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --solid-bg: #0b1120;
+  --panel-bg: rgba(14, 22, 40, 0.85);
+  --code-bg: #04070d;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --accent: #6366f1;
+  --cyan: #22d3ee;
+  --success: #10b981;
+  --danger: #fb7185;
+  --warning: #f59e0b;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-cyber {
+  --bg-color: rgba(10, 1, 24, 0.7);
+  --bg-gradient: linear-gradient(180deg, #0a0118 0%, #1a0b2e 100%);
+  --glass-border: rgba(0, 255, 159, 0.3);
+  --solid-bg: #05010d;
+  --panel-bg: rgba(10, 1, 24, 0.75);
+  --code-bg: #000000;
+  --text-primary: #e0fbfc;
+  --text-secondary: #98f5e1;
+  --accent: #00ff9f;
+  --cyan: #00ff9f;
+  --success: #00ff9f;
+  --danger: #ff0080;
+  --warning: #ffee00;
+  --glass-shadow: 0 0 15px rgba(0, 255, 159, 0.2);
+}
+
+body.theme-light {
+  --bg-color: rgba(255, 255, 255, 0.85);
+  --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --solid-bg: #ffffff;
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --code-bg: #f1f5f9;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --accent: #3b82f6;
+  --cyan: #0284c7;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+body { font-family: var(--font-body); background: var(--bg-color); background-image: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; }
+#canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+.container { max-width: 1280px; margin: 0 auto; padding: 12px; position: relative; z-index: 1; }
+
+/* ── HEADER ── */
+header { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; padding: 14px 16px; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); }
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--success)); display: grid; place-items: center; font-weight: bold; color: #fff; font-family: var(--font-mono); font-size: 1.1rem; box-shadow: 0 0 15px rgba(34,211,238,.3); flex-shrink: 0;}
+.brand h1 { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+.brand .tag { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; }
+
+.live-stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.stat-box { padding: 4px 10px; border-radius: 8px; text-align: center; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); flex: 1; min-width: 60px; }
+body.theme-light .stat-box { background: #fff; }
+.stat-box b { display: block; font-family: var(--font-mono); font-size: 0.95rem; color: var(--cyan); }
+.stat-box span { font-size: 0.6rem; color: var(--text-secondary); }
+
+.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
+button, select, input[type="text"], input[type="number"] { font-family: var(--font-body); background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: var(--transition); font-size: 0.9rem; width: 100%; min-height: 44px; }
+body.theme-light button:not(.primary, .danger), body.theme-light select, body.theme-light input { background: #fff; }
 button:hover:not(:disabled), select:hover, input:hover { border-color: var(--cyan); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+select option, select optgroup { background-color: #1a1a2e; color: #e2e8f0; font-family: var(--font-body); }
+body.theme-cyber select option, body.theme-cyber select optgroup { background-color: #0a0118; color: #e0fbfc; }
+body.theme-light select option, body.theme-light select optgroup { background-color: #ffffff; color: #1e293b; }
+
 button.primary { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; border: none; font-weight: 600; }
+button.primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px rgba(34,211,238,.4); transform: translateY(-1px); }
 button.danger { color: var(--danger); border-color: var(--danger); background: rgba(251,113,133,.08); }
-button.danger:hover { background: var(--danger); color: #fff; }
-button:disabled { opacity: .5; cursor: not-allowed; }
-.flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.flex > * { flex: 1; min-width: 80px; }
-/*! ===== NODE LIST (Virtual Scroll) ===== */
-.node-grid { max-height: 500px; overflow-y: auto; position: relative; }
-.node-placeholder { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 12px; color: var(--text2); }
-.node-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: .15s; background: var(--panel); }
-.node-item:hover { background: rgba(255,255,255,.05); }
-.node-item .flag { font-size: 1.4rem; width: 32px; text-align: center; }
-.node-item .info { flex:1; overflow: hidden; }
-.node-item .info .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.node-item .info .meta { font-size: .7rem; color: var(--text2); display: flex; gap: 6px; flex-wrap: wrap; }
-.badge { padding: 2px 8px; border-radius: 99px; border: 1px solid var(--border); font-size: .65rem; background: rgba(0,0,0,.2); }
-.badge.cyan { border-color: var(--cyan); color: var(--cyan); }
-.badge.green { border-color: var(--success); color: var(--success); }
-.badge.red { border-color: var(--danger); color: var(--danger); }
-/*! ===== OUTPUT ===== */
-.tabs { display: flex; gap: 4px; background: rgba(0,0,0,.2); border-radius: 10px; padding: 4px; }
-.tab { flex:1; text-align:center; padding:6px; border:none; border-radius:6px; background:transparent; color:var(--text2); font-weight:600; cursor:pointer; }
-.tab.active { background: var(--accent); color:#fff; }
-.pre-box { background: #04070d; border:1px solid var(--border); border-radius:10px; padding:12px; font-family:monospace; font-size:.7rem; white-space:pre-wrap; max-height:400px; overflow:auto; direction:ltr; text-align:left; color:var(--cyan); }
-body.light .pre-box { background: #f1f5f9; color:#1e293b; }
-/*! ===== PROGRESS BAR ===== */
-#progress { height:4px; background:var(--border); border-radius:4px; margin:8px 0; display:none; }
-#progress .bar { height:100%; width:0%; background:var(--cyan); border-radius:4px; transition:width .3s; }
-/*! ===== TOASTS ===== */
-#toasts { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:999; display:flex; flex-direction:column; gap:8px; width:90%; max-width:400px; pointer-events:none; }
-.toast { background:var(--panel); border:1px solid var(--cyan); padding:12px 16px; border-radius:12px; font-weight:500; box-shadow:0 10px 30px rgba(0,0,0,.5); opacity:0; transform:translateY(10px); transition:.3s; text-align:center; pointer-events:auto; }
-.toast.show { opacity:1; transform:none; }
-.toast.err { border-color:var(--danger); }
-/*! ===== QR MODAL ===== */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(6px); z-index:100; display:none; place-items:center; }
-.modal-overlay.active { display:grid; }
-.modal { background:var(--panel); border:1px solid var(--border); border-radius:20px; padding:24px; max-width:360px; width:100%; text-align:center; }
-#qrcode { background:#fff; padding:12px; border-radius:12px; margin:16px auto; display:inline-block; }
-/*! ===== I18N DROPDOWN ===== */
-.lang-select { width:auto; min-width:80px; }
-/*! ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width:6px; }
-::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+
+/* ── TEMPLATES ── */
+.tpl-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 14px; margin-bottom: 16px; backdrop-filter: blur(20px); }
+.tpl-lbl { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); width: 100%; text-align: center; margin-bottom: 4px; }
+.tpl-chip { font-size: 0.75rem; padding: 8px 12px; border-radius: 99px; border: 1px solid var(--glass-border); background: var(--code-bg); color: var(--text-primary); cursor: pointer; transition: var(--transition); flex: 1; text-align: center; min-width: 80px; }
+.tpl-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ── MAIN LAYOUT ── */
+.grid-layout { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+
+.card { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--glass-shadow); margin-bottom: 16px; }
+.card-header { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--glass-border); background: rgba(128,160,200,.04); }
+.card-title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.p-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot-in { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.dot-out { background: var(--success); box-shadow: 0 0 10px var(--success); }
+.dot-node { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
+.card-body { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+
+/* ── ACCORDIONS (SETTINGS) ── */
+.acc { border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(0,0,0,0.1); overflow: hidden; }
+body.theme-light .acc { background: #f8fafc; }
+.acc summary { cursor: pointer; padding: 12px 14px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; user-select: none; transition: var(--transition); }
+.acc summary:hover { color: var(--cyan); }
+.acc-body { padding: 4px 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.setting-row { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.fld { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-secondary); width: 100%; }
+.opt { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; padding: 6px 0; }
+
+/* CSS Toggle Switch */
+.switch { position: relative; width: 40px; height: 22px; display: inline-block; flex-shrink: 0; }
+.switch input { display: none; }
+.slider { position: absolute; inset: 0; background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border); border-radius: 99px; transition: .3s; }
+.slider::before { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; top: 3px; right: 4px; background: var(--text-secondary); transition: .3s; }
+.switch input:checked + .slider { background: rgba(34,211,238,.2); border-color: var(--cyan); }
+.switch input:checked + .slider::before { transform: translateX(-18px); background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+textarea.input-box { width: 100%; min-height: 120px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.75rem; resize: vertical; direction: ltr; line-height: 1.6; }
+
+#tempFileStatus {
+  display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger);
+  color: var(--danger); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;
+  align-items: center; justify-content: space-between; font-size: 0.8rem; font-weight: 600;
+  animation: popIn 0.3s ease; flex-wrap: wrap; gap: 8px;
+}
+@keyframes popIn { from{transform:scale(0.95); opacity:0} to{transform:scale(1); opacity:1} }
+
+/* ── OUTPUT SECTION ── */
+.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; flex-wrap: nowrap; width: 100%;}
+.tab { font-size: 0.7rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; transition: .2s; flex: 1; text-align: center; min-height: 36px; }
+.tab.active { color: #fff; background: var(--accent); font-weight: 700; }
+.out-wrap { position: relative; min-height: 300px; flex: 1; display: flex; flex-direction: column; }
+#prettyOut, #plainOut, #diffOut { width: 100%; height: 300px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; font-family: var(--font-mono); font-size: 0.7rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
+#prettyOut { color: #94a3b8; }
+#plainOut { color: var(--success); }
+.hidden { display: none !important; }
+.tok-key { color: #7dd3fc; } .tok-str { color: #86efac; } .tok-num { color: var(--warning); } .tok-bool { color: var(--danger); }
+.d-add { background: rgba(16,185,129,.15); color: #86efac; display: block; }
+.d-del { background: rgba(251,113,133,.15); color: #fda4af; display: block; text-decoration: line-through; }
+.d-ctx { display: block; opacity: 0.6; }
+
+/* ── NODES GRID ── */
+.node-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 4px; }
+.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: var(--transition); cursor: pointer; }
+body.theme-light .node-card { background: #fff; }
+.node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
+.node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); }
+
+.node-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.node-flag { font-size: 1.4rem; }
+.node-remark { font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
+.node-meta { display: flex; gap: 4px; flex-wrap: wrap; font-size: 0.6rem; font-family: var(--font-mono); align-items: center; }
+.badge { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--glass-border); font-size: 0.6rem; }
+
+.b-ws { color: var(--cyan); border-color: rgba(34,211,238,.4); }
+.b-grpc { color: #a78bfa; border-color: rgba(167,139,250,.4); }
+.b-tcp { color: var(--warning); border-color: rgba(251,191,36,.4); }
+.b-tls { color: var(--success); border-color: rgba(16,185,129,.4); }
+.b-reality { color: var(--danger); border-color: rgba(251,113,133,.4); }
+
+.node-actions { display: flex; gap: 6px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px; flex-wrap: wrap; }
+body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
+.node-actions button { font-size: 0.7rem; padding: 6px 8px; min-height: 32px; flex: 1; }
+
+/* STICKY BAR */
+.sticky-bar { position: sticky; bottom: 10px; z-index: 50; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--accent); border-radius: 14px; padding: 12px 16px; display: none; flex-direction: column; gap: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.sticky-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.sticky-buttons button { flex: 1; min-width: 80px; font-size: 0.85rem; padding: 10px 12px; min-height: 44px; }
+@keyframes slideUp { from{transform:translateY(100%); opacity:0} to{transform:none; opacity:1} }
+
+/* QR MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
+.modal-overlay.active { display: grid; }
+.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--glass-shadow); }
+#qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
+#qrcode img { width: 200px !important; height: 200px !important; max-width: 100%; }
+
+/* TOASTS */
+#toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: 92%; max-width: 380px; }
+.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 14px 18px; border-radius: 12px; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; transform: translateY(15px); transition: all 0.3s; width: 100%; text-align: center; }
+.toast.show { opacity: 1; transform: none; }
+.toast.warn { border-color: var(--warning); } .toast.err { border-color: var(--danger); }
+
+/* ── RESPONSIVE MOBILE TWEAKS ── */
+@media (min-width: 850px) {
+  header { flex-direction: row; flex-wrap: wrap; }
+  .brand { flex: 1; }
+  .live-stats { flex: 1; justify-content: flex-end; }
+  .controls { width: auto; flex: 0 1 auto; }
+  .card-header { flex-direction: row; align-items: center; }
+  .card-header .controls { flex-direction: row; }
+  .grid-layout { grid-template-columns: 1fr 1.2fr; }
+  .setting-row { flex-direction: row; align-items: flex-end; }
+  .tpl-lbl { width: auto; margin-bottom: 0; }
+  .sticky-bar { flex-direction: row; align-items: center; }
+  .sticky-buttons { flex-direction: row; }
+  .node-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .tabs { flex-wrap: wrap; }
+}
+
+@media (max-width: 400px) {
+  .container { padding: 8px; }
+  .brand h1 { font-size: 0.95rem; }
+  .logo { width: 36px; height: 36px; font-size: 0.9rem; }
+  .stat-box b { font-size: 0.8rem; }
+  button, select, input[type="text"], input[type="number"] { font-size: 0.8rem; padding: 8px 10px; min-height: 38px; }
+  .card-body { padding: 10px; }
+  .acc summary { font-size: 0.8rem; padding: 10px 12px; }
+  #prettyOut, #plainOut, #diffOut { height: 220px; font-size: 0.6rem; }
+  .node-card { padding: 10px; }
+  .sticky-buttons button { font-size: 0.75rem; padding: 8px; min-height: 38px; }
+  #qrcode img { width: 160px !important; height: 160px !important; }
+  .modal { padding: 16px; }
+}
+
+/* Fix for iPhone notch and safe areas */
+@supports (padding: max(0px)) {
+  .container { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+  #toasts { bottom: max(20px, env(safe-area-inset-bottom)); }
+}
 </style>
 </head>
-<body>
+<body class="theme-glass">
+
+<canvas id="canvas-bg"></canvas>
+
 <div class="container">
-  <!-- ===== HEADER ===== -->
-  <header class="card" style="margin-bottom:16px;">
-    <div class="flex" style="justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:1.8rem;">⚡</span>
-        <h1 data-i18n="appTitle">VLESS ⇢ Xray Studio</h1>
-      </div>
-      <div class="flex" style="flex:0 1 auto;width:auto;">
-        <select class="lang-select" id="langSelect">
-          <option value="fa">🇮🇷 فارسی</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="ar">🇸🇦 العربية</option>
-        </select>
-        <select id="themeSelect">
-          <option value="dark">🌙 تیره</option>
-          <option value="cyber">🤖 سایبر</option>
-          <option value="light">☀️ روشن</option>
-        </select>
+  <header>
+    <div class="brand">
+      <div class="logo">V⇢X</div>
+      <div>
+        <h1>VLESS ⇢ Xray Studio</h1>
+        <p class="tag">تبدیل‌گر قدرتمند با خروجی اختصاصی</p>
       </div>
     </div>
-    <div class="flex" style="justify-content:space-between;margin-top:8px;">
-      <span data-i18n="stats" id="statLabel">گره‌های معتبر:</span>
-      <span id="statValid" style="color:var(--success);font-weight:700;">0</span>
-      <span data-i18n="invalid" id="statInvalidLabel">نامعتبر:</span>
-      <span id="statInvalid" style="color:var(--danger);">0</span>
+    <div class="live-stats">
+      <div class="stat-box"><b id="statLines">۰</b><span>ورودی</span></div>
+      <div class="stat-box"><b id="statValid" style="color:var(--success)">۰</b><span>سالم</span></div>
+      <div class="stat-box"><b id="statInvalid" style="color:var(--danger)">۰</b><span>نامعتبر</span></div>
+    </div>
+    <div class="controls">
+      <select id="themeSelect" onchange="applyTheme(this.value)">
+        <option value="theme-glass">🌙 تم تیره شیشه‌ای</option>
+        <option value="theme-cyber">🤖 تم سایبرپانک</option>
+        <option value="theme-light">☀️ تم روز (روشن)</option>
+      </select>
     </div>
   </header>
 
-  <!-- ===== MAIN GRID ===== -->
-  <div class="grid">
-    <!-- LEFT: INPUT & SETTINGS -->
-    <div>
-      <div class="card">
-        <div class="card-header">
-          <span data-i18n="inputLabel">📥 ورودی ساب‌اسکریپشن</span>
-          <div class="flex" style="flex:0 1 auto;width:auto;">
-            <button class="danger" id="btnClear" style="padding:6px 12px;flex:0;">🗑</button>
-            <button class="primary" id="btnPaste" style="padding:6px 12px;flex:0;">📋 پیست</button>
-          </div>
-        </div>
-        <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="margin-bottom:8px;">
-        <div class="flex">
-          <button class="primary" id="btnFetch" style="flex:1;">⬇ دریافت</button>
-          <button id="btnAutoRefresh" style="flex:1;">⏱ خودکار</button>
-        </div>
-        <textarea id="inputLinks" class="pre-box" style="min-height:120px;margin-top:8px;font-family:monospace;direction:ltr;" placeholder="لینک‌های vless:// یا vmess:// ..."></textarea>
-        <div id="progress"><div class="bar" id="progressBar"></div></div>
-      </div>
+  <div class="tpl-bar">
+    <span class="tpl-lbl">🧩 قالب‌های کاربردی:</span>
+    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هووشمند)</button>
+    <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ / وب</button>
+    <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (بدون فیلتر)</button>
+  </div>
 
-      <div class="card">
-        <div class="card-header"><span data-i18n="settings">⚙️ تنظیمات</span></div>
-        <details class="card" style="padding:8px;margin-bottom:6px;" open>
-          <summary data-i18n="dnsLabel">🌐 DNS & تست</summary>
-          <div style="margin-top:8px;">
-            <select id="dnsPreset">
-              <optgroup label="🌍 Global">
-                <option value="Cloudflare">Cloudflare (1.1.1.1)</option>
-                <option value="Google">Google (8.8.8.8)</option>
-              </optgroup>
-              <optgroup label="🇮🇷 ایران">
-                <option value="Shecan">شکن (178.22.122.100)</option>
-                <option value="Electro">الکترو (78.157.42.101)</option>
-              </optgroup>
-            </select>
-            <button class="primary" id="btnDnsTest" style="margin-top:6px;">📡 تست واقعی DNS</button>
-            <div id="dnsResult" style="font-size:.8rem;color:var(--text2);margin-top:6px;"></div>
+  <div class="grid-layout">
+    
+    <!-- ══ INPUT & SETTINGS (LEFT) ══ -->
+    <div class="left-col">
+      <section class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="p-dot dot-in"></span> ورودی ساب‌اسکریپشن</span>
+          <div class="controls">
+            <button class="danger" id="btnClear" style="font-size:0.75rem; padding:6px; flex:1;">🗑 پاک‌کردن</button>
+            <button class="primary" onclick="pasteFromClipboard()" style="font-size:0.75rem; padding:6px; flex:1;">📋 پیست مستقیم</button>
           </div>
-        </details>
-        <details class="card" style="padding:8px;margin-bottom:6px;" open>
-          <summary data-i18n="routing">🧭 مسیریابی</summary>
-          <div class="flex" style="margin-top:6px;">
-            <label><input type="checkbox" id="swAds" checked> <span data-i18n="blockAds">مسدودسازی تبلیغات</span></label>
-            <label><input type="checkbox" id="swIR" checked> <span data-i18n="directIR">مسیر مستقیم ایران</span></label>
-            <label><input type="checkbox" id="swQuic"> <span data-i18n="blockQuic">بلاک QUIC</span></label>
+        </div>
+        <div class="card-body">
+          <div id="tempFileStatus">
+            <span>⏳ حافظه موقت امنیتی (<b id="tempTime">05:00</b>)</span>
+            <button class="danger" style="padding: 4px 8px; font-size: 0.75rem; background:transparent;" onclick="deleteTempFile()">حذف فـوری</button>
           </div>
-        </details>
-        <details class="card" style="padding:8px;margin-bottom:6px;">
-          <summary data-i18n="advanced">⚙️ پیشرفته</summary>
-          <div class="flex">
-            <label><input type="checkbox" id="swMux"> <span data-i18n="mux">MUX</span></label>
-            <label><input type="checkbox" id="swInsecure"> <span data-i18n="insecure">Insecure TLS</span></label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="flex:1; min-width:120px;">
+            <button class="primary" id="btnFetch" style="width:auto; flex:0 1 auto;">⬇ دریافت</button>
           </div>
-          <div class="flex" style="margin-top:6px;">
-            <label><span data-i18n="prefix">پیشوند:</span> <input type="text" id="prefix" value="proxy-" style="flex:1;"></label>
-          </div>
-        </details>
-        <button class="primary" id="btnConvert" style="width:100%;padding:14px;margin-top:12px;font-size:1rem;">⚡ <span data-i18n="generate">تولید و کپی</span></button>
-      </div>
+          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا کپی و پِیست کنید..." spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header"><span class="card-title">⚙️ منوی تنظیمات</span></div>
+        <div class="card-body" style="padding: 10px;">
+          
+          <details class="acc" open>
+            <summary>🌐 سرور DNS و تستر</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="fld">پریست DNS اصلی
+                  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <select id="dnsPreset" style="flex:1; min-width:100px;">
+                      <optgroup label="جهانی">
+                        <option value="Cloudflare">Cloudflare (1.1.1.1)</option>
+                        <option value="Google">Google (8.8.8.8)</option>
+                        <option value="Quad9">Quad9 (9.9.9.9)</option>
+                      </optgroup>
+                      <optgroup label="ایران (ضد تحریم)">
+                        <option value="Shecan">شکن (178.22.122.100)</option>
+                        <option value="Electro">الکترو (78.157.42.101)</option>
+                        <option value="Radar">رادار بازی (10.202.10.10)</option>
+                      </optgroup>
+                    </select>
+                    <button id="btnPingDns" class="primary" style="padding:4px 8px; font-size:0.75rem; width:auto; flex:0 1 auto;" onclick="testDnsPings()">📡 تست DNS</button>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <details class="acc" open>
+            <summary>📡 تست خودکار گره‌ها (Observatory)</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>روشن بودن Observatory</label>
+                <label class="fld">استراتژی تست
+                  <select id="obsStrategy"><option value="leastPing" selected>leastPing (اتصال به کمترین پینگ)</option><option value="random">random (تصادفی)</option></select>
+                </label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="fld">آدرس تست سرور
+                  <select id="probeSel">
+                    <option value="gstatic" selected>Google gstatic 204</option>
+                    <option value="cloudflare">Cloudflare 204</option>
+                  </select>
+                </label>
+                <label class="fld">فاصله زمانی تست
+                  <select id="obsInterval"><option value="1m">۱ دقیقه</option><option value="3m" selected>۳ دقیقه</option><option value="5m">۵ دقیقه</option></select>
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <details class="acc" open>
+            <summary>🧭 قوانین مسیریابی (Routing)</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی دامنه‌های تبلیغات</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>اتصال سایت‌های ایران به اینترنت</label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swQuic"><span class="slider"></span></span>بلاک پروتکل QUIC شبکه</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیـم</label>
+              </div>
+            </div>
+          </details>
+
+          <details class="acc">
+            <summary>⚙️ تنظیمات تکمیلی Inbounds و MUX</summary>
+            <div class="acc-body">
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="fld">پورت Socks<input type="number" id="socksPort" value="10808" dir="ltr"></label>
+                <label class="fld">پورت HTTP<input type="number" id="httpPort" value="10809" dir="ltr"></label>
+              </div>
+              <div class="setting-row">
+                <label class="fld" style="margin-top:10px;">پیشوند گره‌ها<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسـیرها)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS (حذف گواهی)</label>
+              </div>
+            </div>
+          </details>
+
+          <button class="primary" id="btnConvert" style="width:100%; padding:14px; margin-top:15px; font-size:1rem; box-shadow: 0 4px 15px rgba(34,211,238,.3); min-height:50px;">⚡ شروع تبدیل و کپی کانفیگ</button>
+
+        </div>
+      </section>
     </div>
 
-    <!-- RIGHT: OUTPUT & NODES -->
-    <div>
-      <div class="card">
+    <!-- ══ OUTPUT & NODES (RIGHT) ══ -->
+    <div class="right-col">
+      <section class="card">
         <div class="card-header">
-          <span data-i18n="output">📤 خروجی</span>
-          <div class="flex" style="flex:0 1 auto;width:auto;">
-            <select id="fmtSel">
-              <option value="xray">Xray JSON</option>
-              <option value="singbox">Sing-Box JSON</option>
-              <option value="clash">Clash YAML</option>
-              <option value="v2rayn">V2RayN Base64</option>
-            </select>
-            <button class="primary" id="btnCopy" style="flex:0;">📋 کپی</button>
-            <button id="btnDownload" style="flex:0;">⬇ دانلود</button>
+          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته پردازش شده</span>
+          <div class="controls" style="flex-direction: column; width: 100%;">
+            <div class="tabs">
+              <button class="tab active" id="tabPretty">نمایش کد</button>
+              <button class="tab" id="tabPlain">متن خام</button>
+              <button class="tab" id="tabDiff">تغییرات Δ</button>
+            </div>
+            <div style="display:flex; gap:8px; width: 100%; margin-top:5px; flex-wrap:wrap;">
+              <select id="fmtSel" style="flex: 2; font-size:0.8rem; min-width:100px;">
+                <option value="xray">Xray-core JSON</option>
+                <option value="singbox">Sing-Box JSON</option>
+                <option value="clash">Clash Meta YAML</option>
+                <option value="v2rayn">لیست استاندارد</option>
+              </select>
+              <button class="primary" id="btnCopy" style="flex: 1; font-size:0.8rem; min-width:70px;">📋 کپی متن</button>
+            </div>
           </div>
         </div>
-        <div class="tabs" style="margin-bottom:8px;">
-          <button class="tab active" data-tab="pretty">📄 Pretty</button>
-          <button class="tab" data-tab="plain">📃 Plain</button>
-          <button class="tab" data-tab="diff">🔁 Diff</button>
+        <div class="card-body" style="padding:10px;">
+          <div class="out-wrap">
+            <pre id="prettyOut"><span style="color:#64748b">// کانفیگ تولید شده در اینجا نمایش داده می‌شود...</span></pre>
+            <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
+            <div id="diffOut" class="hidden"></div>
+          </div>
         </div>
-        <div class="pre-box" id="prettyOut" style="min-height:200px;"><span style="color:var(--text2);">// کانفیگ تولیدی...</span></div>
-        <textarea id="plainOut" class="pre-box" style="display:none;min-height:200px;" readonly></textarea>
-        <div id="diffOut" class="pre-box" style="display:none;min-height:200px;"></div>
-        <button id="btnFullscreen" style="margin-top:8px;padding:6px;">⛶ تمام‌صفحه</button>
-      </div>
+      </section>
 
-      <div class="card">
+      <section class="card">
         <div class="card-header">
-          <span data-i18n="nodes">🖥 گره‌ها</span>
-          <div class="flex" style="flex:0 1 auto;width:auto;">
-            <input type="text" id="nodeSearch" placeholder="🔍 جستجو..." style="flex:1;min-width:120px;">
-            <button id="btnImport" style="flex:0;">📂 Import</button>
-            <button id="btnExport" style="flex:0;">💾 Export</button>
+          <span class="card-title"><span class="p-dot dot-node"></span> گره‌های شناسایی شده</span>
+        </div>
+        <div class="card-body">
+          <input type="text" id="nodeSearch" placeholder="🔍 جستجوی گره (نام، سرور)..." style="width: 100%; margin-bottom: 10px; min-height:40px;">
+          <div class="node-grid" id="nodeList">
+            <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary); font-size:0.9rem;">
+              لطفا متن ساب‌اسکریپشن را وارد کنید.
+            </div>
           </div>
         </div>
-        <div class="node-grid" id="nodeList">
-          <div class="node-placeholder" data-i18n="noNodes">هیچ گره‌ای یافت نشد</div>
-        </div>
-      </div>
+      </section>
     </div>
+
   </div>
 </div>
 
-<!-- ===== QR MODAL ===== -->
-<div class="modal-overlay" id="qrModal">
+<!-- STICKY ACTION BAR FOR FAST EXECUTION ON MOBILE DOWN BELOW -->
+<div id="stickyBar" class="sticky-bar">
+  <div class="selection-info" style="font-size: 0.9rem; text-align:center;">
+    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره در لیست بازسازی وجود دارد
+  </div>
+  <div class="sticky-buttons">
+    <button onclick="document.getElementById('btnConvert').click();" style="flex:1;">⚡ ساخت و کپی</button>
+    <button onclick="downloadConfig()" style="flex:1;">⬇ دانلود فایل</button>
+    <button class="primary" onclick="showQrModal()" style="flex:1;">📷 نمایش QR</button>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div id="qrModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
   <div class="modal">
-    <h3 data-i18n="qrTitle">📷 اسکن QR</h3>
+    <h3 style="margin-bottom:10px; color:var(--cyan); font-size:1.1rem;" id="qrModalTitle">اسکن QR Code</h3>
     <div id="qrcode"></div>
-    <button class="danger" id="qrClose" style="margin-top:12px;" data-i18n="close">بستن</button>
+    <button class="danger" style="margin-top:20px; width:100%; min-height:44px;" onclick="document.getElementById('qrModal').classList.remove('active')">بستن پنجره</button>
   </div>
 </div>
 
-<!-- ===== TOASTS ===== -->
 <div id="toasts"></div>
 
 <script>
 "use strict";
-//! ======================================================================
-//! ====================  CORE: I18N & TRANSLATIONS ====================
-//! ======================================================================
-const i18n = {
-  fa: {
-    appTitle: 'VLESS ⇢ Xray Studio',
-    stats: 'گره‌های معتبر:',
-    invalid: 'نامعتبر:',
-    inputLabel: '📥 ورودی ساب‌اسکریپشن',
-    settings: '⚙️ تنظیمات',
-    dnsLabel: '🌐 DNS & تست',
-    routing: '🧭 مسیریابی',
-    advanced: '⚙️ پیشرفته',
-    generate: 'تولید و کپی',
-    output: '📤 خروجی',
-    nodes: '🖥 گره‌ها',
-    noNodes: 'هیچ گره‌ای یافت نشد',
-    qrTitle: '📷 اسکن QR',
-    close: 'بستن',
-    blockAds: 'مسدودسازی تبلیغات',
-    directIR: 'مسیر مستقیم ایران',
-    blockQuic: 'بلاک QUIC',
-    mux: 'MUX',
-    insecure: 'Insecure TLS',
-    prefix: 'پیشوند:',
-    copySuccess: '✅ کپی شد!',
-    copyError: '❌ خطا در کپی',
-    fetchSuccess: '✅ دریافت شد',
-    fetchError: '❌ دریافت با خطا مواجه شد',
-    dnsTesting: '⏳ در حال تست DNS...',
-    dnsResult: (name, time) => `${name}: ${time < 200 ? '🟢' : time < 500 ? '🟡' : '🔴'} ${time}ms`
-  },
-  en: {
-    appTitle: 'VLESS ⇢ Xray Studio',
-    stats: 'Valid nodes:',
-    invalid: 'Invalid:',
-    inputLabel: '📥 Subscription Input',
-    settings: '⚙️ Settings',
-    dnsLabel: '🌐 DNS & Tester',
-    routing: '🧭 Routing',
-    advanced: '⚙️ Advanced',
-    generate: 'Generate & Copy',
-    output: '📤 Output',
-    nodes: '🖥 Nodes',
-    noNodes: 'No nodes found',
-    qrTitle: '📷 Scan QR',
-    close: 'Close',
-    blockAds: 'Block Ads',
-    directIR: 'Direct Iran',
-    blockQuic: 'Block QUIC',
-    mux: 'MUX',
-    insecure: 'Insecure TLS',
-    prefix: 'Prefix:',
-    copySuccess: '✅ Copied!',
-    copyError: '❌ Copy failed',
-    fetchSuccess: '✅ Fetched',
-    fetchError: '❌ Fetch failed',
-    dnsTesting: '⏳ Testing DNS...',
-    dnsResult: (name, time) => `${name}: ${time < 200 ? '🟢' : time < 500 ? '🟡' : '🔴'} ${time}ms`
-  },
-  ar: {
-    appTitle: 'VLESS ⇢ Xray ستوديو',
-    stats: 'العقد الصالحة:',
-    invalid: 'غير صالحة:',
-    inputLabel: '📥 إدخال الاشتراك',
-    settings: '⚙️ الإعدادات',
-    dnsLabel: '🌐 DNS والاختبار',
-    routing: '🧭 التوجيه',
-    advanced: '⚙️ متقدم',
-    generate: 'توليد ونسخ',
-    output: '📤 المخرجات',
-    nodes: '🖥 العقد',
-    noNodes: 'لم يتم العثور على عقد',
-    qrTitle: '📷 مسح QR',
-    close: 'إغلاق',
-    blockAds: 'حظر الإعلانات',
-    directIR: 'التوجيه المباشر لإيران',
-    blockQuic: 'حظر QUIC',
-    mux: 'MUX',
-    insecure: 'TLS غير آمن',
-    prefix: 'البادئة:',
-    copySuccess: '✅ تم النسخ!',
-    copyError: '❌ فشل النسخ',
-    fetchSuccess: '✅ تم الاستلام',
-    fetchError: '❌ فشل الاستلام',
-    dnsTesting: '⏳ جاري اختبار DNS...',
-    dnsResult: (name, time) => `${name}: ${time < 200 ? '🟢' : time < 500 ? '🟡' : '🔴'} ${time}ms`
+const $ = id => document.getElementById(id);
+const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
+const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/** PARTICLES BACKGROUND **/
+const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+window.addEventListener('resize', resize); resize();
+for(let i=0; i<25; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
+function animate() {
+  ctx.clearRect(0,0,W,H); const accentColor = getComputedStyle(document.body).getPropertyValue('--cyan').trim();
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = accentColor; ctx.globalAlpha = p.a; ctx.fill(); ctx.globalAlpha = 1;
+  }); requestAnimationFrame(animate);
+} animate();
+
+/** TOAST ALERTS **/
+function toast(msg, type=''){
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = (type==='err'?'❌ ':'') + (type==='warn'?'⚠️ ':'✅ ') + msg;
+  $('toasts').appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+/** 🔧 FIXED: SAFE CLIPBOARD COPY WITH FALLBACK **/
+function copyToClipboard(text, onSuccess) {
+  if (!text) {
+    toast('متن برای کپی خالی است', 'err');
+    return;
   }
+
+  // Method 1: Modern Clipboard API (requires HTTPS or localhost)
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        if (onSuccess) onSuccess();
+        toast('متن با موفقیت کپی شد ✅', '');
+      })
+      .catch((err) => {
+        console.warn('Clipboard API failed:', err);
+        // Fallback to execCommand
+        fallbackCopy(text, onSuccess);
+      });
+  } else {
+    // Method 2: Fallback using execCommand
+    fallbackCopy(text, onSuccess);
+  }
+}
+
+function fallbackCopy(text, onSuccess) {
+  // Create a temporary textarea
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  // Make it invisible but part of the DOM
+  textArea.style.position = 'fixed';
+  textArea.style.top = '-9999px';
+  textArea.style.left = '-9999px';
+  textArea.style.width = '2em';
+  textArea.style.height = '2em';
+  textArea.style.opacity = '0';
+  textArea.style.pointerEvents = 'none';
+  document.body.appendChild(textArea);
+
+  // Select and copy
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      if (onSuccess) onSuccess();
+      toast('متن با موفقیت کپی شد ✅', '');
+    } else {
+      toast('عملیات کپی با شکست مواجه شد. لطفاً دستی کپی کنید.', 'err');
+    }
+  } catch (err) {
+    console.error('Fallback copy error:', err);
+    toast('خطا در کپی. لطفاً متن را دستی انتخاب و کپی کنید.', 'err');
+  }
+
+  document.body.removeChild(textArea);
+}
+
+/** SAFE BASE64 ENCODE (Supports UTF-8/Persian remarks) **/
+function encodeBase64Safe(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for(let i=0; i<bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+/** THEME **/
+function applyTheme(theme) {
+  document.body.className = theme;
+  try{ localStorage.setItem('vx_theme', theme); }catch(e){}
+}
+try {
+  const savedTheme = localStorage.getItem('vx_theme');
+  if (savedTheme && ['theme-glass','theme-cyber','theme-light'].includes(savedTheme)) {
+    $('themeSelect').value = savedTheme;
+    applyTheme(savedTheme);
+  }
+} catch (e) {}
+
+/** CONSTANTS & PRESETS **/
+const DNS_PRESETS = {
+  Cloudflare: ['1.1.1.1','1.0.0.1'], Google: ['8.8.8.8','8.8.4.4'], Quad9: ['9.9.9.9','149.112.112.112'],
+  Shecan: ['178.22.122.100','185.51.200.2'], Electro: ['78.157.42.101','78.157.42.100'], Radar: ['10.202.10.10','10.202.10.11']
 };
-let currentLang = 'fa';
+const PROBES = { gstatic: 'https://www.gstatic.com/generate_204', cloudflare: 'https://cp.cloudflare.com/generate_204' };
 
-function t(key, ...args) {
-  let str = i18n[currentLang]?.[key] || i18n.fa[key] || key;
-  if (typeof str === 'function') str = str(...args);
-  return str;
-}
+const BUILTIN_TPLS = {
+  intelligent: { obs: { strategy: 'leastPing', interval: '3m' }, routing: { blockAds: true, blockQuic: true } },
+  streaming: { dns: { preset: 'Google' }, routing: { blockAds: true }, obs: { interval: '5m' } },
+  minimal: { obs: { enabled: false }, routing: { blockAds: false, directIR: false, blockQuic: false }, proxy: { mux: false } }
+};
 
-function updateUI() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    el.textContent = t(key);
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    el.placeholder = t(el.dataset.i18nPlaceholder);
-  });
-}
+/** STATE **/
+let nodes = [], invalidCount = 0;
+let curFmt = 'xray', curTab = 'pretty';
+let textCache = {}, prevTexts = {};
 
-document.getElementById('langSelect').addEventListener('change', e => {
-  currentLang = e.target.value;
-  updateUI();
-});
-
-//! ======================================================================
-//! ====================  STATE & CACHE ================================
-//! ======================================================================
-let nodes = [];
-let invalidCount = 0;
-let textCache = {};
-let prevTexts = {};
-let parsedCache = new Map(); //! cache for parsed links
-let autoRefreshTimer = null;
-
-//! ======================================================================
-//! ====================  PARSER ENGINE (OPTIMIZED) ====================
-//! ======================================================================
-function decodeUriPart(v) { try { return decodeURIComponent(v||''); } catch { return v||''; } }
-
-function tryB64(s) {
-  s = String(s||'').replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
-  if(!s || s.length%4===1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(s)) return null;
-  try { const padded = s + '='.repeat((4 - s.length%4)%4);
+/** PARSER ENGINE **/
+function tryB64(raw){
+  const s = String(raw || '').trim().replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
+  if(!s || s.length % 4 === 1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(s)) return null;
+  try {
+    const padded = s + '='.repeat((4 - (s.length % 4)) % 4);
     const bin = atob(padded);
-    return new TextDecoder('utf-8', {fatal:false}).decode(Uint8Array.from(bin, c=>c.charCodeAt(0)));
-  } catch { return null; }
+    return new TextDecoder('utf-8', { fatal: false }).decode(
+      Uint8Array.from(bin, c => c.charCodeAt(0))
+    );
+  } catch(e) {
+    return null;
+  }
 }
 
-function extractUris(text) {
-  const re = /(?:vless|vmess|trojan|ss):\/\/[^\s<>"']+/gi;
+function decodeUriPart(value){
+  try { return decodeURIComponent(value || ''); } catch(e) { return value || ''; }
+}
+
+function cleanExtractedUri(value){
+  let v = String(value || '').trim();
+  v = v.replace(/\\\//g, '/');
+  v = v.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  v = v.replace(/^[`"'([{<]+/, '').replace(/[`"')\]}>.,;]+$/g, '');
+  return v.trim();
+}
+
+function extractConfigUris(text){
+  const source = String(text || '').replace(/\r?\n/g, '\n');
   const found = [];
   const seen = new Set();
-  for(const m of text.matchAll(re)) {
-    const u = m[0].trim();
-    if(!seen.has(u)) { seen.add(u); found.push(u); }
+  const protocols = '(?:vless|vmess|trojan|ss)://';
+  const re = new RegExp(protocols + "[^\\s<>\"\'`]+", "gi");
+
+  for(const match of source.matchAll(re)){
+    const uri = cleanExtractedUri(match[0]);
+    if(!uri || seen.has(uri)) continue;
+    const parsed = parseNodeLine(uri);
+    if(!parsed.error){
+      seen.add(uri);
+      found.push(uri);
+    }
   }
   return found;
 }
 
-function parseNodeLine(line) {
-  //! cache hit
-  if (parsedCache.has(line)) return parsedCache.get(line);
-  let result = { error: true };
-  try {
-    if(line.startsWith('vless://')) {
-      const u = new URL(line); const p = u.searchParams;
-      result = {
-        proto:'vless', raw:line, uuid:decodeUriPart(u.username),
-        address:u.hostname, port:parseInt(u.port)||443,
-        network:(p.get('type')||'tcp').toLowerCase(),
-        security:(p.get('security')||'none').toLowerCase(),
-        path:p.get('path')||'/', host:p.get('host')||'', sni:p.get('sni')||'',
-        fp:p.get('fp')||'chrome', alpn:(p.get('alpn')||'').split(',').filter(Boolean),
-        flow:p.get('flow')||'', pbk:p.get('pbk')||'', sid:p.get('sid')||'',
-        spx:p.get('spx')||'', serviceName:p.get('serviceName')||'',
-        remark:decodeUriPart(u.hash.slice(1))
-      };
-    } else if(line.startsWith('vmess://')) {
-      const jsonText = tryB64(line.slice(8));
-      if(jsonText) {
-        const j = JSON.parse(jsonText);
-        if(j.add && j.id) {
-          result = {
-            proto:'vmess', raw:line, uuid:j.id,
-            address:j.add, port:parseInt(j.port)||443,
-            network:(j.net||'tcp').toLowerCase(),
-            security:String(j.tls||'').toLowerCase()==='tls'?'tls':'none',
-            sni:j.sni||j.host||j.add, host:j.host||'', path:j.path||'/',
-            fp:j.fp||'chrome', alpn:String(j.alpn||'').split(',').filter(Boolean),
-            remark:j.ps||''
-          };
-        }
-      }
-    } else if(line.startsWith('trojan://')) {
-      const u = new URL(line); const p = u.searchParams;
-      result = {
-        proto:'trojan', raw:line, uuid:decodeUriPart(u.username),
-        address:u.hostname, port:parseInt(u.port)||443,
-        network:(p.get('type')||'tcp').toLowerCase(),
-        security:'tls', sni:p.get('sni')||u.hostname,
-        path:p.get('path')||'/', host:p.get('host')||'',
-        remark:decodeUriPart(u.hash.slice(1))
-      };
-    } else if(line.startsWith('ss://')) {
-      // simplified parser (full version in original code)
-      const tmp = line.slice(5);
-      const hashIdx = tmp.indexOf('#');
-      const remark = hashIdx>-1 ? decodeUriPart(tmp.slice(hashIdx+1)) : '';
-      const main = hashIdx>-1 ? tmp.slice(0,hashIdx) : tmp;
-      let method='', password='', serverPart='';
-      if(main.includes('@')) {
-        const at = main.lastIndexOf('@');
-        const auth = main.slice(0,at);
-        serverPart = main.slice(at+1);
-        const colon = auth.indexOf(':');
-        if(colon>0) { method = decodeUriPart(auth.slice(0,colon)); password = decodeUriPart(auth.slice(colon+1)); }
-      } else {
-        const decoded = tryB64(main);
-        if(decoded && decoded.includes('@')) {
-          const at = decoded.lastIndexOf('@');
-          const auth = decoded.slice(0,at);
-          serverPart = decoded.slice(at+1);
-          const colon = auth.indexOf(':');
-          if(colon>0) { method = auth.slice(0,colon); password = auth.slice(colon+1); }
-        }
-      }
-      if(method && serverPart) {
-        const hp = parseHostPort(serverPart);
-        if(hp.address && hp.port) {
-          result = { proto:'ss', raw:line, method, uuid:password, address:hp.address, port:hp.port, remark };
-        }
-      }
-    }
-    if(!result.error) {
-      result.flag = detectCountry(result.remark);
-      result.id = 'n_' + Math.random().toString(36).slice(2,7);
-      parsedCache.set(line, result);
-    }
-  } catch(e) { /* ignore */ }
-  return result;
+function resolveInput(raw){
+  if(!raw) return '';
+  const source = String(raw).trim();
+
+  const extracted = extractConfigUris(source);
+  if(extracted.length) return extracted.join('\n');
+
+  const decoded = tryB64(source.replace(/^\s+|\s+$/g, ''));
+  if(decoded){
+    const nested = extractConfigUris(decoded);
+    if(nested.length) return nested.join('\n');
+    if(decoded.includes('://')) return decoded;
+  }
+
+  return source;
 }
 
-function parseHostPort(v) {
-  const s = String(v||'').trim();
-  if(!s) return {address:'', port:0};
-  const m6 = s.match(/^\[([^\]]+)\](?::(\d+))?$/);
-  if(m6) return {address:m6[1], port:parseInt(m6[2]||'443')||443};
-  const idx = s.lastIndexOf(':');
-  if(idx>-1 && /^\d+$/.test(s.slice(idx+1))) return {address:s.slice(0,idx), port:parseInt(s.slice(idx+1))||443};
-  return {address:s, port:443};
+function parseHostPort(value){
+  const raw = String(value || '').trim();
+  if(!raw) return { address:'', port:0 };
+
+  const m6 = raw.match(/^\[([^\]]+)\](?::(\d+))?$/);
+  if(m6) return { address:m6[1], port: parseInt(m6[2] || '443', 10) || 443 };
+
+  const idx = raw.lastIndexOf(':');
+  if(idx > -1 && /^\d+$/.test(raw.slice(idx + 1))) {
+    return { address: raw.slice(0, idx), port: parseInt(raw.slice(idx + 1), 10) || 443 };
+  }
+  return { address: raw, port: 443 };
+}
+
+function parseNodeLine(line){
+  try {
+    line = String(line || '').trim();
+    if(!line) return {error:true};
+
+    if(line.startsWith('vless://')){
+      const u = new URL(line);
+      const p = u.searchParams;
+      const network = (p.get('type') || 'tcp').toLowerCase();
+      const security = (p.get('security') || 'none').toLowerCase();
+
+      return {
+        proto: 'vless',
+        raw: line,
+        uuid: decodeUriPart(u.username),
+        address: u.hostname,
+        port: parseInt(u.port, 10) || 443,
+        network,
+        security,
+        path: p.get('path') || '/',
+        host: p.get('host') || '',
+        sni: p.get('sni') || '',
+        fp: p.get('fp') || 'chrome',
+        alpn: (p.get('alpn') || '').split(',').map(x => x.trim()).filter(Boolean),
+        flow: p.get('flow') || '',
+        pbk: p.get('pbk') || '',
+        sid: p.get('sid') || '',
+        spx: p.get('spx') || '',
+        serviceName: p.get('serviceName') || '',
+        remark: decodeUriPart(u.hash.slice(1))
+      };
+    }
+
+    if(line.startsWith('vmess://')){
+      const jsonText = tryB64(line.slice(8));
+      if(!jsonText) return {error:true};
+      const json = JSON.parse(jsonText);
+      if(!json.add || !json.id) return {error:true};
+
+      return {
+        proto: 'vmess',
+        raw: line,
+        uuid: json.id,
+        address: json.add,
+        port: parseInt(json.port, 10) || 443,
+        network: (json.net || 'tcp').toLowerCase(),
+        security: String(json.tls || '').toLowerCase() === 'tls' ? 'tls' : 'none',
+        sni: json.sni || json.host || json.add,
+        host: json.host || '',
+        path: json.path || '/',
+        fp: json.fp || 'chrome',
+        alpn: String(json.alpn || '').split(',').map(x => x.trim()).filter(Boolean),
+        remark: json.ps || ''
+      };
+    }
+
+    if(line.startsWith('trojan://')){
+      const u = new URL(line);
+      const p = u.searchParams;
+      return {
+        proto: 'trojan',
+        raw: line,
+        uuid: decodeUriPart(u.username),
+        address: u.hostname,
+        port: parseInt(u.port, 10) || 443,
+        network: (p.get('type') || 'tcp').toLowerCase(),
+        security: 'tls',
+        sni: p.get('sni') || u.hostname,
+        path: p.get('path') || '/',
+        host: p.get('host') || '',
+        remark: decodeUriPart(u.hash.slice(1))
+      };
+    }
+
+    if(line.startsWith('ss://')){
+      const temp = line.slice(5);
+      const hashIdx = temp.indexOf('#');
+      const remark = hashIdx > -1 ? decodeUriPart(temp.slice(hashIdx + 1)) : '';
+      const main = hashIdx > -1 ? temp.slice(0, hashIdx) : temp;
+
+      let method = '', password = '', serverPart = '';
+      if(main.includes('@')){
+        const at = main.lastIndexOf('@');
+        const auth = main.slice(0, at);
+        serverPart = main.slice(at + 1);
+
+        const colon = auth.indexOf(':');
+        if(colon < 1) return {error:true};
+
+        method = decodeUriPart(auth.slice(0, colon));
+        password = decodeUriPart(auth.slice(colon + 1));
+
+        if(!method || !serverPart) return {error:true};
+      } else {
+        const decoded = tryB64(main);
+        if(!decoded || !decoded.includes('@')) return {error:true};
+
+        const at = decoded.lastIndexOf('@');
+        const auth = decoded.slice(0, at);
+        serverPart = decoded.slice(at + 1);
+
+        const colon = auth.indexOf(':');
+        if(colon < 1) return {error:true};
+
+        method = auth.slice(0, colon);
+        password = auth.slice(colon + 1);
+      }
+
+      const hp = parseHostPort(serverPart);
+      if(!hp.address || !hp.port || !method) return {error:true};
+
+      return {
+        proto: 'ss',
+        raw: line,
+        method,
+        uuid: password,
+        address: hp.address,
+        port: hp.port,
+        remark
+      };
+    }
+
+    return {error:true};
+  } catch(e) {
+    return {error:true};
+  }
 }
 
 function detectCountry(remark) {
   if(!remark) return '🌐';
   const r = remark.toUpperCase();
-  const flags = {'IR':'🇮🇷','DE':'🇩🇪','US':'🇺🇸','NL':'🇳🇱','GB':'🇬🇧','FR':'🇫🇷','JP':'🇯🇵','SG':'🇸🇬','TR':'🇹🇷','CA':'🇨🇦'};
+  const flags = { 'IR':'🇮🇷', 'DE':'🇩🇪', 'US':'🇺🇸', 'NL':'🇳🇱', 'GB':'🇬🇧', 'FR':'🇫🇷', 'JP':'🇯🇵', 'SG':'🇸🇬', 'TR':'🇹🇷', 'CA':'🇨🇦', 'FI':'🇫🇮' };
   for(const [k,f] of Object.entries(flags)) if(r.includes(k)) return f;
   const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u);
   return emoji ? emoji[0] : '🌐';
 }
 
-//! ======================================================================
-//! ====================  VIRTUAL SCROLL (PERFORMANCE) ================
-//! ======================================================================
-class VirtualList {
-  constructor(container, itemHeight = 70, buffer = 10) {
-    this.container = container;
-    this.itemHeight = itemHeight;
-    this.buffer = buffer;
-    this.items = [];
-    this.visible = [];
-    this.observer = new IntersectionObserver(() => this.render(), { root: container, rootMargin: `${buffer*itemHeight}px` });
-    this.container.addEventListener('scroll', () => this.render());
-  }
-  setItems(items) {
-    this.items = items;
-    this.render();
-  }
-  render() {
-    const scrollTop = this.container.scrollTop;
-    const height = this.container.clientHeight;
-    const start = Math.max(0, Math.floor(scrollTop / this.itemHeight) - this.buffer);
-    const end = Math.min(this.items.length, Math.ceil((scrollTop + height) / this.itemHeight) + this.buffer);
-    const visibleSet = new Set(this.visible);
-    const newVisible = [];
-    for(let i=start; i<end; i++) {
-      newVisible.push(i);
-      if(!visibleSet.has(i)) {
-        const node = this.items[i];
-        const div = document.createElement('div');
-        div.className = 'node-item';
-        div.dataset.index = i;
-        div.innerHTML = `
-          <span class="flag">${node.flag||'🌐'}</span>
-          <div class="info">
-            <div class="name">${node.remark||node.address}</div>
-            <div class="meta">
-              <span class="badge cyan">${node.proto.toUpperCase()}</span>
-              <span class="badge">${node.address}:${node.port}</span>
-              ${node.network?`<span class="badge">${node.network.toUpperCase()}</span>`:''}
-              ${node.security==='tls'?'<span class="badge green">TLS</span>':''}
-            </div>
-          </div>
-          <button class="danger" style="padding:2px 8px;font-size:.7rem;flex:0;" data-action="remove" data-id="${node.id}">✕</button>
-        `;
-        this.container.appendChild(div);
-        this.observer.observe(div);
-      }
-    }
-    // remove invisible
-    for(const i of this.visible) {
-      if(!newVisible.includes(i)) {
-        const child = this.container.querySelector(`[data-index="${i}"]`);
-        if(child) { this.observer.unobserve(child); child.remove(); }
-      }
-    }
-    this.visible = newVisible;
-    // placeholder
-    const placeholder = this.container.querySelector('.node-placeholder');
-    if(this.items.length===0) {
-      if(!placeholder) {
-        const p = document.createElement('div');
-        p.className = 'node-placeholder';
-        p.textContent = t('noNodes');
-        this.container.prepend(p);
-      }
-    } else if(placeholder) placeholder.remove();
-  }
+function analyzeInput(){
+  const raw = $('inputLinks').value || '';
+  const text = resolveInput(raw);
+  const candidates = extractConfigUris(text);
+  const lines = candidates.length
+    ? candidates
+    : text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+
+  nodes = []; invalidCount = 0;
+  const seen = new Set();
+
+  lines.forEach((ln, i) => {
+    const candidate = cleanExtractedUri(ln);
+    if(!candidate || seen.has(candidate)) return;
+
+    const pr = parseNodeLine(candidate);
+    if(pr.error) { invalidCount++; return; }
+
+    seen.add(candidate);
+    pr.raw = candidate;
+    pr.id = 'node_' + nodes.length;
+    pr.flag = detectCountry(pr.remark);
+    nodes.push(pr);
+  });
+
+  const sourceLineCount = raw.split(/\r?\n/).filter(x=>x.trim()).length;
+  $('statLines').textContent = faNum(candidates.length || sourceLineCount);
+  $('statValid').textContent = faNum(nodes.length);
+  $('statInvalid').textContent = faNum(invalidCount);
+
+  renderNodes();
+  $('finalCount').textContent = faNum(nodes.length);
+  $('stickyBar').style.display = nodes.length > 0 ? 'flex' : 'none';
 }
 
-//! ======================================================================
-//! ====================  ANALYZER (DEBOUNCED) ========================
-//! ======================================================================
-let debounceTimer;
-
-function analyzeInput() {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    const raw = document.getElementById('inputLinks').value || '';
-    const text = resolveInput(raw);
-    const uris = extractUris(text);
-    const lines = uris.length ? uris : text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    nodes = [];
-    invalidCount = 0;
-    const seen = new Set();
-    for(const ln of lines) {
-      if(!ln || seen.has(ln)) continue;
-      const pr = parseNodeLine(ln);
-      if(pr.error) { invalidCount++; continue; }
-      seen.add(ln);
-      pr.raw = ln;
-      pr.flag = detectCountry(pr.remark);
-      pr.id = 'n_' + nodes.length;
-      nodes.push(pr);
-    }
-    document.getElementById('statValid').textContent = nodes.length;
-    document.getElementById('statInvalid').textContent = invalidCount;
-    if(virtualList) virtualList.setItems(nodes);
-    else renderNodesFallback();
-  }, 400);
-}
-
-function resolveInput(raw) {
-  const extracted = extractUris(raw);
-  if(extracted.length) return extracted.join('\n');
-  const decoded = tryB64(raw.replace(/\s/g,''));
-  if(decoded) {
-    const nested = extractUris(decoded);
-    if(nested.length) return nested.join('\n');
-    if(decoded.includes('://')) return decoded;
+/** NODE RENDERING **/
+function renderNodes(){
+  const list = $('nodeList');
+  const q = $('nodeSearch').value.toLowerCase();
+  
+  const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
+  
+  if(!filtered.length) {
+    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">گره‌ای مطابق فیلتر یافت نشد.</div>';
+    return;
   }
-  return raw;
+  
+  list.innerHTML = filtered.map((n, index) => {
+    const uriSafe = encodeURIComponent(n.raw);
+    return `
+    <div class="node-card">
+      <div class="node-head">
+        <span class="node-flag">${n.flag}</span>
+        <span class="badge" style="border-color:var(--cyan); color:var(--cyan)">${n.proto.toUpperCase()}</span>
+      </div>
+      <div class="node-remark" title="${escHtml(n.remark)}">${escHtml(n.remark||n.address)}</div>
+      <div class="node-meta">
+        <span class="badge">${n.address}:${n.port}</span>
+        <span class="badge b-${n.network||'tcp'}">${(n.network||'tcp').toUpperCase()}</span>
+        ${n.security==='tls'?'<span class="badge b-tls">TLS</span>':''}
+        ${n.security==='reality'?'<span class="badge b-reality">REALITY</span>':''}
+      </div>
+      <div class="node-actions" style="margin-top:6px;">
+        <button class="primary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمـایش QR</button>
+        <button class="danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeNode('${n.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function renderNodesFallback() { /* fallback if virtualList fails */ }
+function removeNode(id) { 
+  nodes = nodes.filter(n => n.id !== id); 
+  renderNodes(); 
+  $('finalCount').textContent = faNum(nodes.length);
+  if(nodes.length === 0) $('stickyBar').style.display = 'none';
+}
 
-let virtualList = null;
-window.addEventListener('load', () => {
-  const container = document.getElementById('nodeList');
-  virtualList = new VirtualList(container, 70, 5);
+$('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 500); });
+$('nodeSearch').addEventListener('input', renderNodes);
+$('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; analyzeInput(); });
+
+/** DNS PING TESTER (No-CORS) **/
+const dnsURLs = {
+  'Cloudflare': 'https://cloudflare-dns.com/dns-query', 'Google': 'https://dns.google/resolve', 'Quad9': 'https://dns.quad9.net/dns-query',
+  'Shecan': 'https://shecan.ir/favicon.ico', 'Electro': 'https://electrotm.org/favicon.ico', 'Radar': 'https://radar.game/favicon.ico'
+};
+async function testDnsPings() {
+  const btn = $('btnPingDns'); btn.textContent = '⏳ ...'; btn.disabled = true;
+  const promises = Object.keys(dnsURLs).map(async (key) => {
+    const start = Date.now();
+    try {
+      const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 3500);
+      await fetch(dnsURLs[key] + "?t=" + start, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeoutId); const ping = Date.now() - start;
+      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+      if(opt) opt.textContent = `${key} (${ping<150?'🟢':(ping<300?'🟡':'🟠')} ${ping}ms)`;
+    } catch (e) {
+      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+      if(opt) opt.textContent = `${key} (❌ مسدود)`;
+    }
+  });
+  await Promise.allSettled(promises);
+  btn.textContent = '📡 تست DNS'; btn.disabled = false; toast('تست پینگ سرورهای DNS تمام شد.');
+}
+
+/** TEMP FILE SYSTEM **/
+let tempFileTimer = null;
+let tempFileInterval = null;
+
+function startTempFileTimer(durationMinutes = 5) {
+  const expireTime = Date.now() + durationMinutes * 60 * 1000;
+  try { localStorage.setItem('sc_temp_expire', expireTime.toString()); } catch(e) {}
+  $('tempFileStatus').style.display = 'flex';
+  
+  clearInterval(tempFileInterval);
+  tempFileInterval = setInterval(() => {
+    const now = Date.now();
+    const left = expireTime - now;
+    if (left <= 0) deleteTempFile(true);
+    else {
+      const mins = Math.floor(left / 60000).toString().padStart(2, '0');
+      const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
+      $('tempTime').textContent = `${mins}:${secs}`;
+    }
+  }, 1000);
+}
+
+function restoreTempFileTimer(){
+  try {
+    const expire = parseInt(localStorage.getItem('sc_temp_expire') || '0', 10);
+    if(!expire) return;
+    const remaining = expire - Date.now();
+    if(remaining <= 0){
+      localStorage.removeItem('sc_temp_expire');
+      return;
+    }
+    $('tempFileStatus').style.display = 'flex';
+    clearInterval(tempFileInterval);
+    tempFileInterval = setInterval(() => {
+      const left = expire - Date.now();
+      if(left <= 0) deleteTempFile(true);
+      else {
+        const mins = Math.floor(left / 60000).toString().padStart(2, '0');
+        const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
+        $('tempTime').textContent = `${mins}:${secs}`;
+      }
+    }, 1000);
+  } catch(e) {}
+}
+
+function deleteTempFile(isAuto = false) {
+  clearInterval(tempFileInterval);
+  $('tempFileStatus').style.display = 'none';
+  try { localStorage.removeItem('sc_temp_expire'); } catch(e) {}
+  $('inputLinks').value = '';
   analyzeInput();
-});
+  if(isAuto) toast("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت پاک شد.", 'warn');
+}
 
-//! ======================================================================
-//! ====================  REAL DNS TEST (DoH) =========================
-//! ======================================================================
-async function testDnsReal() {
-  const btn = document.getElementById('btnDnsTest');
-  btn.disabled = true;
-  btn.textContent = t('dnsTesting');
-  const resultDiv = document.getElementById('dnsResult');
-  resultDiv.innerHTML = '';
-
-  const servers = [
-    { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query?name=example.com&type=A' },
-    { name: 'Google', url: 'https://dns.google/resolve?name=example.com&type=A' },
-    { name: 'Shecan', url: 'https://shecan.ir/favicon.ico' }, // fallback
+/** FETCH FROM URL **/
+$('btnFetch').addEventListener('click', async () => {
+  const url = $('subUrl').value.trim(); if(!url) return toast('آدرس ساب‌اسکریپشن خالی است', 'warn');
+  const btn = $('btnFetch'); btn.textContent = '⏳ در حال دریافت...'; btn.disabled = true;
+  
+  const proxies = [
+    '', 
+    'https://api.allorigins.win/raw?url=',
+    'https://api.codetabs.com/v1/proxy?quest=',
+    'https://corsproxy.io/?'
   ];
 
-  const results = [];
-  for(const s of servers) {
-    const start = performance.now();
+  let success = false;
+
+  for (let proxy of proxies) {
     try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 5000);
-      const res = await fetch(s.url, { signal: ctrl.signal, mode: 'cors', cache: 'no-store' });
-      clearTimeout(timer);
-      const time = Math.round(performance.now() - start);
-      results.push({ name: s.name, time, ok: res.ok });
-    } catch(e) {
-      results.push({ name: s.name, time: Infinity, ok: false });
-    }
+      const fetchUrl = proxy ? proxy + encodeURIComponent(url) : url;
+      let res = await fetch(fetchUrl);
+      if (!res.ok) continue; 
+      
+      let text = await res.text();
+      if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html') && !text.trim().toLowerCase().startsWith('<!doctype')) {
+        $('inputLinks').value = text;
+        analyzeInput();
+        startTempFileTimer(5);
+        toast('ساب‌اسکریپشن به درستی دریافت شد ✓');
+        success = true;
+        break; 
+      }
+    } catch (err) { }
   }
 
-  results.sort((a,b) => a.time - b.time);
-  let html = '';
-  for(const r of results) {
-    const color = r.ok ? (r.time < 200 ? 'var(--success)' : r.time < 500 ? 'var(--warning)' : 'var(--danger)') : 'var(--danger)';
-    const emoji = r.ok ? (r.time < 200 ? '🟢' : r.time < 500 ? '🟡' : '🔴') : '❌';
-    html += `<div style="color:${color};">${emoji} ${r.name}: ${r.ok ? r.time+'ms' : '⛔'}</div>`;
-  }
-  resultDiv.innerHTML = html;
+  if (!success) toast('دریافت با خطا مواجه شد. لطفاً متن ساب را دستی پیست کنید.', 'err');
+  btn.textContent = '⬇ دریافت'; btn.disabled = false;
+});
 
-  btn.disabled = false;
-  btn.textContent = '📡 تست واقعی DNS';
+function pasteFromClipboard() {
+  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err'));
 }
 
-document.getElementById('btnDnsTest').addEventListener('click', testDnsReal);
-
-//! ======================================================================
-//! ====================  GENERATORS (Xray, Sing-Box, Clash) =========
-//! ======================================================================
+/** ═════ THE CORE: GENERATORS (Xray, Sing-Box, Clash) ═════ **/
 function getSettings() {
   return {
-    prefix: document.getElementById('prefix').value.trim() || 'proxy-',
-    mux: document.getElementById('swMux').checked,
-    allowInsecure: document.getElementById('swInsecure').checked,
-    dns: { Cloudflare:['1.1.1.1','1.0.0.1'], Google:['8.8.8.8','8.8.4.4'], Shecan:['178.22.122.100','185.51.200.2'] }[document.getElementById('dnsPreset').value] || ['1.1.1.1'],
-    routing: {
-      blockAds: document.getElementById('swAds').checked,
-      directIR: document.getElementById('swIR').checked,
-      blockQuic: document.getElementById('swQuic').checked
-    }
+    prefix: $('prefix').value.trim()||'proxy-', mux: $('swMux').checked, allowInsecure: $('swInsecure').checked,
+    dns: DNS_PRESETS[$('dnsPreset').value] || DNS_PRESETS.Cloudflare,
+    inbound: { socksPort: parseInt($('socksPort').value)||10808, httpPort: parseInt($('httpPort').value)||10809 },
+    obs: { enabled: $('swObs').checked, strategy: $('obsStrategy').value, probe: PROBES[$('probeSel').value]||PROBES.gstatic, interval: $('obsInterval').value },
+    routing: { blockAds: $('swAds').checked, directIR: $('swIR').checked, blockQuic: $('swQuic').checked, directPrivate: $('swPriv').checked }
   };
 }
 
-function buildXray(list, s) { /* simplified - full in original */ return { outbounds: list.map((n,i)=>({tag:s.prefix+(i+1), protocol:n.proto, settings:{}})) }; }
-function buildSingBox(list, s) { return { outbounds: list.map((n,i)=>({tag:s.prefix+(i+1), type:n.proto})) }; }
-function buildClash(list, s) { return 'proxies:\n' + list.map((n,i)=>`  - name: ${s.prefix}${i+1}\n    type: ${n.proto}\n    server: ${n.address}\n    port: ${n.port}`).join('\n'); }
-
-//! ======================================================================
-//! ====================  GENERATE & COPY =============================
-//! ======================================================================
-function generate() {
-  if(!nodes.length) { toast(t('noNodes'), 'err'); return; }
-  const s = getSettings();
-  const fmt = document.getElementById('fmtSel').value;
-  let out = '';
-  if(fmt==='xray') out = JSON.stringify(buildXray(nodes, s), null, 2);
-  else if(fmt==='singbox') out = JSON.stringify(buildSingBox(nodes, s), null, 2);
-  else if(fmt==='clash') out = buildClash(nodes, s);
-  else if(fmt==='v2rayn') out = btoa(nodes.map(n=>n.raw).join('\n'));
-  textCache[fmt] = out;
-  document.getElementById('prettyOut').textContent = out;
-  document.getElementById('plainOut').value = out;
-  copyToClipboard(out, () => toast(t('copySuccess')));
-}
-
-document.getElementById('btnConvert').addEventListener('click', generate);
-document.getElementById('btnCopy').addEventListener('click', () => {
-  const fmt = document.getElementById('fmtSel').value;
-  if(!textCache[fmt]) generate();
-  copyToClipboard(textCache[fmt], () => toast(t('copySuccess')));
-});
-
-//! ======================================================================
-//! ====================  COPY UTILITY (with fallback) ================
-//! ======================================================================
-function copyToClipboard(text, onSuccess) {
-  if (!text) { toast(t('copyError'), 'err'); return; }
-  if(navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => onSuccess?.()).catch(() => fallbackCopy(text, onSuccess));
-  } else {
-    fallbackCopy(text, onSuccess);
+function buildXray(list, s) {
+  const rules = [];
+  if(s.routing.blockQuic) rules.push({network:'udp', outboundTag:'block', port:'443', type:'field'});
+  rules.push({balancerTag:'proxy-round', domain:['geosite:google'], type:'field'});
+  
+  if(s.routing.directPrivate) {
+     rules.push({ip:['geoip:private'], outboundTag:'direct', type:'field'});
+     rules.push({domain:['geosite:private'], outboundTag:'direct', type:'field'});
   }
-}
-function fallbackCopy(text, onSuccess) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed'; ta.style.top = '-9999px'; ta.style.left = '-9999px';
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand('copy'); onSuccess?.(); } catch(e) { toast(t('copyError'), 'err'); }
-  ta.remove();
-}
+  if(s.routing.directIR) {
+     rules.push({ip:['geoip:cn','geoip:ir'], outboundTag:'direct', type:'field'});
+     rules.push({domain:['geosite:cn'], outboundTag:'direct', type:'field'});
+  }
+  
+  rules.push({inboundTag:['domestic-dns'], outboundTag:'direct', type:'field'});
+  rules.push({balancerTag:'proxy-round', inboundTag:['dns-module'], type:'field'});
+  rules.push({balancerTag:'proxy-round', network:'tcp,udp', type:'field'});
 
-//! ======================================================================
-//! ====================  TOAST, PROGRESS, FETCH, IMPORT/EXPORT ======
-//! ======================================================================
-function toast(msg, type='') {
-  const d = document.createElement('div');
-  d.className = 'toast' + (type ? ' ' + type : '');
-  d.textContent = msg;
-  document.getElementById('toasts').appendChild(d);
-  requestAnimationFrame(() => d.classList.add('show'));
-  setTimeout(() => { d.classList.remove('show'); setTimeout(() => d.remove(), 300); }, 3000);
-}
+  const primaryDns = s.dns[0] || "1.1.1.1";
 
-document.getElementById('btnFetch').addEventListener('click', async () => {
-  const url = document.getElementById('subUrl').value.trim();
-  if(!url) return toast('URL empty', 'err');
-  const btn = document.getElementById('btnFetch');
-  btn.disabled = true; btn.textContent = '⏳ ...';
-  const bar = document.getElementById('progressBar');
-  const prog = document.getElementById('progress');
-  prog.style.display = 'block';
-  bar.style.width = '20%';
-  try {
-    const res = await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url));
-    bar.style.width = '60%';
-    if(res.ok) {
-      const text = await res.text();
-      document.getElementById('inputLinks').value = text;
-      analyzeInput();
-      bar.style.width = '100%';
-      toast(t('fetchSuccess'));
-    } else {
-      toast(t('fetchError'), 'err');
-    }
-  } catch(e) { toast(t('fetchError'), 'err'); }
-  setTimeout(() => { prog.style.display = 'none'; btn.disabled = false; btn.textContent = '⬇ دریافت'; }, 1000);
-});
-
-document.getElementById('btnClear').addEventListener('click', () => { document.getElementById('inputLinks').value = ''; analyzeInput(); });
-document.getElementById('btnPaste').addEventListener('click', () => {
-  navigator.clipboard.readText().then(t => { document.getElementById('inputLinks').value = t; analyzeInput(); }).catch(() => toast('دسترسی محدود', 'err'));
-});
-
-document.getElementById('btnExport').addEventListener('click', () => {
-  const data = JSON.stringify({ nodes, settings: getSettings() }, null, 2);
-  const blob = new Blob([data], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'profile.json'; a.click();
-});
-document.getElementById('btnImport').addEventListener('click', () => {
-  const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
-  input.onchange = () => {
-    const file = input.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = JSON.parse(e.target.result);
-        if(data.nodes) { nodes = data.nodes; virtualList.setItems(nodes); document.getElementById('statValid').textContent = nodes.length; }
-        if(data.settings) { /* apply settings */ }
-        toast('✅ پروفایل بارگذاری شد');
-      } catch(ex) { toast('❌ فایل نامعتبر', 'err'); }
+  const outbounds = list.map((n, i) => {
+    const ob = { 
+      mux: { concurrency: s.mux ? 8 : -1, enabled: !!s.mux },
+      protocol: n.proto, 
+      settings: {}, 
+      streamSettings: { network: n.network||'tcp', security: n.security||'none' },
+      tag: s.prefix + (i + 1)
     };
-    reader.readAsText(file);
+    
+    if(n.proto === 'vless'){
+      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ encryption: "none", id: n.uuid, level: 8 }] }];
+      if(n.flow) ob.settings.vnext[0].users[0].flow = n.flow;
+      
+      if(n.security === 'reality') {
+         ob.streamSettings.realitySettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", publicKey: n.pbk, shortId: n.sid, spiderX: n.spx };
+      } else if (n.security === 'tls') {
+         ob.streamSettings.tlsSettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", alpn: n.alpn.length?n.alpn:["http/1.1"] };
+      }
+      if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
+      else if(n.network === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.serviceName||'grpc' };
+    } 
+    else if(n.proto === 'vmess'){
+      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, alterId: 0, level: 8 }] }];
+      if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp||"chrome" };
+      if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
+    }
+    else if(n.proto === 'trojan'){
+      ob.settings.servers = [{ address: n.address, port: n.port, password: n.uuid, level: 8 }];
+      if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp||"chrome" };
+      if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
+    }
+    else if(n.proto === 'ss'){ ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.uuid, level: 8 }]; }
+    
+    return ob;
+  });
+
+  const dnsHosts = {
+    "domain:googleapis.cn": "googleapis.com",
+    "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
+    "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
+    "dns.cloudflare.com": ["104.16.132.229", "104.16.133.229", "2606:4700::6810:84e5", "2606:4700::6810:85e5"],
+    "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"]
   };
-  input.click();
-});
 
-document.getElementById('btnAutoRefresh').addEventListener('click', function() {
-  if(autoRefreshTimer) {
-    clearInterval(autoRefreshTimer); autoRefreshTimer = null;
-    this.textContent = '⏱ خودکار';
-    toast('⏹ توقف خودکار');
-  } else {
-    autoRefreshTimer = setInterval(() => document.getElementById('btnFetch').click(), 120000);
-    this.textContent = '⏹ توقف';
-    toast('▶️ شروع خودکار (هر ۲ دقیقه)');
+  const cfg = {
+    dns: {
+      hosts: dnsHosts,
+      servers: [
+        primaryDns,
+        { address: primaryDns, domains: ["geosite:google"] },
+        { address: "223.5.5.5", domains: ["domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "geosite:cn"], expectIPs: ["geoip:cn"], skipFallback: true, tag: "domestic-dns" }
+      ],
+      tag: "dns-module"
+    },
+    inbounds: [
+      { listen: '127.0.0.1', port: s.inbound.socksPort, protocol: 'socks', settings: { auth: "noauth", udp: true, userLevel: 8 }, sniffing: { destOverride: ['http','tls'], enabled: true, routeOnly: false }, tag: 'socks' },
+      { listen: '127.0.0.1', port: s.inbound.httpPort, protocol: 'http', tag: 'http-in' }
+    ],
+    log: { loglevel: "warning" },
+    observatory: { enableConcurrency: true, probeInterval: s.obs.interval, probeUrl: s.obs.probe, subjectSelector: [s.prefix] },
+    outbounds: [...outbounds, {protocol:'freedom', settings:{domainStrategy:"UseIP"}, tag:'direct'}, {protocol:'blackhole', settings:{response:{type:"http"}}, tag:'block'}],
+    policy: { levels: { "8": { connIdle: 300, downlinkOnly: 1, handshake: 4, uplinkOnly: 1 } }, system: { statsOutboundDownlink: true, statsOutboundUplink: true } },
+    remarks: "V⇢X Intelligent Config",
+    routing: { balancers: [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }], domainStrategy: 'AsIs', rules: rules },
+    stats: {}
+  };
+  
+  if(!s.obs.enabled) delete cfg.observatory;
+  
+  return cfg;
+}
+
+function buildSingBox(list, s) {
+  const tags = list.map((n,i) => s.prefix + (i+1));
+  const outbounds = list.map((n,i) => {
+    const ob = { type: n.proto, tag: s.prefix + (i+1), server: n.address, server_port: n.port };
+    if(n.proto === 'vless' || n.proto === 'vmess') ob.uuid = n.uuid;
+    if(n.proto === 'trojan') ob.password = n.uuid;
+    if(n.proto === 'ss') { ob.method = n.method; ob.password = n.uuid; }
+    
+    if(n.flow) ob.flow = n.flow;
+    if(n.security === 'tls' || n.security === 'reality') {
+      ob.tls = { enabled: true, server_name: n.sni, insecure: s.allowInsecure };
+      if(n.security === 'reality') ob.tls.reality = { enabled: true, public_key: n.pbk, short_id: n.sid };
+      if(n.fp && (n.security === 'tls' || n.security === 'reality')) {
+        ob.tls.utls = { enabled: true, fingerprint: n.fp };
+      }
+    }
+    if(n.network === 'ws') ob.transport = { type: 'ws', path: n.path||'/', headers: {Host: n.host||n.sni||n.address} };
+    else if(n.network === 'grpc') ob.transport = { type: 'grpc', service_name: n.serviceName||'grpc' };
+    return ob;
+  });
+
+  return {
+    log: { level: "warn" },
+    dns: { servers: [{ address: s.dns[0], tag: 'dns-main' }], rules: [{ outbound: 'any', server: 'dns-main' }] },
+    inbounds: [{
+      type: 'mixed',
+      tag: 'mixed-in',
+      listen: '127.0.0.1',
+      listen_port: s.inbound.socksPort
+    }, {
+      type: 'http',
+      tag: 'http-in',
+      listen: '127.0.0.1',
+      listen_port: s.inbound.httpPort
+    }],
+    outbounds: [
+      ...outbounds,
+      { type: 'urltest', tag: 'auto', outbounds: tags, url: s.obs.probe, interval: s.obs.interval },
+      { type: 'direct', tag: 'direct' }, { type: 'block', tag: 'block' }
+    ],
+    route: { rules: [
+      { protocol: 'dns', outbound: 'direct' },
+      ...(s.routing.blockAds ? [{ rule_set: 'geosite-category-ads-all', outbound: 'block' }] : []),
+      ...(s.routing.directIR ? [{ rule_set: ['geoip-ir', 'geosite-ir'], outbound: 'direct' }] : []),
+      { network: 'udp', port: 443, outbound: 'block' }
+    ], final: 'auto' }
+  };
+}
+
+function buildClash(list, s) {
+  const L = []; const p = x => L.push(x);
+  p('mixed-port: ' + s.inbound.socksPort); p('mode: rule'); p('allow-lan: false');
+  p('dns:\n  enable: true\n  enhanced-mode: fake-ip\n  nameserver:\n    - '+s.dns[0]);
+  p('proxies:');
+  list.forEach((n,i) => {
+    const tag = s.prefix + (i+1);
+    p('  - name: "'+tag+'"\n    type: '+n.proto+'\n    server: '+n.address+'\n    port: '+n.port+'\n    '+(n.proto==='ss'?'password':'uuid')+': "'+n.uuid+'"');
+    if(n.proto==='vless') p('    network: '+(n.network==='grpc'?'grpc':(n.network==='ws'?'ws':'tcp')));
+    if(n.flow) p('    flow: '+n.flow);
+    if(n.security==='tls' || n.security==='reality'){
+      p('    tls: true\n    servername: "'+n.sni+'"');
+      if(s.allowInsecure) p('    skip-cert-verify: true');
+      if(n.security==='reality') p('    reality-opts:\n      public-key: '+n.pbk+(n.sid?'\n      short-id: '+n.sid:''));
+    }
+    if(n.network==='ws') p('    ws-opts:\n      path: "'+(n.path||'/')+'"'+'\n      headers:\n        Host: '+(n.host||n.sni||n.address));
+    else if(n.network==='grpc') p('    grpc-opts:\n      grpc-service-name: "'+(n.serviceName||'grpc')+'"');
+  });
+  p('proxy-groups:\n  - name: AUTO\n    type: url-test\n    url: '+s.obs.probe+'\n    interval: 180\n    proxies:');
+  list.forEach((n,i) => p('      - "'+(s.prefix + (i+1))+'"'));
+  p('rules:');
+  if(s.routing.blockAds) p('  - GEOSITE,category-ads-all,REJECT');
+  if(s.routing.directIR) { p('  - GEOIP,IR,DIRECT'); p('  - GEOSITE,IR,DIRECT'); }
+  if(s.routing.directPrivate) p('  - GEOSITE,private,DIRECT');
+  p('  - MATCH,AUTO');
+  return L.join('\n');
+}
+
+/** DIFF WORKER **/
+function lcsLocal(a,b){
+  const n=a.length, m=b.length; if(n*m>4000000) return {tooBig:true};
+  const W=m+1, dp=new Uint32Array((n+1)*W);
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
+  const out=[]; let i=0, j=0;
+  while(i<n&&j<m){ if(a[i]===b[j]){ out.push([0,a[i]]); i++; j++; } else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){ out.push([-1,a[i]]); i++; } else { out.push([1,b[j]]); j++; } }
+  while(i<n) out.push([-1,a[i++]]); while(j<m) out.push([1,b[j++]]);
+  return {rows:out};
+}
+function renderDiff(){
+  const box=$('diffOut'), cur=textCache[curFmt]||'', prev=prevTexts[curFmt];
+  if(!cur){ box.innerHTML = '<span class="d-ctx">// خروجی فعلی خالی است</span>'; return; }
+  if(!prev){ box.innerHTML = '<span class="d-ctx">// برای مقایسه: تنظیمات را تغییر دهید و دوباره تولید کنید. <br> <span style="color:#86efac">سبز = اضافه شده</span> | <span style="color:#fda4af">قرمز = حذف شده</span></span>'; return; }
+  if(cur === prev){ box.innerHTML = '<span style="color:#86efac">✔ هیچ تغییری نسبت به نسخه قبل وجود ندارد.</span>'; return; }
+  const res = lcsLocal(prev.split('\n'), cur.split('\n'));
+  if(res.tooBig){ box.innerHTML='<span style="color:#f59e0b">⚠ حجم فایل برای مقایسه بیش از حد بزرگ است.</span>'; return; }
+  box.innerHTML = res.rows.slice(0, 4000).map(r => {
+    const t = escHtml(r[1])||'&nbsp;';
+    return r[0]===0 ? '<span class="d-ctx">  '+t+'</span>' : (r[0]===1 ? '<span class="d-add">+ '+t+'</span>' : '<span class="d-del">- '+t+'</span>');
+  }).join('');
+}
+
+/** GENERATE & RENDER **/
+function syntaxHighlight(str, fmt) {
+  let esc = escHtml(str);
+  if(fmt==='xray' || fmt==='singbox') return esc.replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g, m => {
+    return `<span class="${m.startsWith('"') ? (/"\s*:$/.test(m) ? 'tok-key' : 'tok-str') : (/[a-z]/.test(m) ? 'tok-bool' : 'tok-num')}">${m}</span>`;
+  });
+  if(fmt==='clash') return esc.replace(/^(\s*-\s)|^([A-Za-z][\w-]*:)|(\s{2,})([A-Za-z][\w-]*:)/gm, (m,a,b,i,d) => {
+    if(a) return `<span class="tok-bool">${a}</span>`; if(b) return `<span class="tok-key">${b}</span>`; return `${i}<span class="tok-key">${d}</span>`;
+  });
+  return `<span style="color:#86efac">${esc}</span>`;
+}
+
+function processGenerate() {
+  if(!nodes.length) return toast('ابتدا لینک ورودی را وارد کنید', 'warn');
+  const s = getSettings();
+  curFmt = $('fmtSel').value;
+  if(textCache[curFmt]) prevTexts[curFmt] = textCache[curFmt];
+  
+  try {
+    let outStr = '';
+    if(curFmt === 'xray') outStr = JSON.stringify(buildXray(nodes, s), null, 2);
+    else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(nodes, s), null, 2);
+    else if(curFmt === 'clash') outStr = buildClash(nodes, s);
+    else if(curFmt === 'v2rayn') outStr = encodeBase64Safe(nodes.map(n=>n.raw).join('\n'));
+    
+    textCache[curFmt] = outStr;
+    
+    $('prettyOut').innerHTML = syntaxHighlight(outStr, curFmt);
+    $('plainOut').value = outStr;
+    renderDiff();
+    
+    // Use the fixed copy function
+    copyToClipboard(outStr, () => {
+      toast('کانفیگ ' + curFmt.toUpperCase() + ' تولید و در کلیپ‌بورد کپی شد ✓');
+    });
+    
+    if (window.innerWidth <= 850) $('fmtSel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(e) {
+    toast('خطایی در تولید کانفیگ پیش آمد. مجدداً ساب خود را وارد کنید.', 'err');
+    console.error(e);
   }
-});
+}
 
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    this.classList.add('active');
-    const t = this.dataset.tab;
-    document.getElementById('prettyOut').style.display = t==='pretty' ? 'block' : 'none';
-    document.getElementById('plainOut').style.display = t==='plain' ? 'block' : 'none';
-    document.getElementById('diffOut').style.display = t==='diff' ? 'block' : 'none';
+$('btnConvert').addEventListener('click', processGenerate);
+$('fmtSel').addEventListener('change', processGenerate);
+$('btnCopy').addEventListener('click', copyConfig);
+
+/** TABS **/
+function setTab(t) {
+  curTab = t;
+  ['Pretty','Plain','Diff'].forEach(k => $('tab'+k).classList.remove('active'));
+  $(t==='pretty'?'tabPretty':(t==='plain'?'tabPlain':'tabDiff')).classList.add('active');
+  $('prettyOut').classList.toggle('hidden', t!=='pretty');
+  $('plainOut').classList.toggle('hidden', t!=='plain');
+  $('diffOut').classList.toggle('hidden', t!=='diff');
+}
+$('tabPretty').addEventListener('click',()=>setTab('pretty'));
+$('tabPlain').addEventListener('click',()=>setTab('plain'));
+$('tabDiff').addEventListener('click',()=>setTab('diff'));
+
+/** APPLY TEMPLATES **/
+document.querySelectorAll('[data-tpl]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tpl = BUILTIN_TPLS[btn.dataset.tpl];
+    if(tpl.obs) { $('swObs').checked = tpl.obs.enabled!==false; $('obsStrategy').value = tpl.obs.strategy||'leastPing'; $('obsInterval').value = tpl.obs.interval||'3m'; }
+    if(tpl.routing) { $('swAds').checked = !!tpl.routing.blockAds; $('swQuic').checked = !!tpl.routing.blockQuic; $('swIR').checked = tpl.routing.directIR!==false; }
+    if(tpl.dns) $('dnsPreset').value = tpl.dns.preset;
+    if(tpl.proxy) $('swMux').checked = !!tpl.proxy.mux;
+    toast(`قالب «${btn.textContent}» با موفقیت اعمال شد.`);
   });
 });
 
-document.getElementById('btnFullscreen').addEventListener('click', () => {
-  const el = document.getElementById('prettyOut');
-  if(el.requestFullscreen) el.requestFullscreen();
-});
-
-//! ======================================================================
-//! ====================  QR CODE (simple inline) ====================
-//! ======================================================================
-function showQr(text) {
-  const modal = document.getElementById('qrModal');
-  modal.classList.add('active');
-  const div = document.getElementById('qrcode');
-  div.innerHTML = '';
-  // simple QR generation using a lightweight API (or fallback)
-  const img = document.createElement('img');
-  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
-  img.alt = 'QR';
-  div.appendChild(img);
+/** 🔧 FIXED: COPY CONFIG WITH PROPER EVENT HANDLING **/
+function copyConfig(event) {
+  const button = event?.currentTarget || $('btnCopy');
+  if (!textCache[curFmt]) {
+    toast('ابتدا کانفیگ را تولید کنید', 'warn');
+    return processGenerate();
+  }
+  const oldText = button.textContent;
+  copyToClipboard(textCache[curFmt], () => {
+    button.textContent = '✅ کپی شد';
+    setTimeout(() => { button.textContent = oldText; }, 2000);
+  });
 }
-document.getElementById('qrClose').addEventListener('click', () => document.getElementById('qrModal').classList.remove('active'));
 
-//! ======================================================================
-//! ====================  THEME  ======================================
-//! ======================================================================
-document.getElementById('themeSelect').addEventListener('change', function() {
-  document.body.className = this.value;
-  localStorage.setItem('vx_theme', this.value);
-});
-const savedTheme = localStorage.getItem('vx_theme') || 'dark';
-document.body.className = savedTheme;
-document.getElementById('themeSelect').value = savedTheme;
+function downloadConfig() {
+  if(!textCache[curFmt]) processGenerate();
+  const content = textCache[curFmt] || '';
+  const meta = {
+    xray: ['json', 'application/json'],
+    singbox: ['json', 'application/json'],
+    clash: ['yaml', 'text/yaml;charset=utf-8'],
+    v2rayn: ['txt', 'text/plain;charset=utf-8']
+  }[curFmt] || ['txt', 'text/plain;charset=utf-8'];
 
-//! ======================================================================
-//! ====================  INIT ========================================
-//! ======================================================================
-updateUI();
-analyzeInput();
-toast('🚀 آماده! لینک ساب را وارد کنید.', '');
+  const blob = new Blob([content], { type: meta[1] });
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `config_${curFmt}_${Date.now()}.${meta[0]}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function showQrModal(uri = '') {
+  if(!uri) { 
+     if(!textCache[curFmt]) processGenerate(); 
+     uri = encodeURIComponent(textCache[curFmt]); 
+  }
+  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
+  new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
+}
+
+// Initial Loading Fallback
+$('plainOut').value = '';
+restoreTempFileTimer();
 </script>
 </body>
 </html>
