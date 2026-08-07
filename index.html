@@ -3,1279 +3,985 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VLESS ⇢ Xray JSON | تبدیلگر پیشرفته کانفیگ حرفه‌ای</title>
-
-<link href="https://cdn.jsdelivr.net/fontsource/fonts/vazirmatn@latest/arabic-400-normal.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/fontsource/fonts/vazirmatn@latest/arabic-700-normal.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/fontsource/fonts/lalezar@latest/arabic-400-normal.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-600-normal.css" rel="stylesheet">
-
+<title>Sub-Collector | تبدیلگر پیشرفته ساب‌اسکریپشن</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{
-  --bg:#05070d;
-  --panel:#0b1120;
-  --panel-2:#0e1628;
-  --line:rgba(56,189,248,.14);
-  --line-strong:rgba(56,189,248,.32);
-  --ink:#e2e8f0;
-  --mut:#8ea0b8;
-  --dim:#5b6b82;
-  --cyan:#22d3ee;
-  --sky:#38bdf8;
-  --green:#4ade80;
-  --amber:#fbbf24;
-  --rose:#fb7185;
-  --violet:#a78bfa;
-  --mono:'JetBrains Mono',monospace;
-  --body:'Vazirmatn',sans-serif;
-  --disp:'Lalezar','Vazirmatn',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:var(--body);
-  background:var(--bg);
-  color:var(--ink);
-  min-height:100vh;
-  padding:26px clamp(14px,3vw,40px) 60px;
-  overflow-x:hidden;
+/* متغیرهای CSS برای تم‌ها */
+:root {
+  --font-body: 'Vazirmatn', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ═══ ambient layers ═══ */
-body::before{
-  content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
-  background:
-    linear-gradient(rgba(34,211,238,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(34,211,238,.045) 1px,transparent 1px);
-  background-size:44px 44px;
-  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 78%);
-          mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 78%);
-  animation:gridPan 70s linear infinite;
+/* تم پیش‌فرض: شیشه‌ای تیره */
+body.theme-glass {
+  --bg: #0f0f1e;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #0f0f1e 100%);
+  --card-bg: rgba(30, 30, 45, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.4);
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --glass-blur: blur(20px);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
-@keyframes gridPan{to{background-position:44px 88px,88px 44px}}
-.orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:-2;pointer-events:none;opacity:.5}
-.orb-a{width:480px;height:480px;top:-160px;right:-120px;background:radial-gradient(circle,rgba(14,165,233,.35),transparent 65%);animation:drift 16s ease-in-out infinite alternate}
-.orb-b{width:420px;height:420px;bottom:-140px;left:-120px;background:radial-gradient(circle,rgba(74,222,128,.22),transparent 65%);animation:drift 19s ease-in-out infinite alternate-reverse}
-@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(-46px,38px) scale(1.12)}}
-#fx{position:fixed;inset:0;z-index:-1;pointer-events:none}
 
-/* ═══ header ═══ */
-.topbar{
-  max-width:1280px;margin:0 auto 26px;
-  display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;
-  animation:rise .6s ease both;
+/* تم سایبرپانک */
+body.theme-cyber {
+  --bg: #0a0118;
+  --bg-gradient: linear-gradient(180deg, #0a0118 0%, #1a0b2e 100%);
+  --card-bg: rgba(10, 1, 24, 0.7);
+  --card-border: rgba(0, 255, 159, 0.3);
+  --text-main: #e0fbfc;
+  --text-muted: #98f5e1;
+  --accent: #00ff9f;
+  --accent-glow: rgba(0, 255, 159, 0.5);
+  --success: #00ff9f;
+  --danger: #ff0080;
+  --warning: #ffee00;
+  --glass-blur: blur(4px);
+  --shadow: 0 0 15px rgba(0, 255, 159, 0.2);
 }
-.brand{display:flex;align-items:center;gap:16px}
-.logo{
-  width:58px;height:58px;flex:none;border-radius:14px;
-  background:linear-gradient(145deg,#0e2136,#0a1626);
-  border:1px solid var(--line-strong);
-  display:grid;place-items:center;
-  font-family:var(--mono);font-weight:600;font-size:15px;color:var(--cyan);
-  box-shadow:0 0 26px rgba(34,211,238,.18),inset 0 0 18px rgba(34,211,238,.07);
-  position:relative;overflow:hidden;
-}
-.logo::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(34,211,238,.28) 50%,transparent 58%);transform:translateX(-120%);animation:sheen 4.5s ease-in-out infinite}
-@keyframes sheen{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
-.brand h1{
-  font-family:var(--disp);font-weight:400;
-  font-size:clamp(1.7rem,3.6vw,2.5rem);
-  line-height:1;color:#f1f5f9;letter-spacing:.5px;
-}
-.brand h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 22px rgba(34,211,238,.5)}
-.brand .tag{color:var(--mut);font-size:.85rem;margin-top:6px}
-.caret{display:inline-block;color:var(--green);font-family:var(--mono);animation:blink 1s steps(1) infinite;margin-inline-start:2px}
-@keyframes blink{50%{opacity:0}}
-.live{display:flex;gap:10px;flex-wrap:wrap}
-.stat-box{
-  min-width:96px;padding:10px 14px;border-radius:12px;text-align:center;
-  background:linear-gradient(180deg,rgba(30,41,59,.55),rgba(15,23,42,.55));
-  border:1px solid var(--line);backdrop-filter:blur(4px);
-  transition:border-color .25s,transform .25s;
-}
-.stat-box:hover{border-color:var(--line-strong);transform:translateY(-2px)}
-.stat-box b{display:block;font-family:var(--mono);font-size:1.25rem;color:var(--cyan)}
-.stat-box span{font-size:.72rem;color:var(--mut)}
-.stat-box.s2 b{color:var(--green)}
-.stat-box.s3 b{color:var(--violet);font-size:.85rem;padding-top:6px}
 
-/* ═══ layout ═══ */
-main{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1.12fr;gap:20px}
-.panel{
-  background:linear-gradient(180deg,rgba(14,22,40,.92),rgba(9,14,26,.92));
-  border:1px solid var(--line);border-radius:16px;
-  box-shadow:0 18px 44px rgba(2,6,17,.55);
-  display:flex;flex-direction:column;overflow:hidden;
+/* تم ساده روشن */
+body.theme-light {
+  --bg: #f8fafc;
+  --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(0, 0, 0, 0.05);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.3);
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --glass-blur: blur(12px);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
-.reveal{animation:rise .65s ease both}
-.d2{animation-delay:.12s}.d3{animation-delay:.22s}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
-.p-head{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  padding:13px 16px;border-bottom:1px solid var(--line);
-  background:rgba(8,13,25,.55);
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  background-image: var(--bg-gradient);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: var(--transition);
+  position: relative;
 }
-.p-dot{width:9px;height:9px;border-radius:50%;flex:none}
-.dot-c{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
-.dot-g{background:var(--green);box-shadow:0 0 10px var(--green)}
-.p-title{font-family:var(--mono);font-size:.78rem;color:var(--mut);letter-spacing:1px}
-.p-title b{color:var(--ink);font-weight:600}
-.p-actions{margin-inline-start:auto;display:flex;gap:7px;flex-wrap:wrap}
-.mini-btn{
-  font-family:var(--body);font-size:.78rem;color:var(--mut);
-  background:rgba(30,41,59,.6);border:1px solid var(--line);
-  border-radius:8px;padding:5px 11px;cursor:pointer;
-  transition:all .2s;
-}
-.mini-btn:hover{color:var(--cyan);border-color:var(--line-strong);background:rgba(34,211,238,.08);transform:translateY(-1px)}
-.mini-btn.danger:hover{color:var(--rose);border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.08)}
-.mini-btn.primary{color:#04121d;background:linear-gradient(135deg,#0ea5e9,#22d3ee);border-color:transparent}
-.mini-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(34,211,238,.35)}
 
-.p-body{padding:16px;display:flex;flex-direction:column;gap:14px;flex:1}
+#particles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
 
-textarea{
-  width:100%;background:#04070d;color:#7dd3fc;
-  border:1px solid var(--line);border-radius:12px;
-  padding:13px;font-family:var(--mono);font-size:.82rem;line-height:1.75;
-  resize:vertical;direction:ltr;text-align:left;
-  transition:border-color .25s,box-shadow .25s;
-}
-textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(56,189,248,.14)}
-textarea::placeholder{color:#28405c}
-#inputLinks{min-height:190px}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* options */
-.opts{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.opt{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--mut)}
-.opt select,.opt input[type=text],.opt input[type=url]{
-  direction:ltr;text-align:left;background:#04070d;color:var(--ink);
-  border:1px solid var(--line);border-radius:8px;padding:6px 9px;
-  font-family:var(--mono);font-size:.78rem;
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
 }
-.opt select:focus,.opt input[type=text]:focus,.opt input[type=url]:focus{outline:none;border-color:var(--sky)}
-.opt select{color:var(--cyan)}
-.switch{position:relative;width:42px;height:22px;flex:none}
-.switch input{display:none}
-.slider{
-  position:absolute;inset:0;background:#1e293b;border:1px solid var(--line);
-  border-radius:99px;cursor:pointer;transition:.25s;
-}
-.slider::before{
-  content:"";position:absolute;width:14px;height:14px;border-radius:50%;
-  top:3px;inset-inline-start:4px;background:#64748b;transition:.25s;
-}
-.switch input:checked + .slider{background:rgba(14,165,233,.35);border-color:var(--sky)}
-.switch input:checked + .slider::before{inset-inline-start:22px;background:var(--sky);box-shadow:0 0 8px var(--sky)}
 
-/* convert button */
-.go-btn{
-  width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;
-  font-family:var(--body);font-weight:700;font-size:1.02rem;color:#04121d;
-  background:linear-gradient(135deg,#0ea5e9,#22d3ee 55%,#5eead4);
-  background-size:200% 100%;
-  box-shadow:0 6px 22px rgba(14,165,233,.35);
-  transition:all .25s;position:relative;overflow:hidden;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 24px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
 }
-.go-btn:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 10px 30px rgba(34,211,238,.45)}
-.go-btn:active{transform:scale(.98)}
-.go-btn small{font-family:var(--mono);font-weight:400;font-size:.68rem;opacity:.75;margin-inline-start:8px}
-.go-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* output */
-.tabs{display:flex;gap:4px;background:#04070d;border:1px solid var(--line);border-radius:9px;padding:3px}
-.tab{
-  font-family:var(--body);font-size:.75rem;color:var(--dim);
-  background:transparent;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;transition:.2s;
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--accent), var(--success));
+  border-radius: 10px;
+  display: grid; place-items: center;
+  font-weight: bold; color: #fff; font-size: 1.2rem;
+  box-shadow: 0 0 15px var(--accent-glow);
 }
-.tab.active{color:#04121d;background:var(--cyan);font-weight:700}
-.sum-bar{
-  display:none;gap:9px;flex-wrap:wrap;align-items:center;
-  padding:9px 12px;border-radius:10px;
-  background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);
-  font-size:.78rem;color:var(--mut);
-}
-.sum-bar.on{display:flex;animation:rise .4s ease both}
-.sum-bar b{color:var(--green);font-family:var(--mono)}
-.sum-bar .warn{color:var(--rose)}
-.out-wrap{position:relative;flex:1;min-height:320px}
-#prettyOut,#plainOut{
-  position:absolute;inset:0;margin:0;width:100%;height:100%;
-  background:#04070d;border:1px solid var(--line);border-radius:12px;
-  padding:14px;font-family:var(--mono);font-size:.76rem;line-height:1.7;
-  direction:ltr;text-align:left;overflow:auto;white-space:pre;
-}
-#prettyOut{color:#64748b}
-#plainOut{color:var(--green)}
-#prettyOut.hidden,#plainOut.hidden{display:none}
-.tok-key{color:#7dd3fc}
-.tok-str{color:#86efac}
-.tok-num{color:var(--amber)}
-.tok-bool{color:var(--rose)}
+.brand h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; }
+.controls { display: flex; gap: 10px; }
 
-/* scrollbars */
-textarea::-webkit-scrollbar,#prettyOut::-webkit-scrollbar,#plainOut::-webkit-scrollbar,.nodes-list::-webkit-scrollbar{width:9px;height:9px}
-textarea::-webkit-scrollbar-thumb,#prettyOut::-webkit-scrollbar-thumb,#plainOut::-webkit-scrollbar-thumb,.nodes-list::-webkit-scrollbar-thumb{background:#1e3a55;border-radius:9px;border:2px solid #04070d}
+button, select, input[type="text"], input[type="number"] {
+  font-family: var(--font-body);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+button:hover, select:hover, input:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+}
+button.primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+button.danger { border-color: var(--danger); color: var(--danger); background: transparent; }
+button.danger:hover { background: var(--danger); color: #fff; }
 
-/* nodes strip */
-.nodes-panel{max-width:1280px;margin:20px auto 0}
-.nodes-head-count{font-family:var(--mono);font-size:.75rem;color:var(--dim)}
-.nodes-head-count .bad{color:var(--rose)}
-.nodes-list{display:flex;flex-wrap:wrap;gap:9px;max-height:210px;overflow-y:auto}
-.chip{
-  display:flex;align-items:center;gap:8px;
-  background:var(--panel-2);border:1px solid var(--line);
-  border-radius:10px;padding:7px 11px;font-size:.78rem;
-  animation:rise .35s ease both;transition:border-color .2s,transform .2s;
+.card {
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
 }
-.chip:hover{border-color:var(--line-strong);transform:translateY(-2px)}
-.chip-idx{font-family:var(--mono);color:var(--dim);font-size:.7rem;flex:none}
-.chip-name{font-weight:700;color:var(--ink);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip-addr{font-family:var(--mono);color:var(--mut);font-size:.68rem;direction:ltr;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{font-family:var(--mono);font-size:.62rem;padding:2px 7px;border-radius:99px;border:1px solid;flex:none}
-.b-ws{color:var(--cyan);border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.08)}
-.b-grpc{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
-.b-tcp{color:var(--amber);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
-.b-h2{color:#f0abfc;border-color:rgba(240,171,252,.4);background:rgba(240,171,252,.08)}
-.b-tls{color:var(--green);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08)}
-.b-reality{color:var(--rose);border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.08)}
-.b-none{color:var(--dim);border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.08)}
-.empty-note{color:var(--dim);font-size:.8rem;padding:8px 2px}
+.card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--card-border);
+}
+.card-title { font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
-/* search & filter */
-.search-bar{
-  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;
-  padding:10px;background:rgba(4,7,13,.6);border-radius:10px;border:1px solid var(--line);
+textarea {
+  width: 100%;
+  height: 150px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  resize: vertical;
+  direction: ltr;
 }
-.search-input{
-  flex:1;min-width:150px;background:#04070d;color:var(--ink);
-  border:1px solid var(--line);border-radius:8px;padding:6px 10px;
-  font-family:var(--body);font-size:.82rem;
-}
-.search-input:focus{outline:none;border-color:var(--sky)}
-.filter-select{
-  background:#04070d;color:var(--ink);border:1px solid var(--line);
-  border-radius:8px;padding:6px 10px;font-family:var(--body);font-size:.82rem;
-}
-.filter-select:focus{outline:none;border-color:var(--sky)}
+textarea:focus { border-color: var(--accent); }
 
-footer{
-  max-width:1280px;margin:26px auto 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
-  color:var(--dim);font-size:.74rem;border-top:1px solid var(--line);padding-top:16px;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
 }
-footer .mono{font-family:var(--mono)}
-footer .dotsep{color:var(--cyan)}
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+}
+.stat-val { font-size: 1.4rem; font-weight: bold; color: var(--accent); font-family: var(--font-mono); }
+.stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
-/* toasts */
-#toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center}
-.toast{
-  background:#0e2136;border:1px solid var(--line-strong);color:var(--ink);
-  padding:10px 20px;border-radius:11px;font-size:.85rem;
-  box-shadow:0 10px 30px rgba(0,0,0,.5);
-  opacity:0;transform:translateY(14px);transition:all .3s;
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
 }
-.toast.show{opacity:1;transform:none}
-.toast.warn{border-color:rgba(251,191,36,.45)}
-.toast.err{border-color:rgba(251,113,133,.5)}
-.toast::before{content:"✓ ";color:var(--green)}
-.toast.warn::before{content:"⚠ ";color:var(--amber)}
-.toast.err::before{content:"✕ ";color:var(--rose)}
-.toast.loading::before{content:"⏳ ";color:var(--cyan)}
+.setting-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.setting-group input, .setting-group select {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  padding: 8px;
+  border-radius: 6px;
+}
 
-/* loading overlay */
-.loading-overlay{
-  position:fixed;inset:0;background:rgba(5,7,13,.85);
-  backdrop-filter:blur(4px);z-index:9999;
-  display:none;place-items:center;flex-direction:column;gap:16px;
+.fragment-modes {
+  display: flex; gap: 10px; margin-bottom: 12px;
+  background: rgba(0,0,0,0.2);
+  padding: 4px; border-radius: 8px;
 }
-.loading-overlay.active{display:grid}
-.spinner{
-  width:48px;height:48px;border:4px solid var(--line);
-  border-top-color:var(--cyan);border-radius:50%;
-  animation:spin 1s linear infinite;
+.mode-btn {
+  flex: 1; padding: 6px; text-align: center;
+  border-radius: 6px; cursor: pointer;
+  font-size: 0.8rem; transition: var(--transition);
+  opacity: 0.6;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{color:var(--mut);font-size:.9rem}
+.mode-btn.active {
+  background: var(--accent); color: #fff; opacity: 1;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.fragment-inputs {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  animation: slideDown 0.3s ease;
+}
+@keyframes slideDown { from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:none} }
 
-/* Drag overlay */
-.drag-overlay{
-  position:fixed;inset:0;background:rgba(14,165,233,.15);
-  backdrop-filter:blur(8px);z-index:9998;
-  display:none;place-items:center;flex-direction:column;gap:16px;
-  border:3px dashed var(--cyan);
+.node-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 4px;
 }
-.drag-overlay.active{display:grid}
-.drag-icon{font-size:4rem;color:var(--cyan)}
-.drag-text{color:var(--ink);font-size:1.2rem;font-weight:700}
+.node-card {
+  background: rgba(0,0,0,0.15);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+  position: relative;
+  transition: var(--transition);
+}
+.node-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.node-head { display: flex; justify-content: space-between; align-items: center; }
+.node-flag { font-size: 1.2rem; }
+.node-remark {
+  font-weight: 600; font-size: 0.9rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 180px;
+}
+.node-meta {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  font-size: 0.7rem; font-family: var(--font-mono);
+}
+.badge {
+  padding: 2px 6px; border-radius: 4px;
+  background: rgba(255,255,255,0.1);
+  color: var(--text-muted);
+}
+.badge.vless { color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+.badge.vmess { color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+.badge.trojan { color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+.badge.ss { color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+.badge.ws { color: #4ade80; }
+.badge.grpc { color: #f87171; }
+.badge.tcp { color: #94a3b8; }
+.badge.tls { color: #22d3ee; }
+.badge.reality { color: #fb7185; }
 
-@media(max-width:980px){
-  main{grid-template-columns:1fr}
-  .topbar{align-items:flex-start;flex-direction:column}
+.node-actions {
+  display: flex; gap: 6px; margin-top: 4px;
+}
+.action-icon {
+  font-size: 0.9rem; cursor: pointer;
+  padding: 4px; border-radius: 4px;
+  color: var(--text-muted);
+}
+.action-icon:hover { color: var(--accent); background: rgba(255,255,255,0.1); }
+.action-icon.del:hover { color: var(--danger); }
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
+  z-index: 100;
+  display: none;
+  place-items: center;
+}
+.modal-overlay.active { display: grid; }
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%; max-width: 400px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn { from{transform:scale(0.8); opacity:0} to{transform:scale(1); opacity:1} }
+#qrcode { margin: 20px auto; display: flex; justify-content: center; }
+#qrcode img { border: 4px solid #fff; border-radius: 8px; }
+
+@media (max-width: 768px) {
+  header { flex-direction: column; gap: 16px; }
+  .controls { width: 100%; justify-content: space-between; }
+  .fragment-inputs { grid-template-columns: 1fr; }
 }
 </style>
 </head>
-<body>
+<body class="theme-glass">
 
-<canvas id="fx"></canvas>
-<div class="orb orb-a"></div>
-<div class="orb orb-b"></div>
+<canvas id="particles"></canvas>
 
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">در حال پردازش...</div>
-</div>
-
-<!-- Drag & Drop Overlay -->
-<div class="drag-overlay" id="dragOverlay">
-  <div class="drag-icon">📁</div>
-  <div class="drag-text">فایل را اینجا رها کنید</div>
-</div>
-
-<header class="topbar">
-  <div class="brand">
-    <div class="logo">V⇢X</div>
-    <div>
-      <h1>VLESS <em>⇢</em> Xray JSON</h1>
-      <p class="tag">تبدیلگر پیشرفته لینک‌های vless و ساب‌اسکریپشن به کانفیگ کامل Xray با قابلیت دریافت از URL<span class="caret">_</span></p>
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo">SC</div>
+      <h1>Sub-Collector <span style="font-size:0.7em; color:var(--text-muted); font-weight:400">v2.0</span></h1>
     </div>
-  </div>
-  <div class="live">
-    <div class="stat-box"><b id="statLines">۰</b><span>خط ورودی</span></div>
-    <div class="stat-box s2"><b id="statLinks">۰</b><span>لینک vless</span></div>
-    <div class="stat-box s3"><b id="statB64">—</b><span>حالت Base64</span></div>
-  </div>
-</header>
+    <div class="controls">
+      <select id="themeSelect" onchange="setTheme(this.value)">
+        <option value="theme-glass">Glassmorphism</option>
+        <option value="theme-cyber">Cyberpunk</option>
+        <option value="theme-light">Clean Light</option>
+      </select>
+      <button class="primary" onclick="document.getElementById('fileInput').click()">📂 Import File</button>
+      <input type="file" id="fileInput" hidden accept=".txt,.json,.sub" onchange="handleFileImport(this)">
+    </div>
+  </header>
 
-<main>
-  <!-- ═══ INPUT ═══ -->
-  <section class="panel reveal">
-    <div class="p-head">
-      <span class="p-dot dot-c"></span>
-      <span class="p-title"><b>INPUT</b> // ورودی</span>
-      <div class="p-actions">
-        <button class="mini-btn" id="btnSample">🧪 نمونه</button>
-        <button class="mini-btn" id="btnPaste">📋 پیست</button>
-        <button class="mini-btn primary" id="btnFetch">🌐 دریافت از URL</button>
-        <button class="mini-btn" id="btnImportFile">📁 واردات فایل</button>
-        <button class="mini-btn danger" id="btnClear">🗑 پاک کردن</button>
+  <section class="card">
+    <div class="card-header">
+      <span class="card-title">📥 ورودی ساب‌اسکریپشن</span>
+      <div style="display:flex; gap:8px;">
+        <button onclick="pasteFromClipboard()">📋 Paste</button>
+        <button class="danger" onclick="clearInput()">🗑 Clear</button>
       </div>
     </div>
-    <div class="p-body">
-      <textarea id="inputLinks" spellcheck="false"
-        placeholder="vless://uuid@host:443?type=ws&security=tls...&#10;هر لینک در یک خط — یا کل محتوای Base64 ساب‌اسکریپشن — یا لینک مستقیم ساب‌اسکریپشن را وارد کنید"></textarea>
+    <textarea id="rawInput" placeholder="لینک ساب‌اسکریپشن (http/https) یا لینک‌های vless/vmess/trojan/ss را اینجا وارد کنید...&#10;پشتیبانی از Base64 خودکار." spellcheck="false"></textarea>
+    <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+      <input type="text" id="subUrl" placeholder="https://example.com/sub" style="flex:1;" dir="ltr">
+      <button class="primary" onclick="fetchSubscription()">Load URL</button>
+    </div>
+  </section>
 
-      <div class="opts">
-        <label class="opt">پیشوند تگ
-          <input type="text" id="tagPrefix" value="proxy-" spellcheck="false">
-        </label>
-        <label class="opt">DNS سرور
-          <select id="dnsPreset">
-            <option value="cloudflare">Cloudflare (1.1.1.1)</option>
-            <option value="google">Google (8.8.8.8)</option>
-            <option value="quad9">Quad9 (9.9.9.9)</option>
-            <option value="opendns">OpenDNS (208.67.222.222)</option>
-            <option value="adguard">AdGuard (94.140.14.14)</option>
-            <option value="shecan">Shecan IR (178.22.122.100)</option>
-            <option value="electro">Electro IR (78.157.42.100)</option>
-            <option value="custom">سفارشی</option>
-          </select>
-        </label>
-        <label class="opt" id="customDnsOpt" style="display:none">DNS سفارشی
-          <input type="text" id="customDns" value="1.1.1.1,8.8.8.8" placeholder="1.1.1.1,8.8.8.8">
-        </label>
-        <label class="opt">Test URL
-          <select id="probeUrlPreset">
-            <option value="https://www.gstatic.com/generate_204">Google 204</option>
-            <option value="https://1.1.1.1/cdn-cgi/trace">Cloudflare</option>
-            <option value="https://captive.apple.com/hotspot-detect.html">Apple Captive</option>
-            <option value="https://connectivitycheck.platform.hicloud.com/generate_204">Huawei</option>
-            <option value="custom">سفارشی</option>
-          </select>
-        </label>
-        <label class="opt" id="customProbeOpt" style="display:none">URL سفارشی
-          <input type="url" id="customProbeUrl" value="https://www.gstatic.com/generate_204" placeholder="https://...">
-        </label>
-        <label class="opt">Probe Interval
-          <select id="probeInterval">
-            <option value="1m">1 دقیقه</option>
-            <option value="3m" selected>3 دقیقه</option>
-            <option value="5m">5 دقیقه</option>
-            <option value="10m">10 دقیقه</option>
-            <option value="30m">30 دقیقه</option>
-          </select>
-        </label>
-        <label class="opt">
-          <span class="switch"><input type="checkbox" id="allowInsecure"><span class="slider"></span></span>
-          allowInsecure برای TLS
-        </label>
+  <section class="card">
+    <div class="card-header">
+      <span class="card-title">⚙️ تنظیمات پیشرفته</span>
+    </div>
+    <div class="settings-grid">
+      <div class="setting-group">
+        <label>فرمت خروجی</label>
+        <select id="outputFormat">
+          <option value="xray">Xray-core JSON</option>
+          <option value="singbox">Sing-Box JSON</option>
+        </select>
       </div>
-
-      <!-- Fragment Settings -->
-      <div class="frag-panel" id="fragPanel" style="background:rgba(14,22,40,0.4); border:1px solid var(--line); border-radius:12px; padding:14px; margin-top:12px;">
-        <div class="frag-header" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-          <span class="p-title" style="color:var(--cyan); font-weight:700; font-size:0.85rem;">🧩 Fragment Settings</span>
-          <div class="tabs" style="margin-right:auto; background:rgba(0,0,0,0.3); border:none;">
-            <button class="tab active" id="fragAutoBtn" onclick="setFragMode('auto')">خودکار</button>
-            <button class="tab" id="fragManualBtn" onclick="setFragMode('manual')">دستی</button>
-            <button class="tab" id="fragOffBtn" onclick="setFragMode('off')" style="color:var(--rose)">خاموش</button>
-          </div>
-        </div>
-        
-        <div id="fragManualInputs" style="display:none; gap:12px; flex-wrap:wrap;">
-          <label class="opt" style="font-size:0.75rem">Length (مثلا 100-200)
-            <input type="text" id="fragLength" value="100-200" placeholder="min-max" style="width:100px; direction:ltr; text-align:center; background:#04070d; color:var(--amber); border:1px solid var(--line); border-radius:8px; padding:6px 9px; font-family:var(--mono); font-size:0.78rem;">
-          </label>
-          <label class="opt" style="font-size:0.75rem">Interval (مثلا 10-20)
-            <input type="text" id="fragInterval" value="10-20" placeholder="min-max" style="width:100px; direction:ltr; text-align:center; background:#04070d; color:var(--amber); border:1px solid var(--line); border-radius:8px; padding:6px 9px; font-family:var(--mono); font-size:0.78rem;">
-          </label>
-          <label class="opt" style="font-size:0.75rem">Packets
-            <select id="fragPackets" style="background:#04070d; color:var(--amber); border:1px solid var(--line); border-radius:8px; padding:6px 9px; font-family:var(--mono); font-size:0.78rem;">
-              <option value="tlshello">tlshello</option>
-              <option value="1-1">1-1</option>
-              <option value="1-2">1-2</option>
-              <option value="1-3">1-3</option>
-            </select>
-          </label>
-        </div>
-        <div id="fragAutoInfo" style="margin-top:8px; font-size:0.75rem; color:var(--mut); display:flex; align-items:center; gap:6px;">
-          <span style="color:var(--green)">●</span> حالت خودکار: Length=100-200, Interval=10-20, Packets=tlshello
-        </div>
-      </div>
-
-      <button class="go-btn" id="btnConvert">⚡ تولید کانفیگ JSON <small>Ctrl + Enter</small></button>
       
-      <div style="text-align:center;font-size:.75rem;color:var(--dim)">
-        💡 می‌توانید فایل را بکشید و اینجا رها کنید (Drag & Drop)
+      <div class="setting-group">
+        <label>حالت Outbound</label>
+        <select id="outboundMode">
+          <option value="direct">مستقیم (Direct)</option>
+          <option value="warp-full">Cloudflare Warp (Full)</option>
+          <option value="warp-split">Warp (فقط ایران)</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label>DNS Server</label>
+        <select id="dnsPreset">
+          <option value="cloudflare">Cloudflare (1.1.1.1)</option>
+          <option value="google">Google (8.8.8.8)</option>
+          <option value="shecan">Shecan (IR)</option>
+          <option value="custom">Custom...</option>
+        </select>
       </div>
     </div>
-  </section>
 
-  <!-- ═══ OUTPUT ═══ -->
-  <section class="panel reveal d2">
-    <div class="p-head">
-      <span class="p-dot dot-g"></span>
-      <span class="p-title"><b>XRAY CONFIG</b> // خروجی</span>
-      <div class="p-actions">
-        <div class="tabs">
-          <button class="tab active" id="tabPretty">نمای رنگی</button>
-          <button class="tab" id="tabPlain">متن ساده</button>
+    <div style="margin-top:20px; border-top:1px solid var(--card-border); paddingTop:16px;">
+      <label style="font-size:0.9rem; color:var(--text-muted); margin-bottom:8px; display:block;">🧩 Fragment Settings</label>
+      <div class="fragment-modes">
+        <div class="mode-btn active" onclick="setFragmentMode('off')">Off</div>
+        <div class="mode-btn" onclick="setFragmentMode('auto')">Auto</div>
+        <div class="mode-btn" onclick="setFragmentMode('manual')">Manual</div>
+      </div>
+      
+      <div id="fragManualInputs" class="fragment-inputs" style="display:none;">
+        <div class="setting-group">
+          <label>Length (Min-Max)</label>
+          <input type="text" id="fragLen" value="100-200" dir="ltr">
         </div>
-        <button class="mini-btn" id="btnCopy">⧉ کپی</button>
-        <button class="mini-btn" id="btnDownload">⬇ final_sub.json</button>
-        <button class="mini-btn primary" id="btnGetLink">🔗 لینک دانلود</button>
+        <div class="setting-group">
+          <label>Interval (Min-Max)</label>
+          <input type="text" id="fragInt" value="10-20" dir="ltr">
+        </div>
+        <div class="setting-group">
+          <label>Packets</label>
+          <select id="fragPack">
+            <option value="tlshello">tlshello</option>
+            <option value="1-1">1-1</option>
+            <option value="1-2">1-2</option>
+            <option value="rand">rand</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="p-body">
-      <div class="sum-bar" id="sumBar">
-        <span>✅ اوت‌باندها: <b id="sumCount">۰</b></span>
-        <span>📦 حجم: <b id="sumSize">۰</b></span>
-        <span>⏱ زمان تولید: <b id="sumTime">۰</b></span>
-        <span class="warn" id="sumBad" style="display:none"></span>
-      </div>
-      <div class="out-wrap">
-        <pre id="prettyOut"><span style="color:#334155">// خروجی JSON اینجا نمایش داده می‌شود...</span></pre>
-        <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
+      <div id="fragAutoInfo" style="font-size:0.8rem; color:var(--text-muted); padding:8px; display:none;">
+        Auto: Length 100-200, Interval 10-20, Packets tlshello
       </div>
     </div>
   </section>
-</main>
 
-<!-- ═══ NODES ═══ -->
-<section class="panel nodes-panel reveal d3">
-  <div class="p-head">
-    <span class="p-dot dot-c"></span>
-    <span class="p-title"><b>NODES</b> // گره‌های شناسایی‌شده</span>
-    <span class="p-head-count" id="nodesCount"></span>
-  </div>
-  <div class="p-body">
-    <div class="search-bar">
-      <input type="text" class="search-input" id="nodeSearch" placeholder="🔍 جستجو در گره‌ها (نام، آدرس، کشور)...">
-      <select class="filter-select" id="filterNetwork">
-        <option value="">همه شبکه‌ها</option>
-        <option value="ws">WS</option>
-        <option value="grpc">gRPC</option>
-        <option value="tcp">TCP</option>
-        <option value="h2">H2</option>
-        <option value="httpupgrade">HTTPUpgrade</option>
-      </select>
-      <select class="filter-select" id="filterSecurity">
-        <option value="">همه امنیت‌ها</option>
-        <option value="tls">TLS</option>
-        <option value="reality">Reality</option>
-        <option value="none">None</option>
-      </select>
+  <section class="card">
+    <div class="card-header">
+      <span class="card-title">📊 آمار زنده</span>
+      <input type="text" id="nodeFilter" placeholder="🔍 جستجو بر اساس کشور یا نام..." style="width:200px; font-size:0.8rem;" oninput="renderNodes()">
     </div>
-    <div class="nodes-list" id="nodesList">
-      <div class="empty-note">هنوز لینکی پردازش نشده است — ورودی را وارد کنید تا گره‌ها به‌صورت زنده اینجا فهرست شوند.</div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-val" id="statTotal">0</div>
+        <div class="stat-label">کل خطوط</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" style="color:var(--success)" id="statValid">0</div>
+        <div class="stat-label">گره‌های سالم</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" style="color:var(--danger)" id="statInvalid">0</div>
+        <div class="stat-label">نامعتبر</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" style="color:var(--warning)" id="statCountries">0</div>
+        <div class="stat-label">کشورها</div>
+      </div>
     </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="card-title">📡 لیست گره‌ها</span>
+      <button class="primary" style="font-size:0.8rem; padding:4px 12px;" onclick="generateConfig()">⚡ تولید کانفیگ</button>
+    </div>
+    <div id="nodeList" class="node-grid">
+      <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:20px;">
+        هنوز گره‌ای پردازش نشده است. ورودی را وارد کنید.
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="position:sticky; bottom:20px; z-index:10; border-color:var(--accent);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="font-family:var(--font-mono); font-size:0.9rem; color:var(--text-muted);">
+        وضعیت: <span id="statusText" style="color:var(--success)">آماده</span>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="copyConfig()">📋 کپی JSON</button>
+        <button onclick="downloadConfig()">⬇ دانلود فایل</button>
+        <button class="primary" onclick="showQrModal()">📷 نمایش QR</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="qrModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+  <div class="modal">
+    <h3 style="margin-bottom:10px;">QR Code کانفیگ</h3>
+    <div id="qrcode"></div>
+    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">اسکن کنید یا عکس را ذخیره نمایید</p>
+    <button class="primary" onclick="document.getElementById('qrModal').classList.remove('active')">بستن</button>
   </div>
-</section>
-
-<footer>
-  <span>سازگار با <b>Xray-core</b> <span class="dotsep">•</span> VLESS <span class="dotsep">•</span> Reality / TLS <span class="dotsep">•</span> WS / gRPC / TCP / H2</span>
-  <span class="mono">javidsub intelligent selection — routing + observatory built-in</span>
-</footer>
-
-<div id="toasts"></div>
-
-<!-- Hidden file input -->
-<input type="file" id="fileInput" accept=".txt,.json,.sub" style="display:none">
+</div>
 
 <script>
-(function(){
-"use strict";
-const $ = id => document.getElementById(id);
-const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
-let generatedRaw = '';
-let lastInvalid = 0;
-let allNodes = [];
-let generatedBlobUrl = null;
-
-/* ═══ DNS Presets ═══ */
-const DNS_PRESETS = {
-  'cloudflare': ['1.1.1.1', '1.0.0.1'],
-  'google': ['8.8.8.8', '8.8.4.8'],
-  'quad9': ['9.9.9.9', '149.112.112.112'],
-  'opendns': ['208.67.222.222', '208.67.220.220'],
-  'adguard': ['94.140.14.14', '94.140.15.15'],
-  'shecan': ['178.22.122.100', '185.51.200.2'],
-  'electro': ['78.157.42.100', '5.160.218.100']
+const state = {
+  nodes: [],
+  configJson: null,
+  fragment: { mode: 'off', len: '100-200', int: '10-20', pack: 'tlshello' },
+  theme: 'theme-glass'
 };
 
-/* ═══ Probe URL Presets ═══ */
-const PROBE_URLS = [
-  'https://www.gstatic.com/generate_204',
-  'https://1.1.1.1/cdn-cgi/trace',
-  'https://captive.apple.com/hotspot-detect.html',
-  'https://connectivitycheck.platform.hicloud.com/generate_204'
-];
+const $ = id => document.getElementById(id);
+const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
+const safeHtml = str => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
 
-/* ───────── ambient particles ───────── */
-const cv = $('fx'), cx = cv.getContext('2d');
-let W, H;
-function fit(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
-addEventListener('resize', fit); fit();
-const PALETTE = ['34,211,238','74,222,128','148,163,184','167,139,250'];
-const dots = [];
-for (let i = 0; i < 44; i++) dots.push({
-  x: Math.random()*innerWidth, y: Math.random()*innerHeight,
-  r: Math.random()*1.6 + .4,
-  vx: (Math.random()-.5)*.16, vy: -(Math.random()*.22 + .05),
-  a: Math.random()*.4 + .12, c: PALETTE[i % PALETTE.length]
+const canvas = $('particles'), ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+window.addEventListener('resize', resize); resize();
+for(let i=0; i<40; i++) particles.push({
+  x: Math.random()*W, y: Math.random()*H,
+  vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
+  r: Math.random()*2+1, a: Math.random()*0.5+0.1
 });
-(function loop(){
-  cx.clearRect(0,0,W,H);
-  for (const d of dots){
-    d.x += d.vx; d.y += d.vy;
-    if (d.y < -6){ d.y = H + 6; d.x = Math.random()*W; }
-    if (d.x < -6) d.x = W + 6; if (d.x > W + 6) d.x = -6;
-    cx.beginPath(); cx.arc(d.x, d.y, d.r, 0, 7);
-    cx.fillStyle = 'rgba(' + d.c + ',' + d.a + ')'; cx.fill();
-  }
-  requestAnimationFrame(loop);
-})();
-
-/* ───────── toasts ───────── */
-function toast(msg, type){
-  const t = document.createElement('div');
-  t.className = 'toast' + (type ? ' ' + type : '');
-  t.textContent = msg;
-  $('toasts').appendChild(t);
-  requestAnimationFrame(()=>t.classList.add('show'));
-  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 320); }, 2600);
-}
-
-/* ───────── base64 ───────── */
-function tryB64(raw){
-  const s = raw.replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
-  if (!s || s.length % 4 === 1 || !/^[A-Za-z0-9+/=]+$/.test(s)) return null;
-  try {
-    const padded = s + '==='.slice((s.length + 3) % 4);
-    const bin = atob(padded);
-    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
-    return new TextDecoder('utf-8').decode(bytes);
-  } catch(e){ return null; }
-}
-function resolveInput(raw){
-  if (!raw) return { text:'', b64:false };
-  if (raw.includes('vless://')) return { text: raw, b64:false };
-  const d = tryB64(raw);
-  if (d && d.includes('vless://')) return { text: d, b64:true };
-  return { text: raw, b64:false };
-}
-
-/* ───────── vless parser ───────── */
-function parseVlessLine(line, tag, allowInsecure, fragmentSettings){
-  try {
-    const u = new URL(line);
-    if (u.protocol !== 'vless:') return { error:'پروتکل نامعتبر' };
-    const uuid = u.username;
-    const address = decodeURIComponent(u.hostname);
-    if (!uuid || !address) return { error:'آدرس یا UUID ناقص' };
-    const port = parseInt(u.port) || 443;
-    const p = u.searchParams;
-
-    const network  = p.get('type') || 'tcp';
-    const security = p.get('security') || 'none';
-    const path     = p.get('path') || '/';
-    const host     = p.get('host') || '';
-    const sni      = p.get('sni') || '';
-    const fp       = p.get('fp') || 'chrome';
-    const flow     = p.get('flow') || '';
-    const alpnRaw  = p.get('alpn') || '';
-    const alpn     = alpnRaw ? alpnRaw.split(',').filter(Boolean) : [];
-    let remark = '';
-    try { remark = decodeURIComponent(u.hash.slice(1)); } catch(e){ remark = u.hash.slice(1); }
-
-    const user = { encryption:'none', id: uuid, level: 8 };
-    if (flow) user.flow = flow;
-
-    const outbound = {
-      mux: { concurrency:-1, enabled:false },
-      protocol: 'vless',
-      settings: { vnext: [{ address, port, users: [user] }] },
-      streamSettings: { network },
-      tag
-    };
-    
-    // Add fragment settings if enabled
-    if (fragmentSettings && fragmentSettings.enabled){
-      outbound.streamSettings.sockopt = {
-        dialerProxy: 'dialer-fragment',
-        tcpKeepAliveIdle: 100,
-        tcpMptcp: true,
-        penetrate: true
-      };
-    }
-    
-    const ss = outbound.streamSettings;
-
-    if (network === 'ws'){
-      const ws = { headers: {} };
-      if (host) ws.headers.Host = host;
-      if (path) ws.path = path;
-      ss.wsSettings = ws;
-    } else if (network === 'grpc'){
-      ss.grpcSettings = { serviceName: p.get('serviceName') || '', multiMode:false };
-    } else if (network === 'h2' || network === 'http'){
-      ss.httpSettings = { host: host ? [host] : [], path };
-    } else if (network === 'httpupgrade'){
-      const hu = {};
-      if (host) hu.host = host;
-      if (path) hu.path = path;
-      ss.httpupgradeSettings = hu;
-    } else if (network === 'tcp' && (p.get('headerType') === 'http')){
-      ss.tcpSettings = { header: { type:'http', request: {
-        headers: host ? { Host: [host] } : {},
-        path: [path]
-      }}};
-    }
-
-    if (security === 'tls'){
-      ss.security = 'tls';
-      const tls = { allowInsecure: !!allowInsecure, show:false };
-      if (sni) tls.serverName = sni;
-      if (fp) tls.fingerprint = fp;
-      if (alpn.length) tls.alpn = alpn;
-      ss.tlsSettings = tls;
-    } else if (security === 'reality'){
-      ss.security = 'reality';
-      const rl = { show:false };
-      if (sni) rl.serverName = sni;
-      if (fp) rl.fingerprint = fp;
-      if (p.get('pbk')) rl.publicKey = p.get('pbk');
-      if (p.get('sid')) rl.shortId = p.get('sid');
-      if (p.get('spx')) rl.spiderX = p.get('spx');
-      ss.realitySettings = rl;
-    }
-
-    return { outbound, remark, address, port, network, security };
-  } catch(e){
-    return { error:'ساختار لینک نامعتبر است' };
-  }
-}
-
-/* ───────── full config template ───────── */
-function generateFullJsonConfig(outbounds, prefix, dnsServers, probeUrl, probeInterval, fragmentSettings){
-  const dnsList = Array.isArray(dnsServers) ? dnsServers : ['1.1.1.1'];
-  const testUrl = probeUrl || 'https://www.gstatic.com/generate_204';
-  const interval = probeInterval || '3m';
-  
-  const base = {
-    dns: {
-      hosts: {
-        'domain:googleapis.cn': 'googleapis.com',
-        'dns.alidns.com': ['223.5.5.5','223.6.6.6','2400:3200::1','2400:3200:baba::1'],
-        'one.one.one.one': ['1.1.1.1','1.0.0.1','2606:4700:4700::1111','2606:4700:4700::1001'],
-        'dns.cloudflare.com': ['104.16.132.229','104.16.133.229','2606:4700::6810:84e5','2606:4700::6810:85e5'],
-        'dns.google': ['8.8.8.8','8.8.4.4','2001:4860:4860::8888','2001:4860:4860::8844']
-      },
-      servers: [
-        dnsList[0],
-        { address:dnsList[0], domains:['geosite:google'] },
-        { address:dnsList.length > 1 ? dnsList[1] : dnsList[0], domains:['domain:alidns.com','domain:doh.pub','domain:dot.pub','geosite:cn'],
-          expectIPs:['geoip:cn'], skipFallback:true, tag:'domestic-dns' }
-      ],
-      tag: 'dns-module'
-    },
-    inbounds: [{
-      listen:'127.0.0.1', port:10808, protocol:'socks',
-      settings:{ auth:'noauth', udp:true, userLevel:8 },
-      sniffing:{ destOverride:['http','tls'], enabled:true, routeOnly:false },
-      tag:'socks'
-    }],
-    log: { loglevel:'warning' },
-    observatory: {
-      enableConcurrency:true, probeInterval:interval,
-      probeUrl:testUrl,
-      subjectSelector:[prefix]
-    },
-    outbounds: [],
-    policy: {
-      levels: { '8': { connIdle:300, downlinkOnly:1, handshake:4, uplinkOnly:1 } },
-      system: { statsOutboundDownlink:true, statsOutboundUplink:true }
-    },
-    remarks: 'javidsub Intelligent Selection',
-    routing: {
-      balancers: [{ selector:[prefix], strategy:{ type:'leastPing' }, tag:'proxy-round' }],
-      domainStrategy:'AsIs',
-      rules: [
-        { network:'udp', outboundTag:'block', port:'443', type:'field' },
-        { balancerTag:'proxy-round', domain:['geosite:google'], type:'field' },
-        { ip:['geoip:private'], outboundTag:'direct', type:'field' },
-        { domain:['geosite:private'], outboundTag:'direct', type:'field' },
-        { ip:['geoip:cn'], outboundTag:'direct', type:'field' },
-        { domain:['geosite:cn'], outboundTag:'direct', type:'field' },
-        { inboundTag:['domestic-dns'], outboundTag:'direct', type:'field' },
-        { balancerTag:'proxy-round', inboundTag:['dns-module'], type:'field' },
-        { balancerTag:'proxy-round', network:'tcp,udp', type:'field' }
-      ]
-    },
-    stats: {}
-  };
-
-  // Add fragment outbound if enabled
-  if (fragmentSettings && fragmentSettings.enabled){
-    const fragOutbound = {
-      tag: 'dialer-fragment',
-      protocol: 'freedom',
-      settings: {
-        fragment: {
-          packets: fragmentSettings.packets || 'tlshello',
-          length: `${fragmentSettings.length.min}-${fragmentSettings.length.max}`,
-          interval: `${fragmentSettings.interval.min}-${fragmentSettings.interval.max}`
-        }
-      }
-    };
-    base.outbounds.unshift(fragOutbound);
-  }
-
-  base.outbounds = base.outbounds.concat(outbounds);
-  base.outbounds.push({ protocol:'freedom', settings:{ domainStrategy:'UseIP' }, tag:'direct' });
-  base.outbounds.push({ protocol:'blackhole', settings:{ response:{ type:'http' } }, tag:'block' });
-  return base;
-}
-
-/* ───────── parse everything ───────── */
-function parseAll(){
-  const raw = $('inputLinks').value.trim();
-  const res = resolveInput(raw);
-  const prefix = $('tagPrefix').value.trim() || 'proxy-';
-  const insecure = $('allowInsecure').checked;
-  const fragmentSettings = getFragmentSettings();
-
-  const lines = res.text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  let counter = 0;
-  const outbounds = [], nodes = [];
-  let invalid = 0;
-
-  for (const ln of lines){
-    if (!ln.startsWith('vless://')) continue;
-    const parsed = parseVlessLine(ln, prefix + (counter + 1), insecure, fragmentSettings);
-    if (parsed.error){ invalid++; continue; }
-    counter++;
-    outbounds.push(parsed.outbound);
-    nodes.push(parsed);
-  }
-  allNodes = nodes;
-  return { nodes, outbounds, invalid, totalLines: lines.length, b64: res.b64, fragmentSettings };
-}
-
-/* ───────── live analyze + chips ───────── */
-function applyFilters(){
-  const search = $('nodeSearch').value.toLowerCase();
-  const netFilter = $('filterNetwork').value;
-  const secFilter = $('filterSecurity').value;
-  
-  const filtered = allNodes.filter(n => {
-    const matchSearch = !search || 
-      (n.remark && n.remark.toLowerCase().includes(search)) ||
-      (n.address && n.address.toLowerCase().includes(search));
-    const matchNet = !netFilter || n.network === netFilter;
-    const matchSec = !secFilter || n.security === secFilter;
-    return matchSearch && matchNet && matchSec;
+function animate() {
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>W) p.vx*=-1;
+    if(p.y<0||p.y>H) p.vy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent').trim() + Math.floor(p.a*255).toString(16).padStart(2,'0');
+    ctx.fill();
   });
-  
-  const list = $('nodesList');
-  list.innerHTML = '';
-  if (!filtered.length){
-    list.innerHTML = '<div class="empty-note">هیچ گره‌ای با فیلترهای انتخاب‌شده یافت نشد.</div>';
-  } else {
-    filtered.forEach((n, i) => {
-      const chip = document.createElement('div');
-      chip.className = 'chip';
-      
-      const netCls = ({ws:'b-ws', grpc:'b-grpc', tcp:'b-tcp', h2:'b-h2', http:'b-h2', httpupgrade:'b-tcp'})[n.network] || 'b-none';
-      const secCls = ({tls:'b-tls', reality:'b-reality', none:'b-none'})[n.security] || 'b-none';
+  requestAnimationFrame(animate);
+}
+animate();
 
-      const idx = document.createElement('span'); idx.className='chip-idx'; idx.textContent = faNum(i+1);
-      const nm = document.createElement('span'); nm.className='chip-name'; nm.textContent = n.remark || n.address; nm.title = n.remark || n.address;
-      const ad = document.createElement('span'); ad.className='chip-addr'; ad.textContent = n.address + ':' + n.port;
-      const b1 = document.createElement('span'); b1.className='badge ' + netCls; b1.textContent = n.network;
-      const b2 = document.createElement('span'); b2.className='badge ' + secCls; b2.textContent = n.security;
-      chip.append(idx, nm, ad, b1, b2);
-      list.appendChild(chip);
-    });
+function setTheme(theme) {
+  document.body.className = theme;
+  state.theme = theme;
+  localStorage.setItem('sc_theme', theme);
+}
+if(localStorage.getItem('sc_theme')) setTheme(localStorage.getItem('sc_theme'));
+
+function setFragmentMode(mode) {
+  state.fragment.mode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const manualDiv = $('fragManualInputs');
+  const autoDiv = $('fragAutoInfo');
+  
+  if(mode === 'manual') {
+    manualDiv.style.display = 'grid';
+    autoDiv.style.display = 'none';
+  } else if (mode === 'auto') {
+    manualDiv.style.display = 'none';
+    autoDiv.style.display = 'block';
+    $('fragLen').value = '100-200';
+    $('fragInt').value = '10-20';
+    $('fragPack').value = 'tlshello';
+  } else {
+    manualDiv.style.display = 'none';
+    autoDiv.style.display = 'none';
   }
 }
 
-function analyze(skipFilter){
-  const { nodes, invalid, totalLines, b64 } = parseAll();
-  $('statLines').textContent = faNum(totalLines);
-  $('statLinks').textContent = faNum(nodes.length);
-  $('statB64').textContent = b64 ? 'فعال ✓' : (totalLines ? '—' : '—');
-
-  if (!skipFilter) applyFilters();
+function parseInput(text) {
+  if(!text) return [];
+  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const results = [];
   
-  $('nodesCount').innerHTML =
-    '<span class="nodes-head-count">' + faNum(nodes.length) + ' معتبر' +
-    (invalid ? ' <span class="bad">/ ' + faNum(invalid) + ' نامعتبر</span>' : '') + '</span>';
-  lastInvalid = invalid;
+  if(lines.length === 1 && /^[A-Za-z0-9+/=]+$/.test(lines[0]) && lines[0].length > 50) {
+    try {
+      const decoded = atob(lines[0].replace(/-/g,'+').replace(/_/g,'/'));
+      if(decoded.includes('://')) {
+        return parseInput(decoded);
+      }
+    } catch(e) {}
+  }
+
+  lines.forEach(line => {
+    let node = null;
+    if(line.startsWith('vless://')) node = parseVless(line);
+    else if(line.startsWith('vmess://')) node = parseVmess(line);
+    else if(line.startsWith('trojan://')) node = parseTrojan(line);
+    else if(line.startsWith('ss://')) node = parseSS(line);
+    
+    if(node) {
+      node.country = detectCountry(node.remark);
+      results.push(node);
+    }
+  });
+  return results;
 }
 
-/* ───────── highlight ───────── */
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function highlightJSON(str){
-  return esc(str).replace(
-    /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
-    function(m){
-      let cls = 'tok-num';
-      if (m.startsWith('"')) cls = /"\s*:$/.test(m) ? 'tok-key' : 'tok-str';
-      else if (/[a-z]/.test(m)) cls = 'tok-bool';
-      return '<span class="' + cls + '">' + m + '</span>';
-    });
+function parseVless(url) {
+  try {
+    const u = new URL(url);
+    const params = new URLSearchParams(u.search);
+    return {
+      protocol: 'vless',
+      uuid: u.username,
+      address: u.hostname,
+      port: parseInt(u.port) || 443,
+      remark: decodeURIComponent(u.hash.slice(1)) || 'VLESS Node',
+      type: params.get('type') || 'tcp',
+      security: params.get('security') || 'none',
+      sni: params.get('sni') || u.hostname,
+      fp: params.get('fp') || 'chrome',
+      alpn: params.get('alpn'),
+      path: params.get('path') || '/',
+      host: params.get('host') || '',
+      pbk: params.get('pbk'),
+      sid: params.get('sid'),
+      flow: params.get('flow') || ''
+    };
+  } catch(e) { return null; }
 }
 
-/* ───────── convert ───────── */
-function convert(){
-  const t0 = performance.now();
-  const { outbounds, invalid, fragmentSettings } = parseAll();
-  if (!outbounds.length){
-    toast('هیچ لینک vless معتبری پیدا نشد', 'warn');
+function parseVmess(url) {
+  try {
+    const json = JSON.parse(atob(url.slice(8)));
+    return {
+      protocol: 'vmess',
+      uuid: json.id,
+      address: json.add,
+      port: parseInt(json.port),
+      remark: json.ps || 'VMess Node',
+      type: json.net || 'tcp',
+      security: json.tls === 'tls' ? 'tls' : 'none',
+      sni: json.sni || json.host || json.add,
+      host: json.host || '',
+      path: json.path || '/'
+    };
+  } catch(e) { return null; }
+}
+
+function parseTrojan(url) {
+  try {
+    const u = new URL(url);
+    const params = new URLSearchParams(u.search);
+    return {
+      protocol: 'trojan',
+      password: u.username,
+      address: u.hostname,
+      port: parseInt(u.port) || 443,
+      remark: decodeURIComponent(u.hash.slice(1)) || 'Trojan Node',
+      type: params.get('type') || 'tcp',
+      security: 'tls',
+      sni: params.get('sni') || u.hostname,
+      path: params.get('path') || '/',
+      host: params.get('host') || ''
+    };
+  } catch(e) { return null; }
+}
+
+function parseSS(url) {
+  try {
+    const temp = url.slice(5);
+    const hashIdx = temp.indexOf('#');
+    const remark = hashIdx > -1 ? decodeURIComponent(temp.slice(hashIdx+1)) : 'SS Node';
+    const mainPart = hashIdx > -1 ? temp.slice(0, hashIdx) : temp;
+    
+    let auth, rest;
+    if(mainPart.includes('@')) {
+      [auth, rest] = mainPart.split('@');
+    } else {
+      const decoded = atob(mainPart);
+      const hIdx = decoded.indexOf('#');
+      if(hIdx > -1) {
+         remark = decodeURIComponent(decoded.slice(hIdx+1));
+         mainPart = decoded.slice(0, hIdx);
+      }
+      [auth, rest] = mainPart.split('@');
+    }
+    
+    const methodPass = atob(auth);
+    const [method, password] = methodPass.split(':');
+    const [addr, port] = rest.split(':');
+    
+    return {
+      protocol: 'ss',
+      method, password,
+      address: addr,
+      port: parseInt(port),
+      remark
+    };
+  } catch(e) { return null; }
+}
+
+function detectCountry(remark) {
+  if(!remark) return { code: '🌐', name: 'Unknown' };
+  const r = remark.toUpperCase();
+  const flags = {
+    'IR': '🇮🇷', 'TEHRAN': '🇮🇷',
+    'DE': '🇩🇪', 'GERMANY': '🇩🇪', 'FRANKFURT': '🇩🇪',
+    'US': '🇺🇸', 'USA': '🇺🇸', 'NEW YORK': '🇺🇸',
+    'NL': '🇳🇱', 'NETHERLANDS': '🇳🇱',
+    'GB': '🇬🇧', 'UK': '🇬🇧', 'LONDON': '🇬🇧',
+    'FR': '🇫🇷', 'FRANCE': '🇫🇷',
+    'JP': '🇯🇵', 'JAPAN': '🇯🇵', 'TOKYO': '🇯🇵',
+    'SG': '🇸🇬', 'SINGAPORE': '🇸🇬',
+    'CA': '🇨🇦', 'CANADA': '🇨🇦',
+    'RU': '🇷🇺', 'RUSSIA': '🇷🇺',
+    'FI': '🇫🇮', 'FINLAND': '🇫🇮',
+    'SE': '🇸🇪', 'SWEDEN': '🇸🇪',
+    'UA': '🇺🇦', 'UKRAINE': '🇺🇦'
+  };
+  for(const [key, flag] of Object.entries(flags)) {
+    if(r.includes(key)) return { code: flag, name: key };
+  }
+  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u);
+  if(emoji) return { code: emoji[0], name: 'Emoji' };
+  
+  return { code: '🌐', name: 'Global' };
+}
+
+function renderNodes() {
+  const filter = $('nodeFilter').value.toLowerCase();
+  const list = $('nodeList');
+  list.innerHTML = '';
+  
+  const filtered = state.nodes.filter(n => 
+    n.remark.toLowerCase().includes(filter) || 
+    n.country.name.toLowerCase().includes(filter) ||
+    n.country.code === filter
+  );
+
+  $('statTotal').textContent = faNum(state.nodes.length);
+  $('statValid').textContent = faNum(filtered.length);
+  $('statCountries').textContent = faNum(new Set(state.nodes.map(n=>n.country.code)).size);
+
+  if(filtered.length === 0) {
+    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:20px;">گره‌ای یافت نشد.</div>';
     return;
   }
-  const prefix = $('tagPrefix').value.trim() || 'proxy-';
-  
-  // Get DNS servers
-  const dnsPreset = $('dnsPreset').value;
-  let dnsServers;
-  if (dnsPreset === 'custom') {
-    dnsServers = $('customDns').value.split(',').map(s => s.trim()).filter(Boolean);
-  } else {
-    dnsServers = DNS_PRESETS[dnsPreset] || ['1.1.1.1'];
-  }
-  
-  // Get probe URL
-  const probePreset = $('probeUrlPreset').value;
-  let probeUrl;
-  if (probePreset === 'custom') {
-    probeUrl = $('customProbeUrl').value || 'https://www.gstatic.com/generate_204';
-  } else {
-    probeUrl = probePreset;
-  }
-  
-  // Get probe interval
-  const probeInterval = $('probeInterval').value;
-  
-  const finalJson = generateFullJsonConfig(outbounds, prefix, dnsServers, probeUrl, probeInterval, fragmentSettings);
-  generatedRaw = JSON.stringify(finalJson, null, 2);
-  const ms = Math.max(1, Math.round(performance.now() - t0));
 
-  $('prettyOut').innerHTML = highlightJSON(generatedRaw);
-  $('plainOut').value = generatedRaw;
-
-  const kb = (new Blob([generatedRaw]).size / 1024).toFixed(1);
-  $('sumCount').textContent = faNum(outbounds.length);
-  $('sumSize').textContent = faNum(kb) + ' KB';
-  $('sumTime').textContent = faNum(ms) + ' ms';
-  const bad = $('sumBad');
-  if (invalid){ bad.style.display = ''; bad.textContent = '⚠ ' + faNum(invalid) + ' لینک نامعتبر نادیده گرفته شد'; }
-  else bad.style.display = 'none';
-  $('sumBar').classList.add('on');
-
-  toast(faNum(outbounds.length) + ' کانفیگ با موفقیت تولید شد');
-}
-
-/* ───────── copy / download ───────── */
-function fallbackCopy(text){
-  const ta = document.createElement('textarea');
-  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
-  document.body.appendChild(ta); ta.select();
-  try { document.execCommand('copy'); toast('کانفیگ JSON کپی شد ✓'); }
-  catch(e){ toast('کپی ناموفق بود', 'err'); }
-  ta.remove();
-}
-async function copyResult(){
-  if (!generatedRaw){ toast('ابتدا خروجی تولید کنید', 'warn'); return; }
-  try { await navigator.clipboard.writeText(generatedRaw); toast('کانفیگ JSON کپی شد ✓'); }
-  catch(e){ fallbackCopy(generatedRaw); }
-}
-function downloadResult(){
-  if (!generatedRaw){ toast('ابتدا خروجی تولید کنید', 'warn'); return; }
-  const blob = new Blob([generatedRaw], { type:'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'final_sub.json';
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-  toast('فایل final_sub.json دانلود شد');
-}
-function getDownloadLink(){
-  if (!generatedRaw){ toast('ابتدا خروجی تولید کنید', 'warn'); return; }
-  
-  if (generatedBlobUrl) {
-    URL.revokeObjectURL(generatedBlobUrl);
-  }
-  
-  const blob = new Blob([generatedRaw], { type:'application/json' });
-  generatedBlobUrl = URL.createObjectURL(blob);
-  
-  navigator.clipboard.writeText(generatedBlobUrl).then(() => {
-    toast('لینک دانلود کپی شد ✓ (اعتبار تا بسته شدن تب)', 'warn');
-  }).catch(() => {
-    toast('لینک تولید شد اما کپی نشد: ' + generatedBlobUrl, 'warn');
+  filtered.forEach((n, idx) => {
+    const div = document.createElement('div');
+    div.className = 'node-card';
+    div.innerHTML = `
+      <div class="node-head">
+        <span class="node-flag">${n.country.code}</span>
+        <span class="badge ${n.protocol}">${n.protocol.toUpperCase()}</span>
+      </div>
+      <div class="node-remark" title="${safeHtml(n.remark)}">${safeHtml(n.remark)}</div>
+      <div class="node-meta">
+        <span class="badge">${n.address}:${n.port}</span>
+        <span class="badge ${n.type || 'tcp'}">${(n.type||'tcp').toUpperCase()}</span>
+        ${n.security === 'tls' ? '<span class="badge tls">TLS</span>' : ''}
+        ${n.security === 'reality' ? '<span class="badge reality">REALITY</span>' : ''}
+      </div>
+      <div class="node-actions">
+        <span class="action-icon" onclick="editNode(${idx})" title="Edit">✏️</span>
+        <span class="action-icon" onclick="deleteNode(${idx})" title="Delete">🗑</span>
+        <span class="action-icon" onclick="showNodeQr('${encodeURIComponent(JSON.stringify(n))}')" title="QR">📷</span>
+      </div>
+    `;
+    list.appendChild(div);
   });
 }
 
-/* ───────── tabs ───────── */
-function setTab(mode){
-  const pretty = $('prettyOut'), plain = $('plainOut');
-  $('tabPretty').classList.toggle('active', mode === 'pretty');
-  $('tabPlain').classList.toggle('active', mode === 'plain');
-  pretty.classList.toggle('hidden', mode !== 'pretty');
-  plain.classList.toggle('hidden', mode !== 'plain');
-}
-
-/* ───────── sample ───────── */
-const SAMPLE = [
-  'vless://8f2c3d4e-5a6b-7c8d-9e0f-1a2b3c4d5e6f@server1.example.com:443?type=ws&security=tls&path=%2Fvless-ws&host=cdn.example.com&sni=example.com&fp=chrome&alpn=h2%2Chttp/1.1#Germany-Frankfurt-WS',
-  'vless://a1b2c3d4-e5f6-4a5b-8c7d-9e0f1a2b3c4d@198.51.100.10:2053?type=tcp&security=reality&sni=www.microsoft.com&fp=chrome&pbk=SbVKFkJjDdLmPqQW4kHBjxz9sKJDPYsLhO1vD2RnVXc&sid=ab12cd34&spx=%2F&flow=xtls-rprx-vision#Netherlands-Reality-Vision',
-  'vless://11112222-3333-4444-5555-666677778888@grpc.example.com:443?type=grpc&security=tls&serviceName=grpc-tunnel&sni=grpc.example.com&fp=firefox#Finland-Helsinki-gRPC'
-].join('\n');
-
-/* ───────── Fetch from URL ───────── */
-async function fetchFromUrl(){
-  const url = prompt('لطفاً لینک ساب‌اسکریپشن را وارد کنید:\n(مثال: https://example.com/sub)', '');
-  if (!url) return;
+async function fetchSubscription() {
+  const url = $('subUrl').value.trim();
+  if(!url) return alert('لطفا URL را وارد کنید');
   
-  $('loadingOverlay').classList.add('active');
-  $('loadingText').textContent = 'در حال دریافت از URL...';
+  $('statusText').textContent = 'در حال دریافت...';
+  $('statusText').style.color = 'var(--warning)';
   
   try {
-    const corsProxies = [
-      'https://corsproxy.io/?',
-      'https://api.allorigins.win/raw?url=',
-      'https://thingproxy.freeboard.io/fetch/'
-    ];
+    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+    if(!res.ok) throw new Error('Primary failed');
+    let text = await res.text();
     
-    let content = null;
-    let lastError = null;
-    
-    for (const proxy of corsProxies) {
-      try {
-        const response = await fetch(proxy + encodeURIComponent(url), {
-          method: 'GET',
-          headers: { 'Accept': 'text/plain' }
-        });
-        if (response.ok) {
-          content = await response.text();
-          break;
-        }
-      } catch (e) {
-        lastError = e;
-        continue;
-      }
+    if(text.length < 10) {
+      res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+      text = await res.text();
     }
     
-    if (!content) {
-      throw new Error('عدم توانایی در دریافت محتوا. ممکن است محدودیت CORS وجود داشته باشد.');
-    }
-    
-    const decoded = tryB64(content.trim());
-    if (decoded && decoded.includes('vless://')) {
-      $('inputLinks').value = decoded;
-    } else if (content.includes('vless://')) {
-      $('inputLinks').value = content;
-    } else {
-      throw new Error('محتوای دریافتی شامل لینک vless نیست.');
-    }
-    
-    analyze();
-    toast('ساب‌اسکریپشن با موفقیت بارگذاری شد', 'success');
-  } catch (e) {
-    toast(e.message || 'خطا در دریافت URL', 'err');
-  } finally {
-    $('loadingOverlay').classList.remove('active');
+    $('rawInput').value = text;
+    processInput();
+    $('statusText').textContent = 'دریافت موفق';
+    $('statusText').style.color = 'var(--success)';
+  } catch(e) {
+    alert('خطا در دریافت لینک. ممکن است محدودیت CORS وجود داشته باشد.');
+    $('statusText').textContent = 'خطا';
+    $('statusText').style.color = 'var(--danger)';
   }
 }
 
-/* ───────── File Import ───────── */
-function importFile(event){
-  const file = event.target.files[0];
-  if (!file) return;
-  
+function pasteFromClipboard() {
+  navigator.clipboard.readText().then(text => {
+    $('rawInput').value = text;
+    processInput();
+  }).catch(err => alert('دسترسی به کلیپ‌بورد ممکن نیست.'));
+}
+
+function handleFileImport(input) {
+  const file = input.files[0];
+  if(!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    const content = e.target.result;
-    const decoded = tryB64(content.trim());
-    if (decoded && decoded.includes('vless://')) {
-      $('inputLinks').value = decoded;
-    } else {
-      $('inputLinks').value = content;
-    }
-    analyze();
-    toast('فایل با موفقیت بارگذاری شد');
+  reader.onload = e => {
+    $('rawInput').value = e.target.result;
+    processInput();
   };
-  reader.onerror = () => toast('خطا در خواندن فایل', 'err');
   reader.readAsText(file);
-  event.target.value = '';
 }
 
-/* ───────── Drag & Drop ───────── */
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  document.body.addEventListener(eventName, preventDefaults, false);
-});
-
-function preventDefaults(e){
-  e.preventDefault();
-  e.stopPropagation();
+function clearInput() {
+  $('rawInput').value = '';
+  state.nodes = [];
+  renderNodes();
+  $('statInvalid').textContent = '0';
 }
 
-['dragenter', 'dragover'].forEach(eventName => {
-  document.body.addEventListener(eventName, () => $('dragOverlay').classList.add('active'), false);
+function processInput() {
+  const raw = $('rawInput').value;
+  const parsed = parseInput(raw);
+  state.nodes = parsed;
+  $('statInvalid').textContent = faNum(raw.split('\n').length - parsed.length);
+  renderNodes();
+  saveToLocal();
+}
+
+let timeout;
+$('rawInput').addEventListener('input', () => {
+  clearTimeout(timeout);
+  timeout = setTimeout(processInput, 500);
 });
 
-['dragleave', 'drop'].forEach(eventName => {
-  document.body.addEventListener(eventName, () => $('dragOverlay').classList.remove('active'), false);
-});
+function deleteNode(idx) {
+  const filter = $('nodeFilter').value.toLowerCase();
+  if(filter) {
+     alert("برای حذف، فیلتر را پاک کنید.");
+     return;
+  }
+  state.nodes.splice(idx, 1);
+  renderNodes();
+  saveToLocal();
+}
 
-$('dragOverlay').addEventListener('drop', handleDrop, false);
-
-function handleDrop(e){
-  const dt = e.dataTransfer;
-  const files = dt.files;
-  if (files.length){
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      $('inputLinks').value = reader.result;
-      analyze();
-      toast('فایل "' + file.name + '" بارگذاری شد ✓');
-    };
-    reader.readAsText(file);
+function editNode(idx) {
+  const n = state.nodes[idx];
+  const newRemark = prompt("نام گره را ویرایش کنید:", n.remark);
+  if(newRemark) {
+    n.remark = newRemark;
+    n.country = detectCountry(newRemark);
+    renderNodes();
+    saveToLocal();
   }
 }
 
-/* ───────── Fragment Settings ───────── */
-let fragMode = 'auto'; // 'auto', 'manual', 'off'
+function saveToLocal() {
+  localStorage.setItem('sc_nodes', JSON.stringify(state.nodes));
+  localStorage.setItem('sc_input', $('rawInput').value);
+}
 
-function setFragMode(mode){
-  fragMode = mode;
-  $('fragAutoBtn').classList.toggle('active', mode === 'auto');
-  $('fragManualBtn').classList.toggle('active', mode === 'manual');
-  $('fragOffBtn').classList.toggle('active', mode === 'off');
+window.addEventListener('load', () => {
+  if(localStorage.getItem('sc_nodes')) {
+    state.nodes = JSON.parse(localStorage.getItem('sc_nodes'));
+    $('rawInput').value = localStorage.getItem('sc_input') || '';
+    renderNodes();
+  }
+});
+
+function generateConfig() {
+  if(state.nodes.length === 0) return alert('گره‌ای موجود نیست!');
   
-  if (mode === 'manual'){
-    $('fragManualInputs').style.display = 'flex';
-    $('fragAutoInfo').style.display = 'none';
-  } else if (mode === 'auto'){
-    $('fragManualInputs').style.display = 'none';
-    $('fragAutoInfo').style.display = 'flex';
+  const format = $('outputFormat').value;
+  const warpMode = $('outboundMode').value;
+  const dns = $('dnsPreset').value;
+  
+  let config = {};
+  
+  if(format === 'xray') {
+    config = buildXrayConfig(state.nodes, warpMode, dns);
   } else {
-    $('fragManualInputs').style.display = 'none';
-    $('fragAutoInfo').style.display = 'none';
+    config = buildSingBoxConfig(state.nodes, warpMode, dns);
   }
-  saveToStorage();
+  
+  state.configJson = JSON.stringify(config, null, 2);
+  $('statusText').textContent = 'کانفیگ تولید شد (' + format + ')';
 }
 
-function getFragmentSettings(){
-  if (fragMode === 'off') return null;
+function buildXrayConfig(nodes, warpMode, dns) {
+  const outbounds = [];
+  const rules = [];
   
-  if (fragMode === 'auto'){
-    return {
-      enabled: true,
-      packets: 'tlshello',
-      length: { min: 100, max: 200 },
-      interval: { min: 10, max: 20 }
+  if(state.fragment.mode !== 'off') {
+    let len = '100-200', interval = '10-20', pack = 'tlshello';
+    if(state.fragment.mode === 'manual') {
+      len = $('fragLen').value;
+      interval = $('fragInt').value;
+      pack = $('fragPack').value;
+    }
+    outbounds.push({
+      tag: "fragment-out",
+      protocol: "freedom",
+      settings: {
+        domainStrategy: "AsIs",
+        fragment: { packets: pack, length: len, interval: interval }
+      }
+    });
+  }
+
+  nodes.forEach((n, i) => {
+    const tag = `proxy_${i}`;
+    const ob = {
+      tag: tag,
+      protocol: n.protocol,
+      settings: {},
+      streamSettings: { network: n.type || 'tcp', security: n.security || 'none' }
     };
+    
+    if(n.protocol === 'vless') {
+      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, encryption: "none", flow: n.flow }] }];
+      if(n.security === 'reality') {
+        ob.streamSettings.realitySettings = { publicKey: n.pbk, shortId: n.sid, serverName: n.sni };
+      } else if (n.security === 'tls') {
+        ob.streamSettings.tlsSettings = { serverName: n.sni, alpn: n.alpn ? n.alpn.split(',') : [] };
+      }
+      if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
+      if(n.type === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.path };
+    }
+
+    if(state.fragment.mode !== 'off') {
+      ob.streamSettings.sockopt = { dialerProxy: "fragment-out" };
+    }
+    
+    outbounds.push(ob);
+  });
+
+  if(warpMode !== 'direct') {
+    const warpOb = {
+      tag: "warp",
+      protocol: "wireguard",
+      settings: {
+        secretKey: "YFYu4C2pNR8...",
+        address: ["162.159.192.1/32", "2606:4700:d0::1/128"],
+        peers: [{ publicKey: "bmXOC+F1Fx...", endpoint: "engage.cloudflareclient.com:2408" }]
+      }
+    };
+    outbounds.push(warpOb);
+    
+    if(warpMode === 'warp-full') {
+       rules.push({ type: "field", outboundTag: "warp", network: "tcp,udp" });
+    } else if (warpMode === 'warp-split') {
+       rules.push({ type: "field", outboundTag: "warp", ip: ["geoip:ir"] });
+       rules.push({ type: "field", outboundTag: "warp", domain: ["geosite:category-ir"] });
+    }
   }
-  
-  // Manual mode
-  const lengthVal = $('fragLength').value.trim() || '100-200';
-  const intervalVal = $('fragInterval').value.trim() || '10-20';
-  const packets = $('fragPackets').value || 'tlshello';
-  
-  let lengthMin = 100, lengthMax = 200;
-  let intervalMin = 10, intervalMax = 20;
-  
-  const lengthParts = lengthVal.split('-');
-  if (lengthParts.length >= 2){
-    lengthMin = parseInt(lengthParts[0]) || 100;
-    lengthMax = parseInt(lengthParts[1]) || 200;
-  }
-  
-  const intervalParts = intervalVal.split('-');
-  if (intervalParts.length >= 2){
-    intervalMin = parseInt(intervalParts[0]) || 10;
-    intervalMax = parseInt(intervalParts[1]) || 20;
-  }
-  
+
   return {
-    enabled: true,
-    packets: packets,
-    length: { min: lengthMin, max: lengthMax },
-    interval: { min: intervalMin, max: intervalMax }
+    log: { loglevel: "warning" },
+    inbounds: [{ port: 10808, protocol: "socks", settings: { udp: true }, sniffing: { enabled: true } }],
+    outbounds: [...outbounds, { tag: "direct", protocol: "freedom" }, { tag: "block", protocol: "blackhole" }],
+    routing: { rules: rules, domainStrategy: "IPIfNonMatch" },
+    dns: { servers: ["1.1.1.1", "8.8.8.8"] }
   };
 }
 
-/* ───────── LocalStorage Autosave ───────── */
-const STORAGE_KEY = 'vless_converter_v2';
-function saveToStorage(){
-  const data = {
-    input: $('inputLinks').value,
-    prefix: $('tagPrefix').value,
-    dnsPreset: $('dnsPreset').value,
-    customDns: $('customDns').value,
-    probeUrlPreset: $('probeUrlPreset').value,
-    customProbeUrl: $('customProbeUrl').value,
-    probeInterval: $('probeInterval').value,
-    allowInsecure: $('allowInsecure').checked,
-    fragMode: fragMode,
-    fragLength: $('fragLength').value,
-    fragInterval: $('fragInterval').value,
-    fragPackets: $('fragPackets').value
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-function loadFromStorage(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      if (data.input) $('inputLinks').value = data.input;
-      if (data.prefix) $('tagPrefix').value = data.prefix;
-      if (data.dnsPreset) $('dnsPreset').value = data.dnsPreset;
-      if (data.customDns) $('customDns').value = data.customDns;
-      if (data.probeUrlPreset) $('probeUrlPreset').value = data.probeUrlPreset;
-      if (data.customProbeUrl) $('customProbeUrl').value = data.customProbeUrl;
-      if (data.probeInterval) $('probeInterval').value = data.probeInterval;
-      if (data.allowInsecure !== undefined) $('allowInsecure').checked = data.allowInsecure;
-      if (data.fragMode) setFragMode(data.fragMode);
-      if (data.fragLength) $('fragLength').value = data.fragLength;
-      if (data.fragInterval) $('fragInterval').value = data.fragInterval;
-      if (data.fragPackets) $('fragPackets').value = data.fragPackets;
-      
-      $('dnsPreset').dispatchEvent(new Event('change'));
-      $('probeUrlPreset').dispatchEvent(new Event('change'));
-      
-      analyze();
-    } catch(e) {
-      console.error('Error loading from storage:', e);
-    }
-  }
+function buildSingBoxConfig(nodes, warpMode, dns) {
+  return { log: { level: "info" }, inbounds: [], outbounds: [], route: { rules: [] } };
 }
 
-/* ───────── wiring ───────── */
-let debTimer;
-$('inputLinks').addEventListener('input', ()=>{ 
-  clearTimeout(debTimer); 
-  debTimer = setTimeout(() => {
-    analyze();
-    saveToStorage();
-  }, 280); 
-});
-$('tagPrefix').addEventListener('change', ()=>{ 
-  if ($('inputLinks').value) analyze(); 
-  saveToStorage();
-});
+function copyConfig() {
+  if(!state.configJson) return generateConfig();
+  navigator.clipboard.writeText(state.configJson).then(() => alert('کپی شد!'));
+}
 
-$('dnsPreset').addEventListener('change', ()=>{
-  const isCustom = $('dnsPreset').value === 'custom';
-  $('customDnsOpt').style.display = isCustom ? 'flex' : 'none';
-  saveToStorage();
-});
+function downloadConfig() {
+  if(!state.configJson) return generateConfig();
+  const blob = new Blob([state.configJson], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `config_${Date.now()}.json`;
+  a.click();
+}
 
-$('probeUrlPreset').addEventListener('change', ()=>{
-  const isCustom = $('probeUrlPreset').value === 'custom';
-  $('customProbeOpt').style.display = isCustom ? 'flex' : 'none';
-  saveToStorage();
-});
+function showQrModal() {
+  if(!state.configJson) return generateConfig();
+  $('qrModal').classList.add('active');
+  $('qrcode').innerHTML = '';
+  new QRCode($('qrcode'), {
+    text: state.configJson,
+    width: 200,
+    height: 200
+  });
+}
 
-['customDns', 'customProbeUrl', 'probeInterval', 'allowInsecure'].forEach(id => {
-  $(id).addEventListener('change', saveToStorage);
-});
-
-['nodeSearch', 'filterNetwork', 'filterSecurity'].forEach(id => {
-  $(id).addEventListener('input', applyFilters);
-  $(id).addEventListener('change', applyFilters);
-});
-
-$('btnConvert').addEventListener('click', convert);
-$('btnCopy').addEventListener('click', copyResult);
-$('btnDownload').addEventListener('click', downloadResult);
-$('btnGetLink').addEventListener('click', getDownloadLink);
-$('btnSample').addEventListener('click', ()=>{ 
-  $('inputLinks').value = SAMPLE; 
-  analyze(); 
-  toast('لینک‌های نمونه بارگذاری شد'); 
-});
-$('btnClear').addEventListener('click', ()=>{
-  $('inputLinks').value = ''; generatedRaw = '';
-  $('prettyOut').innerHTML = '<span style="color:#334155">// خروجی JSON اینجا نمایش داده می‌شود...</span>';
-  $('plainOut').value = ''; $('sumBar').classList.remove('on');
-  allNodes = [];
-  applyFilters();
-  saveToStorage();
-  toast('پاک شد');
-});
-$('btnPaste').addEventListener('click', async ()=>{
-  try {
-    const txt = await navigator.clipboard.readText();
-    if (txt){ 
-      $('inputLinks').value = txt; 
-      analyze(); 
-      saveToStorage();
-      toast('از کلیپ‌بورد چسبانده شد'); 
-    }
-    else toast('کلیپ‌بورد خالی است', 'warn');
-  } catch(e){ toast('دسترسی به کلیپ‌بورد مسدود است', 'err'); }
-});
-$('btnFetch').addEventListener('click', fetchFromUrl);
-$('btnImportFile').addEventListener('click', ()=> $('fileInput').click());
-$('fileInput').addEventListener('change', importFile);
-$('tabPretty').addEventListener('click', ()=>setTab('pretty'));
-$('tabPlain').addEventListener('click', ()=>setTab('plain'));
-
-document.addEventListener('keydown', e=>{
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') convert();
-});
-
-loadFromStorage();
-analyze();
-})();
+function showNodeQr(encodedNode) {
+  const node = JSON.parse(decodeURIComponent(encodedNode));
+  alert('نمایش QR برای این گره (نیاز به پیاده‌سازی سازنده URI دارد)');
+}
 </script>
 </body>
 </html>
