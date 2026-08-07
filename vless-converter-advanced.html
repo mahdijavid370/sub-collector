@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLESS ⇢ Xray JSON | تبدیلگر پیشرفته کانفیگ</title>
+
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/vazirmatn@latest/arabic-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/vazirmatn@latest/arabic-700-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/lalezar@latest/arabic-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-600-normal.css" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#05070d;
+  --panel:#0b1120;
+  --panel-2:#0e1628;
+  --line:rgba(56,189,248,.14);
+  --line-strong:rgba(56,189,248,.32);
+  --ink:#e2e8f0;
+  --mut:#8ea0b8;
+  --dim:#5b6b82;
+  --cyan:#22d3ee;
+  --sky:#38bdf8;
+  --green:#4ade80;
+  --amber:#fbbf24;
+  --rose:#fb7185;
+  --violet:#a78bfa;
+  --mono:'JetBrains Mono',monospace;
+  --body:'Vazirmatn',sans-serif;
+  --disp:'Lalezar','Vazirmatn',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+  padding:26px clamp(14px,3vw,40px) 60px;
+  overflow-x:hidden;
+}
+
+/* ═══ ambient layers ═══ */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:
+    linear-gradient(rgba(34,211,238,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,211,238,.045) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 78%);
+          mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 78%);
+  animation:gridPan 70s linear infinite;
+}
+@keyframes gridPan{to{background-position:44px 88px,88px 44px}}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:-2;pointer-events:none;opacity:.5}
+.orb-a{width:480px;height:480px;top:-160px;right:-120px;background:radial-gradient(circle,rgba(14,165,233,.35),transparent 65%);animation:drift 16s ease-in-out infinite alternate}
+.orb-b{width:420px;height:420px;bottom:-140px;left:-120px;background:radial-gradient(circle,rgba(74,222,128,.22),transparent 65%);animation:drift 19s ease-in-out infinite alternate-reverse}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(-46px,38px) scale(1.12)}}
+#fx{position:fixed;inset:0;z-index:-1;pointer-events:none}
+
+/* ═══ header ═══ */
+.topbar{
+  max-width:1280px;margin:0 auto 26px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;
+  animation:rise .6s ease both;
+}
+.brand{display:flex;align-items:center;gap:16px}
+.logo{
+  width:58px;height:58px;flex:none;border-radius:14px;
+  background:linear-gradient(145deg,#0e2136,#0a1626);
+  border:1px solid var(--line-strong);
+  display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:15px;color:var(--cyan);
+  box-shadow:0 0 26px rgba(34,211,238,.18),inset 0 0 18px rgba(34,211,238,.07);
+  position:relative;overflow:hidden;
+}
+.logo::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(34,211,238,.28) 50%,transparent 58%);transform:translateX(-120%);animation:sheen 4.5s ease-in-out infinite}
+@keyframes sheen{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.brand h1{
+  font-family:var(--disp);font-weight:400;
+  font-size:clamp(1.7rem,3.6vw,2.5rem);
+  line-height:1;color:#f1f5f9;letter-spacing:.5px;
+}
+.brand h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 22px rgba(34,211,238,.5)}
+.brand .tag{color:var(--mut);font-size:.85rem;margin-top:6px}
+.caret{display:inline-block;color:var(--green);font-family:var(--mono);animation:blink 1s steps(1) infinite;margin-inline-start:2px}
+@keyframes blink{50%{opacity:0}}
+.live{display:flex;gap:10px;flex-wrap:wrap}
+.stat-box{
+  min-width:96px;padding:10px 14px;border-radius:12px;text-align:center;
+  background:linear-gradient(180deg,rgba(30,41,59,.55),rgba(15,23,42,.55));
+  border:1px solid var(--line);backdrop-filter:blur(4px);
+  transition:border-color .25s,transform .25s;
+}
+.stat-box:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.stat-box b{display:block;font-family:var(--mono);font-size:1.25rem;color:var(--cyan)}
+.stat-box span{font-size:.72rem;color:var(--mut)}
+.stat-box.s2 b{color:var(--green)}
+.stat-box.s3 b{color:var(--violet);font-size:.85rem;padding-top:6px}
+
+/* ═══ layout ═══ */
+main{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1.12fr;gap:20px}
+.panel{
+  background:linear-gradient(180deg,rgba(14,22,40,.92),rgba(9,14,26,.92));
+  border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 18px 44px rgba(2,6,17,.55);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.reveal{animation:rise .65s ease both}
+.d2{animation-delay:.12s}.d3{animation-delay:.22s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+.p-head{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:13px 16px;border-bottom:1px solid var(--line);
+  background:rgba(8,13,25,.55);
+}
+.p-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot-c{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.dot-g{background:var(--green);box-shadow:0 0 10px var(--green)}
+.p-title{font-family:var(--mono);font-size:.78rem;color:var(--mut);letter-spacing:1px}
+.p-title b{color:var(--ink);font-weight:600}
+.p-actions{margin-inline-start:auto;display:flex;gap:7px;flex-wrap:wrap}
+.mini-btn{
+  font-family:var(--body);font-size:.78rem;color:var(--mut);
+  background:rgba(30,41,59,.6);border:1px solid var(--line);
+  border-radius:8px;padding:5px 11px;cursor:pointer;
+  transition:all .2s;
+}
+.mini-btn:hover{color:var(--cyan);border-color:var(--line-strong);background:rgba(34,211,238,.08);transform:translateY(-1px)}
+.mini-btn.danger:hover{color:var(--rose);border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.08)}
+.mini-btn.primary{color:#04121d;background:linear-gradient(135deg,#0ea5e9,#22d3ee);border-color:transparent}
+.mini-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(34,211,238,.35)}
+
+.p-body{padding:16px;display:flex;flex-direction:column;gap:14px;flex:1}
+
+textarea{
+  width:100%;background:#04070d;color:#7dd3fc;
+  border:1px solid var(--line);border-radius:12px;
+  padding:13px;font-family:var(--mono);font-size:.82rem;line-height:1.75;
+  resize:vertical;direction:ltr;text-align:left;
+  transition:border-color .25s,box-shadow .25s;
+}
+textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(56,189,248,.14)}
+textarea::placeholder{color:#28405c}
+#inputLinks{min-height:190px}
+
+/* options */
+.opts{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.opt{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--mut)}
+.opt select,.opt input[type=text],.opt input[type=url]{
+  direction:ltr;text-align:left;background:#04070d;color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:6px 9px;
+  font-family:var(--mono);font-size:.78rem;
+}
+.opt select:focus,.opt input[type=text]:focus,.opt input[type=url]:focus{outline:none;border-color:var(--sky)}
+.opt select{color:var(--cyan)}
+.switch{position:relative;width:42px;height:22px;flex:none}
+.switch input{display:none}
+.slider{
+  position:absolute;inset:0;background:#1e293b;border:1px solid var(--line);
+  border-radius:99px;cursor:pointer;transition:.25s;
+}
+.slider::before{
+  content:"";position:absolute;width:14px;height:14px;border-radius:50%;
+  top:3px;inset-inline-start:4px;background:#64748b;transition:.25s;
+}
+.switch input:checked + .slider{background:rgba(14,165,233,.35);border-color:var(--sky)}
+.switch input:checked + .slider::before{inset-inline-start:22px;background:var(--sky);box-shadow:0 0 8px var(--sky)}
+
+/* convert button */
+.go-btn{
+  width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;
+  font-family:var(--body);font-weight:700;font-size:1.02rem;color:#04121d;
+  background:linear-gradient(135deg,#0ea5e9,#22d3ee 55%,#5eead4);
+  background-size:200% 100%;
+  box-shadow:0 6px 22px rgba(14,165,233,.35);
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.go-btn:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 10px 30px rgba(34,211,238,.45)}
+.go-btn:active{transform:scale(.98)}
+.go-btn small{font-family:var(--mono);font-weight:400;font-size:.68rem;opacity:.75;margin-inline-start:8px}
+.go-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* output */
+.tabs{display:flex;gap:4px;background:#04070d;border:1px solid var(--line);border-radius:9px;padding:3px}
+.tab{
+  font-family:var(--body);font-size:.75rem;color:var(--dim);
+  background:transparent;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;transition:.2s;
+}
+.tab.active{color:#04121d;background:var(--cyan);font-weight:700}
+.sum-bar{
+  display:none;gap:9px;flex-wrap:wrap;align-items:center;
+  padding:9px 12px;border-radius:10px;
+  background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);
+  font-size:.78rem;color:var(--mut);
+}
+.sum-bar.on{display:flex;animation:rise .4s ease both}
+.sum-bar b{color:var(--green);font-family:var(--mono)}
+.sum-bar .warn{color:var(--rose)}
+.out-wrap{position:relative;flex:1;min-height:320px}
+#prettyOut,#plainOut{
+  position:absolute;inset:0;margin:0;width:100%;height:100%;
+  background:#04070d;border:1px solid var(--line);border-radius:12px;
+  padding:14px;font-family:var(--mono);font-size:.76rem;line-height:1.7;
+  direction:ltr;text-align:left;overflow:auto;white-space:pre;
+}
+#prettyOut{color:#64748b}
+#plainOut{color:var(--green)}
+#prettyOut.hidden,#plainOut.hidden{display:none}
+.tok-key{color:#7dd3fc}
+.tok-str{color:#86efac}
+.tok-num{color:var(--amber)}
+.tok-bool{color:var(--rose)}
+
+/* scrollbars */
+textarea::-webkit-scrollbar,#prettyOut::-webkit-scrollbar,#plainOut::-webkit-scrollbar,.nodes-list::-webkit-scrollbar{width:9px;height:9px}
+textarea::-webkit-scrollbar-thumb,#prettyOut::-webkit-scrollbar-thumb,#plainOut::-webkit-scrollbar-thumb,.nodes-list::-webkit-scrollbar-thumb{background:#1e3a55;border-radius:9px;border:2px solid #04070d}
+
+/* nodes strip */
+.nodes-panel{max-width:1280px;margin:20px auto 0}
+.nodes-head-count{font-family:var(--mono);font-size:.75rem;color:var(--dim)}
+.nodes-head-count .bad{color:var(--rose)}
+.nodes-list{display:flex;flex-wrap:wrap;gap:9px;max-height:210px;overflow-y:auto}
+.chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--panel-2);border:1px solid var(--line);
+  border-radius:10px;padding:7px 11px;font-size:.78rem;
+  animation:rise .35s ease both;transition:border-color .2s,transform .2s;
+}
+.chip:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.chip-idx{font-family:var(--mono);color:var(--dim);font-size:.7rem;flex:none}
+.chip-name{font-weight:700;color:var(--ink);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-addr{font-family:var(--mono);color:var(--mut);font-size:.68rem;direction:ltr;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-family:var(--mono);font-size:.62rem;padding:2px 7px;border-radius:99px;border:1px solid;flex:none}
+.b-ws{color:var(--cyan);border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.08)}
+.b-grpc{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
+.b-tcp{color:var(--amber);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.b-h2{color:#f0abfc;border-color:rgba(240,171,252,.4);background:rgba(240,171,252,.08)}
+.b-tls{color:var(--green);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08)}
+.b-reality{color:var(--rose);border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.08)}
+.b-none{color:var(--dim);border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.08)}
+.empty-note{color:var(--dim);font-size:.8rem;padding:8px 2px}
+
+/* search & filter */
+.search-bar{
+  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;
+  padding:10px;background:rgba(4,7,13,.6);border-radius:10px;border:1px solid var(--line);
+}
+.search-input{
+  flex:1;min-width:150px;background:#04070d;color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:6px 10px;
+  font-family:var(--body);font-size:.82rem;
+}
+.search-input:focus{outline:none;border-color:var(--sky)}
+.filter-select{
+  background:#04070d;color:var(--ink);border:1px solid var(--line);
+  border-radius:8px;padding:6px 10px;font-family:var(--body);font-size:.82rem;
+}
+.filter-select:focus{outline:none;border-color:var(--sky)}
+
+footer{
+  max-width:1280px;margin:26px auto 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  color:var(--dim);font-size:.74rem;border-top:1px solid var(--line);padding-top:16px;
+}
+footer .mono{font-family:var(--mono)}
+footer .dotsep{color:var(--cyan)}
+
+/* toasts */
+#toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  background:#0e2136;border:1px solid var(--line-strong);color:var(--ink);
+  padding:10px 20px;border-radius:11px;font-size:.85rem;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(14px);transition:all .3s;
+}
+.toast.show{opacity:1;transform:none}
+.toast.warn{border-color:rgba(251,191,36,.45)}
+.toast.err{border-color:rgba(251,113,133,.5)}
+.toast::before{content:"✓ ";color:var(--green)}
+.toast.warn::before{content:"⚠ ";color:var(--amber)}
+.toast.err::before{content:"✕ ";color:var(--rose)}
+.toast.loading::before{content:"⏳ ";color:var(--cyan)}
+
+/* loading overlay */
+.loading-overlay{
+  position:fixed;inset:0;background:rgba(5,7,13,.85);
+  backdrop-filter:blur(4px);z-index:9999;
+  display:none;place-items:center;flex-direction:column;gap:16px;
+}
+.loading-overlay.active{display:grid}
+.spinner{
+  width:48px;height:48px;border:4px solid var(--line);
+  border-top-color:var(--cyan);border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--mut);font-size:.9rem}
+
+@media(max-width:980px){
+  main{grid-template-columns:1fr}
+  .topbar{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<canvas id="fx"></canvas>
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">در حال پردازش...</div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">V⇢X</div>
+    <div>
+      <h1>VLESS <em>⇢</em> Xray JSON</h1>
+      <p class="tag">تبدیلگر پیشرفته لینک‌های vless و ساب‌اسکریپشن به کانفیگ کامل Xray<span class="caret">_</span></p>
+    </div>
+  </div>
+  <div class="live">
+    <div class="stat-box"><b id="statLines">۰</b><span>خط ورودی</span></div>
+    <div class="stat-box s2"><b id="statLinks">۰</b><span>لینک vless</span></div>
+    <div class="stat-box s3"><b id="statB64">—</b><span>حالت Base64</span></div>
+  </div>
+</header>
+
+<main>
+  <!-- ═══ INPUT ═══ -->
+  <section class="panel reveal">
+    <div class="p-head">
+      <span class="p-dot dot-c"></span>
+      <span class="p-title"><b>INPUT</b> // ورودی</span>
+      <div class="p-actions">
+        <button class="mini-btn" id="btnSample">🧪 نمونه</button>
+        <button class="mini-btn" id="btnPaste">📋 پیست</button>
+        <button class="mini-btn primary" id="btnFetch">🌐 دریافت از URL</button>
+        <button class="mini-btn" id="btnImportFile">📁 واردات فایل</button>
+        <button class="mini-btn danger" id="btnClear">🗑 پاک کردن</button>
+      </div>
+    </div>
+    <div class="p-body">
+      <textarea id="inputLinks" spellcheck="false"
+        placeholder="vless://uuid@host:443?type=ws&security=tls...&#10;هر لینک در یک خط — یا کل محتوای Base64 ساب‌اسکریپشن — یا لینک مستقیم ساب‌اسکریپشن"></textarea>
+
+      <div class="opts">
+        <label class="opt">پیشوند تگ
+          <input type="text" id="tagPrefix" value="proxy-" spellcheck="false">
+        </label>
+        <label class="opt">DNS سرور
+          <select id="dnsPreset">
+            <option value="cloudflare">Cloudflare (1.1.1.1)</option>
+            <option value="google">Google (8.8.8.8)</option>
+            <option value="quad9">Quad9 (9.9.9.9)</option>
+            <option value="opendns">OpenDNS (208.67.222.222)</option>
+            <option value="adguard">AdGuard (94.140.14.14)</option>
+            <option value="shecan">Shecan IR (178.22.122.100)</option>
+            <option value="electro">Electro IR (78.157.42.100)</option>
+            <option value="custom">سفارشی</option>
+          </select>
+        </label>
+        <label class="opt" id="customDnsOpt" style="display:none">DNS سفارشی
+          <input type="text" id="customDns" value="1.1.1.1,8.8.8.8" placeholder="1.1.1.1,8.8.8.8">
+        </label>
+        <label class="opt">Test URL
+          <select id="probeUrlPreset">
+            <option value="https://www.gstatic.com/generate_204">Google 204</option>
+            <option value="https://1.1.1.1/cdn-cgi/trace">Cloudflare</option>
+            <option value="https://captive.apple.com/hotspot-detect.html">Apple Captive</option>
+            <option value="https://connectivitycheck.platform.hicloud.com/generate_204">Huawei</option>
+            <option value="custom">سفارشی</option>
+          </select>
+        </label>
+        <label class="opt" id="customProbeOpt" style="display:none">URL سفارشی
+          <input type="url" id="customProbeUrl" value="https://www.gstatic.com/generate_204" placeholder="https://...">
+        </label>
+        <label class="opt">Probe Interval
+          <select id="probeInterval">
+            <option value="1m">1 دقیقه</option>
+            <option value="3m" selected>3 دقیقه</option>
+            <option value="5m">5 دقیقه</option>
+            <option value="10m">10 دقیقه</option>
+            <option value="30m">30 دقیقه</option>
+          </select>
+        </label>
+        <label class="opt">
+          <span class="switch"><input type="checkbox" id="allowInsecure"><span class="slider"></span></span>
+          allowInsecure برای TLS
+        </label>
+      </div>
+
+      <button class="go-btn" id="btnConvert">⚡ تولید کانفیگ JSON <small>Ctrl + Enter</small></button>
+      
+      <div style="text-align:center;font-size:.75rem;color:var(--dim)">
+        💡 می‌توانید فایل را بکشید و اینجا رها کنید (Drag & Drop)
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ OUTPUT ═══ -->
+  <section class="panel reveal d2">
+    <div class="p-head">
+      <span class="p-dot dot-g"></span>
+      <span class="p-title"><b>XRAY CONFIG</b> // خروجی</span>
+      <div class="p-actions">
+        <div class="tabs">
+          <button class="tab active" id="tabPretty">نمای رنگی</button>
+          <button class="tab" id="tabPlain">متن ساده</button>
+        </div>
+        <button class="mini-btn" id="btnCopy">⧉ کپی</button>
+        <button class="mini-btn" id="btnDownload">⬇ final_sub.json</button>
+        <button class="mini-btn primary" id="btnGetLink">🔗 لینک دانلود</button>
+      </div>
+    </div>
+    <div class="p-body">
+      <div class="sum-bar" id="sumBar">
+        <span>✅ اوت‌باندها: <b id="sumCount">۰</b></span>
+        <span>📦 حجم: <b id="sumSize">۰</b></span>
+        <span>⏱ زمان تولید: <b id="sumTime">۰</b></span>
+        <span class="warn" id="sumBad" style="display:none"></span>
+      </div>
+      <div class="out-wrap">
+        <pre id="prettyOut"><span style="color:#334155">// خروجی JSON اینجا نمایش داده می‌شود...</span></pre>
+        <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══ NODES ═══ -->
+<section class="panel nodes-panel reveal d3">
+  <div class="p-head">
+    <span class="p-dot dot-c"></span>
+    <span class="p-title"><b>NODES</b> // گره‌های شناسایی‌شده</span>
+    <span class="p-head-count" id="nodesCount"></span>
+  </div>
+  <div class="p-body">
+    <div class="search-bar">
+      <input type="text" class="search-input" id="nodeSearch" placeholder="🔍 جستجو در گره‌ها (نام، آدرس، کشور)...">
+      <select class="filter-select" id="filterNetwork">
+        <option value="">همه شبکه‌ها</option>
+        <option value="ws">WS</option>
+        <option value="grpc">gRPC</option>
+        <option value="tcp">TCP</option>
+        <option value="h2">H2</option>
+        <option value="httpupgrade">HTTPUpgrade</option>
+      </select>
+      <select class="filter-select" id="filterSecurity">
+        <option value="">همه امنیت‌ها</option>
+        <option value="tls">TLS</option>
+        <option value="reality">Reality</option>
+        <option value="none">None</option>
+      </select>
+    </div>
+    <div class="nodes-list" id="nodesList">
+      <div class="empty-note">هنوز لینکی پردازش نشده است — ورودی را وارد کنید تا گره‌ها به‌صورت زنده اینجا فهرست شوند.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>سازگار با <b>Xray-core</b> <span class="dotsep">•</span> VLESS <span class="dotsep">•</span> Reality / TLS <span class="dotsep">•</span> WS / gRPC / TCP / H2</span>
+  <span class="mono">javidsub intelligent selection — routing + observatory built-in</span>
+</footer>
+
+<div id="toasts"></div>
+
+<!-- Hidden file input -->
+<input type="file" id="fileInput" accept=".txt,.json,.sub" style="display:none">
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
+let generatedRaw = '';
+let lastInvalid = 0;
+let allNodes = []; // Store all parsed nodes for filtering
+let generatedBlobUrl = null;
+
+/* ═══ DNS Presets ═══ */
+const DNS_PRESETS = {
+  'cloudflare': ['1.1.1.1', '1.0.0.1'],
+  'google': ['8.8.8.8', '8.8.4.8'],
+  'quad9': ['9.9.9.9', '149.112.112.112'],
+  'opendns': ['208.67.222.222', '208.67.220.220'],
+  'adguard': ['94.140.14.14', '94.140.15.15'],
+  'shecan': ['178.22.122.100', '185.51.200.2'],
+  'electro': ['78.157.42.100', '5.160.218.100']
+};
+
+/* ═══ Probe URL Presets ═══ */
+const PROBE_URLS = [
+  'https://www.gstatic.com/generate_204',
+  'https://1.1.1.1/cdn-cgi/trace',
+  'https://captive.apple.com/hotspot-detect.html',
+  'https://connectivitycheck.platform.hicloud.com/generate_204'
+];
+
+/* ───────── ambient particles ───────── */
+const cv = $('fx'), cx = cv.getContext('2d');
+let W, H;
+function fit(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+addEventListener('resize', fit); fit();
+const PALETTE = ['34,211,238','74,222,128','148,163,184','167,139,250'];
+const dots = [];
+for (let i = 0; i < 44; i++) dots.push({
+  x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+  r: Math.random()*1.6 + .4,
+  vx: (Math.random()-.5)*.16, vy: -(Math.random()*.22 + .05),
+  a: Math.random()*.4 + .12, c: PALETTE[i % PALETTE.length]
+});
+(function loop(){
+  cx.clearRect(0,0,W,H);
+  for (const d of dots){
+    d.x += d.vx; d.y += d.vy;
+    if (d.y < -6){ d.y = H + 6; d.x = Math.random()*W; }
+    if (d.x < -6) d.x = W + 6; if (d.x > W + 6) d.x = -6;
+    cx.beginPath(); cx.arc(d.x, d.y, d.r, 0, 7);
+    cx.fillStyle = 'rgba(' + d.c + ',' + d.a + ')'; cx.fill();
+  }
+  requestAnimationFrame(loop);
+})();
+
+/* ───────── toasts ───────── */
+function toast(msg, type){
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
+  $('toasts').appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 320); }, 2600);
+}
+
+/* ───────── base64 ───────── */
+function tryB64(raw){
+  const s = raw.replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
+  if (!s || s.length % 4 === 1 || !/^[A-Za-z0-9+/=]+$/.test(s)) return null;
+  try {
+    const padded = s + '==='.slice((s.length + 3) % 4);
+    const bin = atob(padded);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  } catch(e){ return null; }
+}
+function resolveInput(raw){
+  if (!raw) return { text:'', b64:false };
+  if (raw.includes('vless://')) return { text: raw, b64:false };
+  const d = tryB64(raw);
+  if (d && d.includes('vless://')) return { text: d, b64:true };
+  return { text: raw, b64:false };
+}
+
+/* ───────── vless parser ───────── */
+function parseVlessLine(line, tag, allowInsecure){
+  try {
+    const u = new URL(line);
+    if (u.protocol !== 'vless:') return { error:'پروتکل نامعتبر' };
+    const uuid = u.username;
+    const address = decodeURIComponent(u.hostname);
+    if (!uuid || !address) return { error:'آدرس یا UUID ناقص' };
+    const port = parseInt(u.port) || 443;
+    const p = u.searchParams;
+
+    const network  = p.get('type') || 'tcp';
+    const security = p.get('security') || 'none';
+    const path     = p.get('path') || '/';
+    const host     = p.get('host') || '';
+    const sni      = p.get('sni') || '';
+    const fp       = p.get('fp') || 'chrome';
+    const flow     = p.get('flow') || '';
+    const alpnRaw  = p.get('alpn') || '';
+    const alpn     = alpnRaw ? alpnRaw.split(',').filter(Boolean) : [];
+    let remark = '';
+    try { remark = decodeURIComponent(u.hash.slice(1)); } catch(e){ remark = u.hash.slice(1); }
+
+    const user = { encryption:'none', id: uuid, level: 8 };
+    if (flow) user.flow = flow;
+
+    const outbound = {
+      mux: { concurrency:-1, enabled:false },
+      protocol: 'vless',
+      settings: { vnext: [{ address, port, users: [user] }] },
+      streamSettings: { network },
+      tag
+    };
+    const ss = outbound.streamSettings;
+
+    if (network === 'ws'){
+      const ws = { headers: {} };
+      if (host) ws.headers.Host = host;
+      if (path) ws.path = path;
+      ss.wsSettings = ws;
+    } else if (network === 'grpc'){
+      ss.grpcSettings = { serviceName: p.get('serviceName') || '', multiMode:false };
+    } else if (network === 'h2' || network === 'http'){
+      ss.httpSettings = { host: host ? [host] : [], path };
+    } else if (network === 'httpupgrade'){
+      const hu = {};
+      if (host) hu.host = host;
+      if (path) hu.path = path;
+      ss.httpupgradeSettings = hu;
+    } else if (network === 'tcp' && (p.get('headerType') === 'http')){
+      ss.tcpSettings = { header: { type:'http', request: {
+        headers: host ? { Host: [host] } : {},
+        path: [path]
+      }}};
+    }
+
+    if (security === 'tls'){
+      ss.security = 'tls';
+      const tls = { allowInsecure: !!allowInsecure, show:false };
+      if (sni) tls.serverName = sni;
+      if (fp) tls.fingerprint = fp;
+      if (alpn.length) tls.alpn = alpn;
+      ss.tlsSettings = tls;
+    } else if (security === 'reality'){
+      ss.security = 'reality';
+      const rl = { show:false };
+      if (sni) rl.serverName = sni;
+      if (fp) rl.fingerprint = fp;
+      if (p.get('pbk')) rl.publicKey = p.get('pbk');
+      if (p.get('sid')) rl.shortId = p.get('sid');
+      if (p.get('spx')) rl.spiderX = p.get('spx');
+      ss.realitySettings = rl;
+    }
+
+    return { outbound, remark, address, port, network, security };
+  } catch(e){
+    return { error:'ساختار لینک نامعتبر است' };
+  }
+}
+
+/* ───────── full config template ───────── */
+function generateFullJsonConfig(outbounds, prefix, dnsServers, probeUrl, probeInterval){
+  const base = {
+    dns: {
+      hosts: {
+        'domain:googleapis.cn': 'googleapis.com',
+        'dns.alidns.com': ['223.5.5.5','223.6.6.6','2400:3200::1','2400:3200:baba::1'],
+        'one.one.one.one': ['1.1.1.1','1.0.0.1','2606:4700:4700::1111','2606:4700:4700::1001'],
+        'dns.cloudflare.com': ['104.16.132.229','104.16.133.229','2606:4700::6810:84e5','2606:4700::6810:85e5'],
+        'dns.google': ['8.8.8.8','8.8.4.4','2001:4860:4860::8888','2001:4860:4860::8844']
+      },
+      servers: [
+        dnsServers[0],
+        { address:dnsServers[0], domains:['geosite:google'] },
+        { address:dnsServers.length > 1 ? dnsServers[1] : dnsServers[0], domains:['domain:alidns.com','domain:doh.pub','domain:dot.pub','geosite:cn'],
+          expectIPs:['geoip:cn'], skipFallback:true, tag:'domestic-dns' }
+      ],
+      tag: 'dns-module'
+    },
+    inbounds: [{
+      listen:'127.0.0.1', port:10808, protocol:'socks',
+      settings:{ auth:'noauth', udp:true, userLevel:8 },
+      sniffing:{ destOverride:['http','tls'], enabled:true, routeOnly:false },
+      tag:'socks'
+    }],
+    log: { loglevel:'warning' },
+    observatory: {
+      enableConcurrency:true, probeInterval: probeInterval,
+      probeUrl: probeUrl,
+      subjectSelector:[prefix]
+    },
+    outbounds: [],
+    policy: {
+      levels: { '8': { connIdle:300, downlinkOnly:1, handshake:4, uplinkOnly:1 } },
+      system: { statsOutboundDownlink:true, statsOutboundUplink:true }
+    },
+    remarks: 'javidsub Intelligent Selection',
+    routing: {
+      balancers: [{ selector:[prefix], strategy:{ type:'leastPing' }, tag:'proxy-round' }],
+      domainStrategy:'AsIs',
+      rules: [
+        { network:'udp', outboundTag:'block', port:'443', type:'field' },
+        { balancerTag:'proxy-round', domain:['geosite:google'], type:'field' },
+        { ip:['geoip:private'], outboundTag:'direct', type:'field' },
+        { domain:['geosite:private'], outboundTag:'direct', type:'field' },
+        { ip:['geoip:cn'], outboundTag:'direct', type:'field' },
+        { domain:['geosite:cn'], outboundTag:'direct', type:'field' },
+        { inboundTag:['domestic-dns'], outboundTag:'direct', type:'field' },
+        { balancerTag:'proxy-round', inboundTag:['dns-module'], type:'field' },
+        { balancerTag:'proxy-round', network:'tcp,udp', type:'field' }
+      ]
+    },
+    stats: {}
+  };
+
+  base.outbounds = base.outbounds.concat(outbounds);
+  base.outbounds.push({ protocol:'freedom', settings:{ domainStrategy:'UseIP' }, tag:'direct' });
+  base.outbounds.push({ protocol:'blackhole', settings:{ response:{ type:'http' } }, tag:'block' });
+  return base;
+}
+
+/* ───────── parse everything ───────── */
+function parseAll(){
+  const raw = $('inputLinks').value.trim();
+  const res = resolveInput(raw);
+  const prefix = $('tagPrefix').value.trim() || 'proxy-';
+  const insecure = $('allowInsecure').checked;
+
+  const lines = res.text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  let counter = 0;
+  const outbounds = [], nodes = [];
+  let invalid = 0;
+
+  for (const ln of lines){
+    if (!ln.startsWith('vless://')) continue;
+    const parsed = parseVlessLine(ln, prefix + (counter + 1), insecure);
+    if (parsed.error){ invalid++; continue; }
+    counter++;
+    outbounds.push(parsed.outbound);
+    nodes.push(parsed);
+  }
+  return { nodes, outbounds, invalid, totalLines: lines.length, b64: res.b64 };
+}
+
+/* ───────── live analyze + chips ───────── */
+function analyze(skipFilter = false){
+  const { nodes, invalid, totalLines, b64 } = parseAll();
+  $('statLines').textContent = faNum(totalLines);
+  $('statLinks').textContent = faNum(nodes.length);
+  $('statB64').textContent = b64 ? 'فعال ✓' : (totalLines ? '—' : '—');
+
+  // Store all nodes for filtering
+  if (!skipFilter) {
+    allNodes = nodes;
+    applyFilters();
+  }
+
+  $('nodesCount').innerHTML =
+    '<span class="nodes-head-count">' + faNum(nodes.length) + ' معتبر' +
+    (invalid ? ' <span class="bad">/ ' + faNum(invalid) + ' نامعتبر</span>' : '') + '</span>';
+  lastInvalid = invalid;
+}
+
+/* ───────── Filter & Search ───────── */
+function applyFilters(){
+  const searchTerm = $('nodeSearch').value.toLowerCase();
+  const networkFilter = $('filterNetwork').value;
+  const securityFilter = $('filterSecurity').value;
+
+  const list = $('nodesList');
+  list.innerHTML = '';
+
+  const filtered = allNodes.filter(n => {
+    const matchSearch = !searchTerm || 
+      (n.remark && n.remark.toLowerCase().includes(searchTerm)) ||
+      n.address.toLowerCase().includes(searchTerm);
+    const matchNetwork = !networkFilter || n.network === networkFilter;
+    const matchSecurity = !securityFilter || n.security === securityFilter;
+    return matchSearch && matchNetwork && matchSecurity;
+  });
+
+  if (!filtered.length){
+    list.innerHTML = '<div class="empty-note">هیچ گره‌ای با معیارهای جستجو یافت نشد.</div>';
+    return;
+  }
+
+  filtered.forEach((n, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.style.animationDelay = (i * 0.03) + 's';
+
+    const netCls = ({ws:'b-ws', grpc:'b-grpc', tcp:'b-tcp', h2:'b-h2', http:'b-h2', httpupgrade:'b-tcp'})[n.network] || 'b-none';
+    const secCls = ({tls:'b-tls', reality:'b-reality', none:'b-none'})[n.security] || 'b-none';
+
+    const idx = document.createElement('span'); idx.className='chip-idx'; idx.textContent = faNum(i+1);
+    const nm = document.createElement('span'); nm.className='chip-name'; nm.textContent = n.remark || n.address; nm.title = n.remark || n.address;
+    const ad = document.createElement('span'); ad.className='chip-addr'; ad.textContent = n.address + ':' + n.port;
+    const b1 = document.createElement('span'); b1.className='badge ' + netCls; b1.textContent = n.network;
+    const b2 = document.createElement('span'); b2.className='badge ' + secCls; b2.textContent = n.security;
+    chip.append(idx, nm, ad, b1, b2);
+    list.appendChild(chip);
+  });
+
+  if (lastInvalid){
+    const bad = document.createElement('div');
+    bad.className = 'chip';
+    bad.style.borderColor = 'rgba(251,113,133,.4)';
+    bad.innerHTML = '<span class="badge b-reality">✕</span><span class="chip-name" style="color:var(--rose)">' + faNum(lastInvalid) + ' لینک نامعتبر رد شد</span>';
+    list.appendChild(bad);
+  }
+}
+
+/* ───────── highlight ───────── */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function highlightJSON(str){
+  return esc(str).replace(
+    /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
+    function(m){
+      let cls = 'tok-num';
+      if (m.startsWith('"')) cls = /"\s*:$/.test(m) ? 'tok-key' : 'tok-str';
+      else if (/[a-z]/.test(m)) cls = 'tok-bool';
+      return '<span class="' + cls + '">' + m + '</span>';
+    });
+}
+
+/* ───────── get DNS servers ───────── */
+function getDnsServers(){
+  const preset = $('dnsPreset').value;
+  if (preset === 'custom'){
+    const custom = $('customDns').value.trim();
+    return custom.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return DNS_PRESETS[preset] || ['1.1.1.1'];
+}
+
+/* ───────── get probe URL ───────── */
+function getProbeUrl(){
+  const preset = $('probeUrlPreset').value;
+  if (preset === 'custom'){
+    return $('customProbeUrl').value.trim() || 'https://www.gstatic.com/generate_204';
+  }
+  return preset;
+}
+
+/* ───────── convert ───────── */
+function convert(){
+  const t0 = performance.now();
+  const { outbounds, invalid } = parseAll();
+  if (!outbounds.length){
+    toast('هیچ لینک vless معتبری پیدا نشد', 'warn');
+    return;
+  }
+  
+  const prefix = $('tagPrefix').value.trim() || 'proxy-';
+  const dnsServers = getDnsServers();
+  const probeUrl = getProbeUrl();
+  const probeInterval = $('probeInterval').value;
+  
+  const finalJson = generateFullJsonConfig(outbounds, prefix, dnsServers, probeUrl, probeInterval);
+  generatedRaw = JSON.stringify(finalJson, null, 2);
+  const ms = Math.max(1, Math.round(performance.now() - t0));
+
+  $('prettyOut').innerHTML = highlightJSON(generatedRaw);
+  $('plainOut').value = generatedRaw;
+
+  const kb = (new Blob([generatedRaw]).size / 1024).toFixed(1);
+  $('sumCount').textContent = faNum(outbounds.length);
+  $('sumSize').textContent = faNum(kb) + ' KB';
+  $('sumTime').textContent = faNum(ms) + ' ms';
+  const bad = $('sumBad');
+  if (invalid){ bad.style.display = ''; bad.textContent = '⚠ ' + faNum(invalid) + ' لینک نامعتبر نادیده گرفته شد'; }
+  else bad.style.display = 'none';
+  $('sumBar').classList.add('on');
+
+  // Revoke previous blob URL
+  if (generatedBlobUrl) {
+    URL.revokeObjectURL(generatedBlobUrl);
+    generatedBlobUrl = null;
+  }
+
+  toast(faNum(outbounds.length) + ' کانفیگ با موفقیت تولید شد');
+}
+
+/* ───────── copy / download / link ───────── */
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('کانفیگ JSON کپی شد ✓'); }
+  catch(e){ toast('کپی ناموفق بود', 'err'); }
+  ta.remove();
+}
+async function copyResult(){
+  if (!generatedRaw){ toast('ابتدا خروجی تولید کنید', 'warn'); return; }
+  try { await navigator.clipboard.writeText(generatedRaw); toast('کانفیگ JSON کپی شد ✓'); }
+  catch(e){ fallbackCopy(generatedRaw); }
+}
+function downloadResult(){
+  if (!generatedRaw){ toast('ابتدا خروجی تولید کنید', 'warn'); return; }
+  const blob = new Blob([generatedRaw], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'final_sub.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  toast('فایل final_sub.json دانلود شد');
+}
+function getDownloadLink(){
+  if (!generatedRaw){ toast('ابتدا خروجی تولید کنید', 'warn'); return; }
+  
+  // Revoke previous blob URL
+  if (generatedBlobUrl) {
+    URL.revokeObjectURL(generatedBlobUrl);
+  }
+  
+  const blob = new Blob([generatedRaw], { type:'application/json' });
+  generatedBlobUrl = URL.createObjectURL(blob);
+  
+  // Copy link to clipboard
+  navigator.clipboard.writeText(generatedBlobUrl).then(() => {
+    toast('لینک دانلود کپی شد ✓ (اعتبار تا بسته شدن تب)', 'warn');
+  }).catch(() => {
+    toast('لینک تولید شد اما کپی نشد: ' + generatedBlobUrl, 'warn');
+  });
+}
+
+/* ───────── tabs ───────── */
+function setTab(mode){
+  const pretty = $('prettyOut'), plain = $('plainOut');
+  $('tabPretty').classList.toggle('active', mode === 'pretty');
+  $('tabPlain').classList.toggle('active', mode === 'plain');
+  pretty.classList.toggle('hidden', mode !== 'pretty');
+  plain.classList.toggle('hidden', mode !== 'plain');
+}
+
+/* ───────── sample ───────── */
+const SAMPLE = [
+  'vless://8f2c3d4e-5a6b-7c8d-9e0f-1a2b3c4d5e6f@server1.example.com:443?type=ws&security=tls&path=%2Fvless-ws&host=cdn.example.com&sni=example.com&fp=chrome&alpn=h2%2Chttp/1.1#Germany-Frankfurt-WS',
+  'vless://a1b2c3d4-e5f6-4a5b-8c7d-9e0f1a2b3c4d@198.51.100.10:2053?type=tcp&security=reality&sni=www.microsoft.com&fp=chrome&pbk=SbVKFkJjDdLmPqQW4kHBjxz9sKJDPYsLhO1vD2RnVXc&sid=ab12cd34&spx=%2F&flow=xtls-rprx-vision#Netherlands-Reality-Vision',
+  'vless://11112222-3333-4444-5555-666677778888@grpc.example.com:443?type=grpc&security=tls&serviceName=grpc-tunnel&sni=grpc.example.com&fp=firefox#Finland-Helsinki-gRPC'
+].join('\n');
+
+/* ───────── Fetch from URL ───────── */
+async function fetchFromUrl(){
+  const url = prompt('لطفاً لینک ساب‌اسکریپشن را وارد کنید:\n(مثال: https://example.com/sub)', '');
+  if (!url) return;
+  
+  $('loadingOverlay').classList.add('active');
+  $('loadingText').textContent = 'در حال دریافت از URL...';
+  
+  try {
+    // Try with CORS proxy first
+    const corsProxies = [
+      'https://corsproxy.io/?',
+      'https://api.allorigins.win/raw?url=',
+      'https://thingproxy.freeboard.io/fetch/'
+    ];
+    
+    let content = null;
+    let lastError = null;
+    
+    for (const proxy of corsProxies) {
+      try {
+        const response = await fetch(proxy + encodeURIComponent(url), {
+          method: 'GET',
+          headers: { 'Accept': 'text/plain' }
+        });
+        if (response.ok) {
+          content = await response.text();
+          break;
+        }
+      } catch (e) {
+        lastError = e;
+        continue;
+      }
+    }
+    
+    if (!content) {
+      throw new Error('عدم توانایی در دریافت محتوا. ممکن است محدودیت CORS وجود داشته باشد.');
+    }
+    
+    // Check if it's base64 encoded subscription
+    const decoded = tryB64(content.trim());
+    if (decoded && decoded.includes('vless://')) {
+      $('inputLinks').value = decoded;
+    } else if (content.includes('vless://')) {
+      $('inputLinks').value = content;
+    } else {
+      throw new Error('محتوای دریافتی شامل لینک vless نیست.');
+    }
+    
+    analyze();
+    toast('ساب‌اسکریپشن با موفقیت بارگذاری شد', 'success');
+  } catch (e) {
+    toast(e.message || 'خطا در دریافت URL', 'err');
+  } finally {
+    $('loadingOverlay').classList.remove('active');
+  }
+}
+
+/* ───────── File Import ───────── */
+function importFile(event){
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target.result;
+    const decoded = tryB64(content.trim());
+    if (decoded && decoded.includes('vless://')) {
+      $('inputLinks').value = decoded;
+    } else {
+      $('inputLinks').value = content;
+    }
+    analyze();
+    toast('فایل با موفقیت بارگذاری شد');
+  };
+  reader.onerror = () => toast('خطا در خواندن فایل', 'err');
+  reader.readAsText(file);
+  event.target.value = ''; // Reset for re-import
+}
+
+/* ───────── Drag & Drop ───────── */
+document.addEventListener('dragover', e => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+});
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && (file.name.endsWith('.txt') || file.name.endsWith('.json') || file.name.endsWith('.sub'))) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const content = ev.target.result;
+      const decoded = tryB64(content.trim());
+      if (decoded && decoded.includes('vless://')) {
+        $('inputLinks').value = decoded;
+      } else {
+        $('inputLinks').value = content;
+      }
+      analyze();
+      toast('فایل با موفقیت بارگذاری شد');
+    };
+    reader.readAsText(file);
+  }
+});
+
+/* ───────── LocalStorage Autosave ───────── */
+const STORAGE_KEY = 'vless_converter_v2';
+function saveToStorage(){
+  const data = {
+    input: $('inputLinks').value,
+    prefix: $('tagPrefix').value,
+    dnsPreset: $('dnsPreset').value,
+    customDns: $('customDns').value,
+    probeUrlPreset: $('probeUrlPreset').value,
+    customProbeUrl: $('customProbeUrl').value,
+    probeInterval: $('probeInterval').value,
+    allowInsecure: $('allowInsecure').checked
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+function loadFromStorage(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.input) $('inputLinks').value = data.input;
+      if (data.prefix) $('tagPrefix').value = data.prefix;
+      if (data.dnsPreset) $('dnsPreset').value = data.dnsPreset;
+      if (data.customDns) $('customDns').value = data.customDns;
+      if (data.probeUrlPreset) $('probeUrlPreset').value = data.probeUrlPreset;
+      if (data.customProbeUrl) $('customProbeUrl').value = data.customProbeUrl;
+      if (data.probeInterval) $('probeInterval').value = data.probeInterval;
+      if (data.allowInsecure !== undefined) $('allowInsecure').checked = data.allowInsecure;
+      
+      // Trigger visibility changes
+      $('dnsPreset').dispatchEvent(new Event('change'));
+      $('probeUrlPreset').dispatchEvent(new Event('change'));
+      
+      analyze();
+    } catch(e) {
+      console.error('Error loading from storage:', e);
+    }
+  }
+}
+
+/* ───────── wiring ───────── */
+let debTimer;
+$('inputLinks').addEventListener('input', ()=>{ 
+  clearTimeout(debTimer); 
+  debTimer = setTimeout(() => {
+    analyze();
+    saveToStorage();
+  }, 280); 
+});
+$('tagPrefix').addEventListener('change', ()=>{ 
+  if ($('inputLinks').value) analyze(); 
+  saveToStorage();
+});
+
+// DNS preset change handler
+$('dnsPreset').addEventListener('change', ()=>{
+  const isCustom = $('dnsPreset').value === 'custom';
+  $('customDnsOpt').style.display = isCustom ? 'flex' : 'none';
+  saveToStorage();
+});
+
+// Probe URL preset change handler
+$('probeUrlPreset').addEventListener('change', ()=>{
+  const isCustom = $('probeUrlPreset').value === 'custom';
+  $('customProbeOpt').style.display = isCustom ? 'flex' : 'none';
+  saveToStorage();
+});
+
+// Other option changes
+['customDns', 'customProbeUrl', 'probeInterval', 'allowInsecure'].forEach(id => {
+  $(id).addEventListener('change', saveToStorage);
+});
+
+// Filter & Search handlers
+['nodeSearch', 'filterNetwork', 'filterSecurity'].forEach(id => {
+  $(id).addEventListener('input', applyFilters);
+  $(id).addEventListener('change', applyFilters);
+});
+
+$('btnConvert').addEventListener('click', convert);
+$('btnCopy').addEventListener('click', copyResult);
+$('btnDownload').addEventListener('click', downloadResult);
+$('btnGetLink').addEventListener('click', getDownloadLink);
+$('btnSample').addEventListener('click', ()=>{ 
+  $('inputLinks').value = SAMPLE; 
+  analyze(); 
+  toast('لینک‌های نمونه بارگذاری شد'); 
+});
+$('btnClear').addEventListener('click', ()=>{
+  $('inputLinks').value = ''; generatedRaw = '';
+  $('prettyOut').innerHTML = '<span style="color:#334155">// خروجی JSON اینجا نمایش داده می‌شود...</span>';
+  $('plainOut').value = ''; $('sumBar').classList.remove('on');
+  allNodes = [];
+  applyFilters();
+  saveToStorage();
+  toast('پاک شد');
+});
+$('btnPaste').addEventListener('click', async ()=>{
+  try {
+    const txt = await navigator.clipboard.readText();
+    if (txt){ 
+      $('inputLinks').value = txt; 
+      analyze(); 
+      saveToStorage();
+      toast('از کلیپ‌بورد چسبانده شد'); 
+    }
+    else toast('کلیپ‌بورد خالی است', 'warn');
+  } catch(e){ toast('دسترسی به کلیپ‌بورد مسدود است', 'err'); }
+});
+$('btnFetch').addEventListener('click', fetchFromUrl);
+$('btnImportFile').addEventListener('click', ()=> $('fileInput').click());
+$('fileInput').addEventListener('change', importFile);
+$('tabPretty').addEventListener('click', ()=>setTab('pretty'));
+$('tabPlain').addEventListener('click', ()=>setTab('plain'));
+
+document.addEventListener('keydown', e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') convert();
+});
+
+// Initialize
+loadFromStorage();
+analyze();
+})();
+</script>
+</body>
+</html>
