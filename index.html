@@ -92,9 +92,10 @@ button, select, input[type="text"], input[type="number"] {
 }
 body.theme-light button:not(.primary), body.theme-light select, body.theme-light input { background: #fff; }
 button:hover, select:hover, input:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 button.primary { background: var(--accent); color: #fff; border: none; font-weight: 600; }
-button.primary:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--accent); }
+button.primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px var(--accent); }
 button.danger { color: var(--danger); border-color: var(--danger); }
 button.danger:hover { background: var(--danger); color: #fff; }
 .icon-btn { padding: 8px 12px; font-size: 1.1rem; }
@@ -131,12 +132,12 @@ body.theme-light textarea { background: #fff; }
 .setting-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; }
 .setting-group input, .setting-group select { width: 100%; }
 
-.fragment-modes { display: flex; gap: 10px; margin-bottom: 12px; background: rgba(0,0,0,0.1); padding: 4px; border-radius: 8px; }
-.mode-btn { flex: 1; padding: 6px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: var(--transition); opacity: 0.7; }
+.fragment-modes { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; background: rgba(0,0,0,0.1); padding: 4px; border-radius: 8px; }
+.mode-btn { flex: 1; padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: var(--transition); opacity: 0.7; min-width: 100px; }
 .mode-btn.active { background: var(--accent); color: #fff; opacity: 1; }
 .fragment-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
-.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
 .node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
 .node-card {
   background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
@@ -200,6 +201,7 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
   .node-grid { grid-template-columns: 1fr; }
   .sticky-bar { flex-direction: column; text-align: center; }
   .sticky-bar div { width: 100%; display: flex; justify-content: center; gap: 10px; }
+  .settings-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -232,7 +234,6 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
       </div>
     </div>
     
-    <!-- Timer UI for Temporary Files -->
     <div id="tempFileStatus">
       <span>⏳ داده‌های موقت (ساب‌اسکریپشن) تا <b id="tempTime">05:00</b> دیگر کاملاً پاک می‌شوند.</span>
       <button class="danger" style="padding: 4px 8px; font-size: 0.8rem; background:transparent;" onclick="deleteTempFile()">حذف فوری</button>
@@ -245,44 +246,64 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
     </div>
   </section>
 
-  <!-- SETTINGS SECTION -->
+  <!-- EXPANDED SETTINGS SECTION -->
   <section class="card">
     <div class="card-header"><span class="card-title">⚙️ تنظیمات پیشرفته کانفیگ</span></div>
+    
     <div class="settings-grid">
       <div class="setting-group">
-        <label>فرمت خروجی</label>
+        <label>فرمت خروجی کانفیگ</label>
         <select id="outputFormat">
-          <option value="xray">Xray-core JSON</option>
+          <option value="xray">Xray-core JSON (V2rayN, Nekobox)</option>
           <option value="singbox">Sing-Box JSON</option>
         </select>
       </div>
+      
       <div class="setting-group">
-        <label>استراتژی Warp</label>
+        <label>استراتژی مسیریابی Warp</label>
         <select id="outboundMode">
-          <option value="direct">غیرفعال (مستقیم)</option>
-          <option value="warp-full">Warp کامل (همه ترافیک)</option>
-          <option value="warp-split">Warp هوشمند (فقط ایران)</option>
+          <option value="direct">غیرفعال (اتصال مستقیم به اینترنت)</option>
+          <option value="warp-full">Warp کامل (عبور تمام ترافیک از وارپ)</option>
+          <option value="warp-split">Warp هوشمند (فقط سایت‌های مسدود ایران)</option>
+          <option value="warp-ipv6">Warp IPv6 (دور زدن تحریم با آی‌پی ۶)</option>
         </select>
       </div>
-      <div class="setting-group">
-        <label>DNS Resolver</label>
-        <select id="dnsPreset">
-          <option value="cloudflare">Cloudflare (1.1.1.1)</option>
-          <option value="google">Google (8.8.8.8)</option>
-          <option value="shecan">Shecan (IR)</option>
-        </select>
+      
+      <div class="setting-group" style="position: relative;">
+        <label>DNS Resolver (برای رفع تحریم و سرعت)</label>
+        <div style="display:flex; gap:8px;">
+          <select id="dnsPreset" style="flex:1;">
+            <optgroup label="🌐 جهانی (سرعت بالا)">
+              <option value="cloudflare">Cloudflare (1.1.1.1)</option>
+              <option value="google">Google (8.8.8.8)</option>
+              <option value="quad9">Quad9 (9.9.9.9)</option>
+              <option value="adguard">AdGuard (بدون تبلیغات)</option>
+            </optgroup>
+            <optgroup label="🇮🇷 ضد تحریم و گیمینگ (ایران)">
+              <option value="shecan">شکن - Shecan (178.22.122.100)</option>
+              <option value="electro">الکترو - Electro (78.157.42.101)</option>
+              <option value="radar">رادار بازی - Radar (10.202.10.10)</option>
+              <option value="403">سرویس 403.online (10.202.10.202)</option>
+            </optgroup>
+          </select>
+          <button id="btnPingDns" class="primary" style="padding: 0 10px; font-size: 0.8rem; white-space:nowrap;" onclick="testDnsPings()">📡 تست پینگ</button>
+        </div>
       </div>
     </div>
+
+    <!-- Fragment Settings -->
     <div style="margin-top:24px; border-top:1px solid var(--glass-border); padding-top:16px;">
-      <label style="font-size:0.95rem; color:var(--text-primary); font-weight:600; display:block; margin-bottom:8px;">🧩 Fragment Settings</label>
+      <label style="font-size:0.95rem; color:var(--text-primary); font-weight:600; display:block; margin-bottom:8px;">🧩 Fragment (دور زدن فیلترینگ شدید SNI)</label>
+      
       <div class="fragment-modes">
         <div class="mode-btn active" onclick="setFragmentMode('off', this)">خاموش</div>
-        <div class="mode-btn" onclick="setFragmentMode('auto', this)">خودکار</div>
-        <div class="mode-btn" onclick="setFragmentMode('manual', this)">دستی</div>
+        <div class="mode-btn" onclick="setFragmentMode('auto_tls', this)">خودکار (TLS Hello)</div>
+        <div class="mode-btn" onclick="setFragmentMode('auto_sni', this)">خودکار (SNI Split)</div>
+        <div class="mode-btn" onclick="setFragmentMode('manual', this)">دستی پیشرفته</div>
       </div>
       
       <div id="fragManualInputs" class="fragment-inputs" style="display:none;">
-        <div class="setting-group"><label>Length (Min-Max)</label><input type="text" id="fragLen" value="100-200" dir="ltr"></div>
+        <div class="setting-group"><label>Length (Min-Max)</label><input type="text" id="fragLen" value="10-30" dir="ltr"></div>
         <div class="setting-group"><label>Interval (Min-Max)</label><input type="text" id="fragInt" value="10-20" dir="ltr"></div>
         <div class="setting-group">
           <label>Packets</label>
@@ -290,12 +311,12 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
             <option value="tlshello">tlshello</option>
             <option value="1-1">1-1</option>
             <option value="1-2">1-2</option>
-            <option value="rand">rand</option>
+            <option value="1-3">1-3</option>
           </select>
         </div>
       </div>
       <div id="fragAutoInfo" style="font-size:0.85rem; color:var(--text-secondary); padding:10px; background:rgba(0,0,0,0.1); border-radius:8px; display:none;">
-        ⚡ حالت خودکار: Length 100-200, Interval 10-20, Packets tlshello
+        <!-- Text injected via JS depending on auto mode -->
       </div>
     </div>
   </section>
@@ -319,7 +340,7 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
       <span class="card-title">📡 لیست گره‌ها (<span id="selectedCount" style="color:var(--accent)">0</span> انتخاب شده)</span>
       <div style="display:flex; gap:8px;">
         <button onclick="toggleSelectAll()" style="font-size:0.8rem; padding:6px 12px;">انتخاب همه/هیچ</button>
-        <button class="primary" onclick="generateConfig()" style="font-size:0.8rem; padding:6px 16px;">⚡ ساخت کانفیگ</button>
+        <button class="primary" onclick="generateConfig()" style="font-size:0.8rem; padding:6px 16px;">⚡ ساخت کانفیگ نهایی</button>
       </div>
     </div>
     <div id="nodeList" class="node-grid">
@@ -347,7 +368,7 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
   <div class="modal">
     <h3 style="margin-bottom:10px; color:var(--accent);" id="qrModalTitle">QR Code کانفیگ</h3>
     <div id="qrcode"></div>
-    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">جهت اسکن با کلاینت‌ها (v2rayNG, Shadowrocket)</p>
+    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">جهت اسکن با کلاینت‌ها (v2rayNG, Shadowrocket, NekoBox)</p>
     <button class="primary" onclick="document.getElementById('qrModal').classList.remove('active')">بستن</button>
   </div>
 </div>
@@ -365,29 +386,73 @@ const $ = id => document.getElementById(id);
 const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
 const safeHtml = str => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
 
+/** DNS PING TESTER **/
+const dnsServers = {
+  'cloudflare': { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query' },
+  'google': { name: 'Google', url: 'https://dns.google/resolve' },
+  'quad9': { name: 'Quad9', url: 'https://dns.quad9.net/dns-query' },
+  'adguard': { name: 'AdGuard', url: 'https://dns.adguard-dns.com/dns-query' },
+  'shecan': { name: 'شکن - Shecan', url: 'https://shecan.ir/favicon.ico' },
+  'electro': { name: 'الکترو - Electro', url: 'https://electrotm.org/favicon.ico' },
+  'radar': { name: 'رادار بازی - Radar', url: 'https://radar.game/favicon.ico' },
+  '403': { name: 'سرویس 403', url: 'https://403.online/favicon.ico' }
+};
+
+async function testDnsPings() {
+  const btn = $('btnPingDns');
+  btn.textContent = '⏳ در حال تست...';
+  btn.disabled = true;
+
+  // Reset texts
+  for (const key in dnsServers) {
+    const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+    if(opt) opt.textContent = dnsServers[key].name + " (در حال تست...)";
+  }
+
+  const promises = Object.keys(dnsServers).map(async (key) => {
+    const server = dnsServers[key];
+    const start = Date.now();
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout
+      
+      // Request with no-cors so we don't get blocked, we just measure network round trip
+      await fetch(server.url + "?t=" + start, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeoutId);
+      
+      const ping = Date.now() - start;
+      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+      if(opt) {
+        let color = ping < 150 ? '🟢' : (ping < 300 ? '🟡' : '🟠');
+        opt.textContent = `${server.name} (${color} ${ping}ms)`;
+      }
+    } catch (e) {
+      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+      if(opt) opt.textContent = `${server.name} (❌ مسدود/تایم‌اوت)`;
+    }
+  });
+
+  await Promise.allSettled(promises);
+  
+  btn.textContent = '📡 تست پینگ';
+  btn.disabled = false;
+  alert('تست پینگ با موفقیت انجام شد. می‌توانید لیست DNS را باز کرده و سریع‌ترین را انتخاب کنید.');
+}
+
 /** PARTICLES BACKGROUND **/
 const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
 let W, H, particles = [];
 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
 window.addEventListener('resize', resize); resize();
-for(let i=0; i<40; i++) particles.push({
-  x: Math.random()*W, y: Math.random()*H,
-  vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
-  r: Math.random()*2+1, a: Math.random()*0.5+0.1
-});
+for(let i=0; i<40; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
 function animate() {
   ctx.clearRect(0,0,W,H);
   const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy;
-    if(p.x<0||p.x>W) p.vx*=-1;
-    if(p.y<0||p.y>H) p.vy*=-1;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fillStyle = accentColor;
-    ctx.globalAlpha = p.a;
-    ctx.fill();
-    ctx.globalAlpha = 1;
+    if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = accentColor; ctx.globalAlpha = p.a; ctx.fill(); ctx.globalAlpha = 1;
   });
   requestAnimationFrame(animate);
 }
@@ -410,15 +475,23 @@ function setFragmentMode(mode, element) {
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   element.classList.add('active');
   
+  const manual = $('fragManualInputs');
+  const autoInfo = $('fragAutoInfo');
+  
   if(mode === 'manual') {
-    $('fragManualInputs').style.display = 'grid';
-    $('fragAutoInfo').style.display = 'none';
-  } else if (mode === 'auto') {
-    $('fragManualInputs').style.display = 'none';
-    $('fragAutoInfo').style.display = 'block';
+    manual.style.display = 'grid';
+    autoInfo.style.display = 'none';
+  } else if (mode === 'auto_tls') {
+    manual.style.display = 'none';
+    autoInfo.style.display = 'block';
+    autoInfo.innerHTML = "⚡ <b>پیکربندی هوشمند TLS:</b> تکه‌تکه کردن هدر TLS Hello برای عبور از سیستم‌های فیلترینگ. (Length: 100-200, Packets: tlshello)";
+  } else if (mode === 'auto_sni') {
+    manual.style.display = 'none';
+    autoInfo.style.display = 'block';
+    autoInfo.innerHTML = "⚡ <b>پیکربندی هوشمند SNI:</b> شکستن درخواست در همان بسته‌های اول برای مخفی کردن نام دامنه. (Length: 10-30, Packets: 1-1)";
   } else {
-    $('fragManualInputs').style.display = 'none';
-    $('fragAutoInfo').style.display = 'none';
+    manual.style.display = 'none';
+    autoInfo.style.display = 'none';
   }
 }
 
@@ -429,18 +502,14 @@ let tempFileInterval = null;
 function startTempFileTimer(durationMinutes = 5) {
   const expireTime = Date.now() + durationMinutes * 60 * 1000;
   localStorage.setItem('sc_temp_expire', expireTime.toString());
-  
   $('tempFileStatus').style.display = 'flex';
   
   clearInterval(tempFileInterval);
-  clearTimeout(tempFileTimer);
-  
   tempFileInterval = setInterval(() => {
     const now = Date.now();
     const left = expireTime - now;
-    if (left <= 0) {
-      deleteTempFile(true);
-    } else {
+    if (left <= 0) deleteTempFile(true);
+    else {
       const mins = Math.floor(left / 60000).toString().padStart(2, '0');
       const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
       $('tempTime').textContent = `${mins}:${secs}`;
@@ -450,9 +519,7 @@ function startTempFileTimer(durationMinutes = 5) {
 
 function deleteTempFile(isAuto = false) {
   clearInterval(tempFileInterval);
-  clearTimeout(tempFileTimer);
   $('tempFileStatus').style.display = 'none';
-  
   localStorage.removeItem('sc_temp_expire');
   localStorage.removeItem('sc_nodes');
   localStorage.removeItem('sc_input');
@@ -470,22 +537,16 @@ function checkExistingTempFile() {
   const expireStr = localStorage.getItem('sc_temp_expire');
   if (expireStr) {
     const expireTime = parseInt(expireStr);
-    if (Date.now() >= expireTime) {
-      deleteTempFile(false); 
-    } else {
-      const leftMins = (expireTime - Date.now()) / 60000;
-      startTempFileTimer(leftMins);
-    }
+    if (Date.now() >= expireTime) deleteTempFile(false); 
+    else startTempFileTimer((expireTime - Date.now()) / 60000);
   }
 }
 
 /** SMART EXTRACTION ENGINE **/
 function parseInput(text) {
   if(!text) return [];
-  
   let decodedText = text;
   
-  // Try Auto-decode Base64 if text looks like huge block
   try {
     const cleanText = text.replace(/\s/g, '');
     if (/^[A-Za-z0-9+/=]+$/.test(cleanText) && cleanText.length > 30) {
@@ -494,8 +555,6 @@ function parseInput(text) {
     }
   } catch(e) {}
 
-  // REGEX: Smart Extraction of Configs from ANY messy text
-  // Matches vless://, vmess://, trojan://, ss:// and grabs until whitespace or quote/bracket
   const regex = /(vless|vmess|trojan|ss):\/\/[^\s<>'"]+/gi;
   const matches = decodedText.match(regex) || [];
   const results = [];
@@ -521,8 +580,7 @@ function parseVless(url) {
     const u = new URL(url);
     const params = new URLSearchParams(u.search);
     return {
-      protocol: 'vless', uuid: u.username, address: u.hostname,
-      port: parseInt(u.port) || 443,
+      protocol: 'vless', uuid: u.username, address: u.hostname, port: parseInt(u.port) || 443,
       remark: decodeURIComponent(u.hash.slice(1)) || 'VLESS Node',
       type: params.get('type') || 'tcp', security: params.get('security') || 'none',
       sni: params.get('sni') || u.hostname, fp: params.get('fp') || 'chrome',
@@ -536,9 +594,8 @@ function parseVmess(url) {
   try {
     const json = JSON.parse(atob(url.slice(8)));
     return {
-      protocol: 'vmess', uuid: json.id, address: json.add,
-      port: parseInt(json.port), remark: json.ps || 'VMess Node',
-      type: json.net || 'tcp', security: json.tls === 'tls' ? 'tls' : 'none',
+      protocol: 'vmess', uuid: json.id, address: json.add, port: parseInt(json.port),
+      remark: json.ps || 'VMess Node', type: json.net || 'tcp', security: json.tls === 'tls' ? 'tls' : 'none',
       sni: json.sni || json.host || json.add, host: json.host || '', path: json.path || '/'
     };
   } catch(e) { return null; }
@@ -549,11 +606,9 @@ function parseTrojan(url) {
     const u = new URL(url);
     const params = new URLSearchParams(u.search);
     return {
-      protocol: 'trojan', password: u.username, address: u.hostname,
-      port: parseInt(u.port) || 443,
-      remark: decodeURIComponent(u.hash.slice(1)) || 'Trojan Node',
-      type: params.get('type') || 'tcp', security: 'tls',
-      sni: params.get('sni') || u.hostname, path: params.get('path') || '/', host: params.get('host') || ''
+      protocol: 'trojan', password: u.username, address: u.hostname, port: parseInt(u.port) || 443,
+      remark: decodeURIComponent(u.hash.slice(1)) || 'Trojan Node', type: params.get('type') || 'tcp',
+      security: 'tls', sni: params.get('sni') || u.hostname, path: params.get('path') || '/', host: params.get('host') || ''
     };
   } catch(e) { return null; }
 }
@@ -564,18 +619,14 @@ function parseSS(url) {
     const hashIdx = temp.indexOf('#');
     const remark = hashIdx > -1 ? decodeURIComponent(temp.slice(hashIdx+1)) : 'SS Node';
     let mainPart = hashIdx > -1 ? temp.slice(0, hashIdx) : temp;
-    
     let auth, rest;
-    if(mainPart.includes('@')) {
-      [auth, rest] = mainPart.split('@');
-    } else {
+    if(mainPart.includes('@')) [auth, rest] = mainPart.split('@');
+    else {
       try {
         const decoded = atob(mainPart);
-        if(decoded.includes('@')) { [auth, rest] = decoded.split('@'); }
-        else return null;
+        if(decoded.includes('@')) [auth, rest] = decoded.split('@'); else return null;
       } catch(e) { return null; }
     }
-    
     const methodPass = atob(auth);
     const [method, password] = methodPass.split(':');
     const [addr, port] = rest.split(':');
@@ -591,9 +642,7 @@ function detectCountry(remark) {
     'NL': '🇳🇱', 'GB': '🇬🇧', 'UK': '🇬🇧', 'FR': '🇫🇷', 'JP': '🇯🇵', 'JAPAN': '🇯🇵',
     'SG': '🇸🇬', 'SINGAPORE': '🇸🇬', 'CA': '🇨🇦', 'RU': '🇷🇺', 'FI': '🇫🇮', 'SE': '🇸🇪', 'UA': '🇺🇦', 'TR': '🇹🇷'
   };
-  for(const [key, flag] of Object.entries(flags)) {
-    if(r.includes(key)) return { code: flag, name: key };
-  }
+  for(const [key, flag] of Object.entries(flags)) if(r.includes(key)) return { code: flag, name: key };
   const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u);
   if(emoji) return { code: emoji[0], name: 'Emoji' };
   return { code: '🌐', name: 'Global' };
@@ -607,9 +656,7 @@ function renderNodes() {
   
   const filteredIndices = [];
   state.nodes.forEach((n, idx) => {
-    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) {
-      filteredIndices.push(idx);
-    }
+    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) filteredIndices.push(idx);
   });
   
   $('statTotal').textContent = faNum(state.nodes.length);
@@ -627,10 +674,7 @@ function renderNodes() {
     const isSelected = state.selected.has(idx);
     const div = document.createElement('div');
     div.className = `node-card ${isSelected ? 'selected' : ''}`;
-    div.onclick = (e) => {
-      if(e.target.closest('.action-icon')) return;
-      toggleNode(idx);
-    };
+    div.onclick = (e) => { if(!e.target.closest('.action-icon')) toggleNode(idx); };
     
     div.innerHTML = `
       <div class="node-head">
@@ -655,8 +699,7 @@ function renderNodes() {
 }
 
 function toggleNode(idx) {
-  if(state.selected.has(idx)) state.selected.delete(idx);
-  else state.selected.add(idx);
+  if(state.selected.has(idx)) state.selected.delete(idx); else state.selected.add(idx);
   renderNodes();
 }
 
@@ -664,16 +707,12 @@ function toggleSelectAll() {
   const filter = $('nodeFilter').value.toLowerCase();
   const allVisible = [];
   state.nodes.forEach((n, idx) => {
-    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) {
-      allVisible.push(idx);
-    }
+    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) allVisible.push(idx);
   });
   
   const allSelected = allVisible.length > 0 && allVisible.every(idx => state.selected.has(idx));
-  
   if(allSelected) allVisible.forEach(idx => state.selected.delete(idx));
   else allVisible.forEach(idx => state.selected.add(idx));
-  
   renderNodes();
 }
 
@@ -685,21 +724,13 @@ function updateSelectionUI() {
 }
 
 function deleteNode(idx) {
-  if(confirm('آیا از حذف این گره اطمینان دارید؟')) {
-    state.nodes.splice(idx, 1);
-    processInput(false); // Parse without regenerating from original input text to allow deletion override
-  }
+  if(confirm('آیا از حذف این گره اطمینان دارید؟')) { state.nodes.splice(idx, 1); processInput(false); }
 }
 
 function editNode(idx) {
   const n = state.nodes[idx];
   const newRemark = prompt("نام گره را ویرایش کنید:", n.remark);
-  if(newRemark) {
-    n.remark = newRemark;
-    n.country = detectCountry(newRemark);
-    renderNodes();
-    saveToLocal();
-  }
+  if(newRemark) { n.remark = newRemark; n.country = detectCountry(newRemark); renderNodes(); saveToLocal(); }
 }
 
 /** DATA HANDLING (FETCH & EXTRACT) **/
@@ -709,16 +740,9 @@ async function fetchSubscription(e) {
   
   const btn = e.target;
   const originalText = btn.textContent;
-  btn.textContent = '⏳ در حال دریافت...';
-  btn.disabled = true;
+  btn.textContent = '⏳ در حال دریافت...'; btn.disabled = true;
   
-  const proxies = [
-    '', 
-    'https://api.allorigins.win/raw?url=',
-    'https://api.codetabs.com/v1/proxy?quest=',
-    'https://corsproxy.io/?'
-  ];
-
+  const proxies = ['', 'https://api.allorigins.win/raw?url=', 'https://api.codetabs.com/v1/proxy?quest=', 'https://corsproxy.io/?'];
   let success = false;
 
   for (let proxy of proxies) {
@@ -728,83 +752,38 @@ async function fetchSubscription(e) {
       if (!res.ok) continue; 
       
       let text = await res.text();
-      
       if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html') && !text.trim().toLowerCase().startsWith('<!doctype')) {
-        $('rawInput').value = text;
-        processInput();
+        $('rawInput').value = text; processInput();
         alert('✅ ساب‌اسکریپشن دریافت و کانفیگ‌ها استخراج شد.\n\n⚠️ این داده‌ها در یک فایل موقت ذخیره شده و ۵ دقیقه دیگر به طور خودکار حذف می‌شوند.');
-        
-        // Start 5 Minute temporary file timer
-        startTempFileTimer(5);
-        success = true;
-        break; 
+        startTempFileTimer(5); success = true; break; 
       }
-    } catch (err) {
-      console.warn("Proxy failed: ", proxy);
-    }
+    } catch (err) { console.warn("Proxy failed: ", proxy); }
   }
 
-  if (!success) {
-    alert('❌ دریافت لینک با خطا مواجه شد.\n\nسرور مبدا مسدود است یا اجازه دسترسی نمی‌دهد. لطفاً لینک ساب‌اسکریپشن را در مرورگر باز کنید، کل متن آن را کپی کرده و در باکس بالا Paste کنید.');
-  }
-  
-  btn.textContent = originalText;
-  btn.disabled = false;
+  if (!success) alert('❌ دریافت لینک با خطا مواجه شد.\n\nسرور مبدا مسدود است یا اجازه دسترسی نمی‌دهد. لطفاً لینک را در مرورگر باز کنید، کل متن آن را کپی کرده و دستی Paste کنید.');
+  btn.textContent = originalText; btn.disabled = false;
 }
 
 function pasteFromClipboard() {
-  navigator.clipboard.readText().then(text => {
-    $('rawInput').value = text;
-    processInput();
-  }).catch(() => alert('دسترسی به کلیپ‌بورد مقدور نیست. لطفا متن را به صورت دستی Paste کنید.'));
+  navigator.clipboard.readText().then(text => { $('rawInput').value = text; processInput(); }).catch(() => alert('دسترسی به کلیپ‌بورد مقدور نیست. لطفا دستی Paste کنید.'));
 }
-
 function handleFileImport(input) {
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    $('rawInput').value = e.target.result;
-    processInput();
-  };
-  reader.readAsText(file);
-  input.value = '';
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader(); reader.onload = e => { $('rawInput').value = e.target.result; processInput(); };
+  reader.readAsText(file); input.value = '';
 }
-
-function clearAll() {
-  if(confirm('تمام داده‌ها پاک شوند؟')) {
-    deleteTempFile(false);
-  }
-}
+function clearAll() { if(confirm('تمام داده‌ها پاک شوند؟')) deleteTempFile(false); }
 
 let inputTimeout;
 function processInput(save = true) {
-  const raw = $('rawInput').value;
-  const parsed = parseInput(raw);
-  state.nodes = parsed;
-  state.selected.clear();
-  renderNodes();
-  if(save) saveToLocal();
+  const raw = $('rawInput').value; state.nodes = parseInput(raw); state.selected.clear(); renderNodes(); if(save) saveToLocal();
 }
+$('rawInput').addEventListener('input', () => { clearTimeout(inputTimeout); inputTimeout = setTimeout(() => processInput(true), 600); });
 
-$('rawInput').addEventListener('input', () => {
-  clearTimeout(inputTimeout);
-  inputTimeout = setTimeout(() => processInput(true), 600);
-});
-
-function saveToLocal() {
-  localStorage.setItem('sc_nodes', JSON.stringify(state.nodes));
-  localStorage.setItem('sc_input', $('rawInput').value);
-}
-
+function saveToLocal() { localStorage.setItem('sc_nodes', JSON.stringify(state.nodes)); localStorage.setItem('sc_input', $('rawInput').value); }
 window.addEventListener('load', () => {
-  checkExistingTempFile(); // Check if there is an active 5-min timer
-  
-  if(localStorage.getItem('sc_nodes')) {
-    state.nodes = JSON.parse(localStorage.getItem('sc_nodes'));
-    $('rawInput').value = localStorage.getItem('sc_input') || '';
-    renderNodes();
-  }
+  checkExistingTempFile();
+  if(localStorage.getItem('sc_nodes')) { state.nodes = JSON.parse(localStorage.getItem('sc_nodes')); $('rawInput').value = localStorage.getItem('sc_input') || ''; renderNodes(); }
 });
 
 /** CONFIG GENERATION **/
@@ -827,31 +806,23 @@ function buildXrayConfig(nodes, warpMode) {
   const outbounds = [];
   const rules = [];
   
+  // Apply Fragment
   if(state.fragment.mode !== 'off') {
-    let len = '100-200', interval = '10-20', pack = 'tlshello';
-    if(state.fragment.mode === 'manual') {
-      len = $('fragLen').value;
-      interval = $('fragInt').value;
-      pack = $('fragPack').value;
-    }
+    let len, interval, pack;
+    if(state.fragment.mode === 'auto_tls') { len = '100-200'; interval = '10-20'; pack = 'tlshello'; }
+    else if(state.fragment.mode === 'auto_sni') { len = '10-30'; interval = '10-20'; pack = '1-1'; }
+    else { len = $('fragLen').value; interval = $('fragInt').value; pack = $('fragPack').value; }
+    
     outbounds.push({
-      tag: "fragment-out",
-      protocol: "freedom",
-      settings: {
-        domainStrategy: "AsIs",
-        fragment: { packets: pack, length: len, interval: interval }
-      }
+      tag: "fragment-out", protocol: "freedom",
+      settings: { domainStrategy: "AsIs", fragment: { packets: pack, length: len, interval: interval } }
     });
   }
 
+  // Nodes
   nodes.forEach((n, i) => {
     const tag = `proxy_${i}`;
-    const ob = {
-      tag: tag,
-      protocol: n.protocol,
-      settings: {},
-      streamSettings: { network: n.type || 'tcp', security: n.security || 'none' }
-    };
+    const ob = { tag: tag, protocol: n.protocol, settings: {}, streamSettings: { network: n.type || 'tcp', security: n.security || 'none' } };
     
     if(n.protocol === 'vless') {
       ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, encryption: "none", flow: n.flow }] }];
@@ -859,17 +830,14 @@ function buildXrayConfig(nodes, warpMode) {
       else if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, alpn: n.alpn ? n.alpn.split(',') : [] };
       if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
       if(n.type === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.path };
-    } 
-    else if (n.protocol === 'vmess') {
+    } else if (n.protocol === 'vmess') {
        ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, level: 8 }] }];
        if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni };
        if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
-    } 
-    else if (n.protocol === 'trojan') {
+    } else if (n.protocol === 'trojan') {
        ob.settings.servers = [{ address: n.address, port: n.port, password: n.password }];
        if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni };
-    } 
-    else if (n.protocol === 'ss') {
+    } else if (n.protocol === 'ss') {
        ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.password }];
     }
 
@@ -877,30 +845,38 @@ function buildXrayConfig(nodes, warpMode) {
     outbounds.push(ob);
   });
 
+  // Warp Logic
   if(warpMode !== 'direct') {
+    const isIPv6 = warpMode === 'warp-ipv6';
     outbounds.push({
-      tag: "warp",
-      protocol: "wireguard",
+      tag: "warp", protocol: "wireguard",
       settings: {
         secretKey: "YOUR_SECRET_KEY_HERE", 
-        address: ["162.159.192.1/32", "2606:4700:d0::1/128"],
+        address: isIPv6 ? ["2606:4700:d0::1/128"] : ["172.16.0.2/32", "2606:4700:d0::1/128"],
         peers: [{ publicKey: "bmXOC+F1FxEMF9N1", endpoint: "engage.cloudflareclient.com:2408" }]
       }
     });
     
-    if(warpMode === 'warp-full') rules.push({ type: "field", outboundTag: "warp", network: "tcp,udp" });
+    if(warpMode === 'warp-full' || isIPv6) rules.push({ type: "field", outboundTag: "warp", network: "tcp,udp" });
     else if (warpMode === 'warp-split') {
        rules.push({ type: "field", outboundTag: "warp", ip: ["geoip:ir"] });
        rules.push({ type: "field", outboundTag: "warp", domain: ["geosite:category-ir"] });
     }
   }
 
+  // Get selected DNS IPs
+  const dnsDict = {
+    'cloudflare': "1.1.1.1", 'google': "8.8.8.8", 'quad9': "9.9.9.9", 'adguard': "94.140.14.14",
+    'shecan': "178.22.122.100", 'electro': "78.157.42.101", 'radar': "10.202.10.10", '403': "10.202.10.202"
+  };
+  const selectedDns = dnsDict[$('dnsPreset').value] || "1.1.1.1";
+
   return {
     log: { loglevel: "warning" },
     inbounds: [{ port: 10808, protocol: "socks", settings: { udp: true }, sniffing: { enabled: true, destOverride: ["http", "tls"] } }],
     outbounds: [...outbounds, { tag: "direct", protocol: "freedom" }, { tag: "block", protocol: "blackhole" }],
     routing: { rules: rules, domainStrategy: "IPIfNonMatch" },
-    dns: { servers: [ $('dnsPreset').value === 'shecan' ? "178.22.122.100" : ($('dnsPreset').value === 'google' ? "8.8.8.8" : "1.1.1.1") ] }
+    dns: { servers: [selectedDns, "8.8.8.8", "localhost"] }
   };
 }
 
@@ -915,11 +891,18 @@ function buildSingBoxConfig(nodes, warpMode) {
   });
   outbounds.push({ type: "direct", tag: "direct" }, { type: "block", tag: "block" });
 
+  const dnsDict = {
+    'cloudflare': "1.1.1.1", 'google': "8.8.8.8", 'quad9': "9.9.9.9", 'adguard': "94.140.14.14",
+    'shecan': "178.22.122.100", 'electro': "78.157.42.101", 'radar': "10.202.10.10", '403': "10.202.10.202"
+  };
+  const selectedDns = dnsDict[$('dnsPreset').value] || "1.1.1.1";
+
   return {
     log: { level: "info" },
     inbounds: [{ type: "tun", tag: "tun-in", interface_name: "tun0", inet4_address: "172.19.0.1/30", auto_route: true, strict_route: true }],
     outbounds: outbounds,
-    route: { rules: [{ protocol: "dns", outbound: "direct" }] }
+    route: { rules: [{ protocol: "dns", outbound: "direct" }] },
+    dns: { servers: [{ address: selectedDns, strategy: "ipv4_only"}] }
   };
 }
 
@@ -927,51 +910,34 @@ function buildSingBoxConfig(nodes, warpMode) {
 function copyConfig(e) {
   if(!state.configJson) return generateConfig();
   navigator.clipboard.writeText(state.configJson).then(() => {
-    const btn = e.target;
-    const old = btn.textContent;
-    btn.textContent = '✅ کپی شد';
-    setTimeout(() => btn.textContent = old, 2000);
+    const btn = e.target; const old = btn.textContent;
+    btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 2000);
   });
 }
-
 function downloadConfig() {
   if(!state.configJson) return generateConfig();
   const blob = new Blob([state.configJson], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `config_${Date.now()}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `config_${Date.now()}.json`; a.click(); URL.revokeObjectURL(a.href);
 }
-
 function showQrModal() {
   if(!state.configJson) return generateConfig();
   $('qrModalTitle').textContent = 'QR Code کانفیگ نهایی';
-  $('qrModal').classList.add('active');
-  $('qrcode').innerHTML = '';
+  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
   new QRCode($('qrcode'), { text: state.configJson, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
-
 function showNodeQr(idx) {
-  const node = state.nodes[idx];
-  let uri = "";
-  
-  if(node.protocol === 'vless') {
-    uri = `vless://${node.uuid}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}&pbk=${node.pbk||''}&sid=${node.sid||''}&fp=${node.fp||'chrome'}#${encodeURIComponent(node.remark)}`;
-  } else if(node.protocol === 'vmess') {
+  const node = state.nodes[idx]; let uri = "";
+  if(node.protocol === 'vless') uri = `vless://${node.uuid}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}&pbk=${node.pbk||''}&sid=${node.sid||''}&fp=${node.fp||'chrome'}#${encodeURIComponent(node.remark)}`;
+  else if(node.protocol === 'vmess') {
     const vObj = { v: "2", ps: node.remark, add: node.address, port: node.port, id: node.uuid, net: node.type, type: "none", host: node.host, path: node.path, tls: node.security === 'tls' ? 'tls' : '', sni: node.sni };
     uri = `vmess://${btoa(JSON.stringify(vObj))}`;
-  } else if(node.protocol === 'trojan') {
-    uri = `trojan://${node.password}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}#${encodeURIComponent(node.remark)}`;
-  } else if(node.protocol === 'ss') {
-    uri = `ss://${btoa(node.method + ':' + node.password)}@${node.address}:${node.port}#${encodeURIComponent(node.remark)}`;
-  }
+  } else if(node.protocol === 'trojan') uri = `trojan://${node.password}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}#${encodeURIComponent(node.remark)}`;
+  else if(node.protocol === 'ss') uri = `ss://${btoa(node.method + ':' + node.password)}@${node.address}:${node.port}#${encodeURIComponent(node.remark)}`;
   
   if(!uri) return alert('ساخت QR برای این پروتکل یا این فرمت دارای مشکل است.');
-  
   $('qrModalTitle').textContent = `QR Code: ${node.remark}`;
-  $('qrModal').classList.add('active');
-  $('qrcode').innerHTML = '';
+  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
   new QRCode($('qrcode'), { text: uri, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
 </script>
