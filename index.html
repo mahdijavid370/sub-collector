@@ -63,11 +63,7 @@ body {
   position: relative;
 }
 
-#canvas-bg {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -1; pointer-events: none;
-}
+#canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -77,12 +73,9 @@ body {
 .container { max-width: 1280px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
 header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 24px; padding: 16px 24px;
-  background: var(--bg-color);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border); border-radius: 16px;
-  box-shadow: var(--glass-shadow);
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px 24px;
+  background: var(--bg-color); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow);
 }
 .brand { display: flex; align-items: center; gap: 12px; }
 .logo {
@@ -94,18 +87,16 @@ header {
 
 .controls { display: flex; gap: 10px; }
 button, select, input[type="text"], input[type="number"] {
-  font-family: var(--font-body);
-  background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
-  color: var(--text-primary); padding: 8px 16px; border-radius: 8px;
-  cursor: pointer; transition: var(--transition);
+  font-family: var(--font-body); background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
+  color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: var(--transition);
 }
 body.theme-light button:not(.primary), body.theme-light select, body.theme-light input { background: #fff; }
 button:hover, select:hover, input:hover { border-color: var(--accent); }
 
 button.primary { background: var(--accent); color: #fff; border: none; font-weight: 600; }
 button.primary:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--accent); }
-button.danger { color: var(--danger); }
-button.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+button.danger { color: var(--danger); border-color: var(--danger); }
+button.danger:hover { background: var(--danger); color: #fff; }
 .icon-btn { padding: 8px 12px; font-size: 1.1rem; }
 
 .card {
@@ -116,11 +107,18 @@ button.danger:hover { background: var(--danger); color: #fff; border-color: var(
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border); }
 .card-title { font-weight: 700; font-size: 1.1rem; }
 
+#tempFileStatus {
+  display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger);
+  color: var(--danger); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px;
+  align-items: center; justify-content: space-between; font-size: 0.9rem; font-weight: 600;
+  animation: popIn 0.3s ease;
+}
+
 textarea {
   width: 100%; height: 120px; background: rgba(0,0,0,0.15);
   border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px;
   color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;
-  resize: vertical; direction: ltr;
+  resize: vertical; direction: ltr; line-height: 1.5;
 }
 body.theme-light textarea { background: #fff; }
 
@@ -147,13 +145,7 @@ body.theme-light textarea { background: #fff; }
 }
 body.theme-light .node-card { background: #fff; }
 .node-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-
-/* طراحی ویژه حالت انتخاب شده گره‌ها */
-.node-card.selected {
-  border-color: var(--success);
-  background: rgba(16, 185, 129, 0.1);
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-}
+.node-card.selected { border-color: var(--success); background: rgba(16, 185, 129, 0.1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
 
 .node-head { display: flex; justify-content: space-between; align-items: center; }
 .node-flag { font-size: 1.4rem; line-height: 1; }
@@ -233,16 +225,23 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
   <!-- INPUT SECTION -->
   <section class="card">
     <div class="card-header">
-      <span class="card-title">📥 ورودی هوشمند</span>
+      <span class="card-title">📥 ورودی هوشمند و استخراج خودکار</span>
       <div style="display:flex; gap:8px;">
         <button onclick="pasteFromClipboard()" title="Paste from Clipboard">📋 Paste</button>
         <button class="danger" onclick="clearAll()" title="Clear All">🗑 Clear</button>
       </div>
     </div>
-    <textarea id="rawInput" placeholder="لینک ساب‌اسکریپشن (http/https) یا لیست لینک‌های vless/vmess/trojan/ss را اینجا وارد کنید...&#10;پشتیبانی خودکار از فرمت Base64." spellcheck="false"></textarea>
+    
+    <!-- Timer UI for Temporary Files -->
+    <div id="tempFileStatus">
+      <span>⏳ داده‌های موقت (ساب‌اسکریپشن) تا <b id="tempTime">05:00</b> دیگر کاملاً پاک می‌شوند.</span>
+      <button class="danger" style="padding: 4px 8px; font-size: 0.8rem; background:transparent;" onclick="deleteTempFile()">حذف فوری</button>
+    </div>
+
+    <textarea id="rawInput" placeholder="هر متنی که حاوی کانفیگ است را اینجا Paste کنید...&#10;سیستم به صورت خودکار کانفیگ‌ها را از بین متن‌های اضافه استخراج می‌کند. (پشتیبانی از Base64)" spellcheck="false"></textarea>
     <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
       <input type="text" id="subUrl" placeholder="https://example.com/sub" style="flex:1;" dir="ltr">
-      <button class="primary" onclick="fetchSubscription(event)">دریافت لینک</button>
+      <button class="primary" onclick="fetchSubscription(event)">دریافت لینک ساب</button>
     </div>
   </section>
 
@@ -283,14 +282,8 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
       </div>
       
       <div id="fragManualInputs" class="fragment-inputs" style="display:none;">
-        <div class="setting-group">
-          <label>Length (Min-Max)</label>
-          <input type="text" id="fragLen" value="100-200" dir="ltr">
-        </div>
-        <div class="setting-group">
-          <label>Interval (Min-Max)</label>
-          <input type="text" id="fragInt" value="10-20" dir="ltr">
-        </div>
+        <div class="setting-group"><label>Length (Min-Max)</label><input type="text" id="fragLen" value="100-200" dir="ltr"></div>
+        <div class="setting-group"><label>Interval (Min-Max)</label><input type="text" id="fragInt" value="10-20" dir="ltr"></div>
         <div class="setting-group">
           <label>Packets</label>
           <select id="fragPack">
@@ -314,22 +307,9 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
       <input type="text" id="nodeFilter" placeholder="🔍 جستجو (نام، کشور، پروتکل)..." style="width:100%; max-width:250px; font-size:0.85rem;" oninput="renderNodes()">
     </div>
     <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-val" id="statTotal">0</div>
-        <div class="stat-label">کل خطوط</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" style="color:var(--success)" id="statValid">0</div>
-        <div class="stat-label">گره‌های سالم</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" style="color:var(--danger)" id="statInvalid">0</div>
-        <div class="stat-label">نامعتبر</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" style="color:var(--warning)" id="statCountries">0</div>
-        <div class="stat-label">کشورها</div>
-      </div>
+      <div class="stat-item"><div class="stat-val" id="statTotal">0</div><div class="stat-label">کل استخراج شده</div></div>
+      <div class="stat-item"><div class="stat-val" style="color:var(--success)" id="statValid">0</div><div class="stat-label">گره‌های سالم</div></div>
+      <div class="stat-item"><div class="stat-val" style="color:var(--warning)" id="statCountries">0</div><div class="stat-label">کشورها</div></div>
     </div>
   </section>
 
@@ -344,7 +324,7 @@ body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
     </div>
     <div id="nodeList" class="node-grid">
       <div style="grid-column:1/-1; text-align:center; color:var(--text-secondary); padding:40px; opacity:0.7;">
-        هنوز گره‌ای پردازش نشده است.<br>لینک ساب یا کانفیگ وارد کنید.
+        هنوز گره‌ای پردازش نشده است.<br>متن دارای کانفیگ را وارد کنید یا لینک ساب بدهید.
       </div>
     </div>
   </section>
@@ -442,25 +422,90 @@ function setFragmentMode(mode, element) {
   }
 }
 
-/** PARSING ENGINE **/
+/** TEMP FILE SYSTEM (5 MINUTE EXPIRY) **/
+let tempFileTimer = null;
+let tempFileInterval = null;
+
+function startTempFileTimer(durationMinutes = 5) {
+  const expireTime = Date.now() + durationMinutes * 60 * 1000;
+  localStorage.setItem('sc_temp_expire', expireTime.toString());
+  
+  $('tempFileStatus').style.display = 'flex';
+  
+  clearInterval(tempFileInterval);
+  clearTimeout(tempFileTimer);
+  
+  tempFileInterval = setInterval(() => {
+    const now = Date.now();
+    const left = expireTime - now;
+    if (left <= 0) {
+      deleteTempFile(true);
+    } else {
+      const mins = Math.floor(left / 60000).toString().padStart(2, '0');
+      const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
+      $('tempTime').textContent = `${mins}:${secs}`;
+    }
+  }, 1000);
+}
+
+function deleteTempFile(isAuto = false) {
+  clearInterval(tempFileInterval);
+  clearTimeout(tempFileTimer);
+  $('tempFileStatus').style.display = 'none';
+  
+  localStorage.removeItem('sc_temp_expire');
+  localStorage.removeItem('sc_nodes');
+  localStorage.removeItem('sc_input');
+  
+  $('rawInput').value = '';
+  state.nodes = [];
+  state.selected.clear();
+  renderNodes();
+  $('stickyBar').style.display = 'none';
+  
+  if(isAuto) alert("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت ۵ دقیقه‌ای پاک شد.");
+}
+
+function checkExistingTempFile() {
+  const expireStr = localStorage.getItem('sc_temp_expire');
+  if (expireStr) {
+    const expireTime = parseInt(expireStr);
+    if (Date.now() >= expireTime) {
+      deleteTempFile(false); 
+    } else {
+      const leftMins = (expireTime - Date.now()) / 60000;
+      startTempFileTimer(leftMins);
+    }
+  }
+}
+
+/** SMART EXTRACTION ENGINE **/
 function parseInput(text) {
   if(!text) return [];
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  
+  let decodedText = text;
+  
+  // Try Auto-decode Base64 if text looks like huge block
+  try {
+    const cleanText = text.replace(/\s/g, '');
+    if (/^[A-Za-z0-9+/=]+$/.test(cleanText) && cleanText.length > 30) {
+      const decoded = atob(cleanText.replace(/-/g, '+').replace(/_/g, '/'));
+      if (decoded.includes('://')) decodedText = decoded;
+    }
+  } catch(e) {}
+
+  // REGEX: Smart Extraction of Configs from ANY messy text
+  // Matches vless://, vmess://, trojan://, ss:// and grabs until whitespace or quote/bracket
+  const regex = /(vless|vmess|trojan|ss):\/\/[^\s<>'"]+/gi;
+  const matches = decodedText.match(regex) || [];
   const results = [];
   
-  if(lines.length === 1 && /^[A-Za-z0-9+/=]+$/.test(lines[0]) && lines[0].length > 50) {
-    try {
-      const decoded = atob(lines[0].replace(/-/g,'+').replace(/_/g,'/'));
-      if(decoded.includes('://')) return parseInput(decoded);
-    } catch(e) {}
-  }
-
-  lines.forEach((line, index) => {
+  matches.forEach((line, index) => {
     let node = null;
-    if(line.startsWith('vless://')) node = parseVless(line);
-    else if(line.startsWith('vmess://')) node = parseVmess(line);
-    else if(line.startsWith('trojan://')) node = parseTrojan(line);
-    else if(line.startsWith('ss://')) node = parseSS(line);
+    if(line.toLowerCase().startsWith('vless://')) node = parseVless(line);
+    else if(line.toLowerCase().startsWith('vmess://')) node = parseVmess(line);
+    else if(line.toLowerCase().startsWith('trojan://')) node = parseTrojan(line);
+    else if(line.toLowerCase().startsWith('ss://')) node = parseSS(line);
     
     if(node) {
       node.country = detectCountry(node.remark);
@@ -542,20 +587,9 @@ function detectCountry(remark) {
   if(!remark) return { code: '🌐', name: 'Unknown' };
   const r = remark.toUpperCase();
   const flags = {
-    'IR': '🇮🇷', 'TEHRAN': '🇮🇷', 'IRAN': '🇮🇷',
-    'DE': '🇩🇪', 'GERMANY': '🇩🇪', 'FRANKFURT': '🇩🇪',
-    'US': '🇺🇸', 'USA': '🇺🇸', 'NEW YORK': '🇺🇸',
-    'NL': '🇳🇱', 'NETHERLANDS': '🇳🇱',
-    'GB': '🇬🇧', 'UK': '🇬🇧', 'LONDON': '🇬🇧',
-    'FR': '🇫🇷', 'FRANCE': '🇫🇷',
-    'JP': '🇯🇵', 'JAPAN': '🇯🇵', 'TOKYO': '🇯🇵',
-    'SG': '🇸🇬', 'SINGAPORE': '🇸🇬',
-    'CA': '🇨🇦', 'CANADA': '🇨🇦',
-    'RU': '🇷🇺', 'RUSSIA': '🇷🇺',
-    'FI': '🇫🇮', 'FINLAND': '🇫🇮',
-    'SE': '🇸🇪', 'SWEDEN': '🇸🇪',
-    'UA': '🇺🇦', 'UKRAINE': '🇺🇦',
-    'TR': '🇹🇷', 'TURKEY': '🇹🇷'
+    'IR': '🇮🇷', 'TEHRAN': '🇮🇷', 'IRAN': '🇮🇷', 'DE': '🇩🇪', 'GERMANY': '🇩🇪', 'US': '🇺🇸', 'USA': '🇺🇸',
+    'NL': '🇳🇱', 'GB': '🇬🇧', 'UK': '🇬🇧', 'FR': '🇫🇷', 'JP': '🇯🇵', 'JAPAN': '🇯🇵',
+    'SG': '🇸🇬', 'SINGAPORE': '🇸🇬', 'CA': '🇨🇦', 'RU': '🇷🇺', 'FI': '🇫🇮', 'SE': '🇸🇪', 'UA': '🇺🇦', 'TR': '🇹🇷'
   };
   for(const [key, flag] of Object.entries(flags)) {
     if(r.includes(key)) return { code: flag, name: key };
@@ -594,7 +628,7 @@ function renderNodes() {
     const div = document.createElement('div');
     div.className = `node-card ${isSelected ? 'selected' : ''}`;
     div.onclick = (e) => {
-      if(e.target.closest('.action-icon')) return; // Ignore click if on actions
+      if(e.target.closest('.action-icon')) return;
       toggleNode(idx);
     };
     
@@ -653,7 +687,7 @@ function updateSelectionUI() {
 function deleteNode(idx) {
   if(confirm('آیا از حذف این گره اطمینان دارید؟')) {
     state.nodes.splice(idx, 1);
-    processInput(false);
+    processInput(false); // Parse without regenerating from original input text to allow deletion override
   }
 }
 
@@ -668,42 +702,61 @@ function editNode(idx) {
   }
 }
 
-/** DATA HANDLING **/
+/** DATA HANDLING (FETCH & EXTRACT) **/
 async function fetchSubscription(e) {
   const url = $('subUrl').value.trim();
   if(!url) return alert('لطفا URL را وارد کنید');
   
   const btn = e.target;
   const originalText = btn.textContent;
-  btn.textContent = '⏳...';
+  btn.textContent = '⏳ در حال دریافت...';
   btn.disabled = true;
   
-  try {
-    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-    if(!res.ok) throw new Error('Primary failed');
-    let text = await res.text();
-    
-    if(text.length < 10) {
-      res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-      text = await res.text();
+  const proxies = [
+    '', 
+    'https://api.allorigins.win/raw?url=',
+    'https://api.codetabs.com/v1/proxy?quest=',
+    'https://corsproxy.io/?'
+  ];
+
+  let success = false;
+
+  for (let proxy of proxies) {
+    try {
+      const fetchUrl = proxy ? proxy + encodeURIComponent(url) : url;
+      let res = await fetch(fetchUrl);
+      if (!res.ok) continue; 
+      
+      let text = await res.text();
+      
+      if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html') && !text.trim().toLowerCase().startsWith('<!doctype')) {
+        $('rawInput').value = text;
+        processInput();
+        alert('✅ ساب‌اسکریپشن دریافت و کانفیگ‌ها استخراج شد.\n\n⚠️ این داده‌ها در یک فایل موقت ذخیره شده و ۵ دقیقه دیگر به طور خودکار حذف می‌شوند.');
+        
+        // Start 5 Minute temporary file timer
+        startTempFileTimer(5);
+        success = true;
+        break; 
+      }
+    } catch (err) {
+      console.warn("Proxy failed: ", proxy);
     }
-    
-    $('rawInput').value = text;
-    processInput();
-    alert('ساب‌اسکریپشن با موفقیت بارگذاری شد.');
-  } catch(err) {
-    alert('خطا در دریافت لینک. ممکن است محدودیت CORS وجود داشته باشد.');
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
   }
+
+  if (!success) {
+    alert('❌ دریافت لینک با خطا مواجه شد.\n\nسرور مبدا مسدود است یا اجازه دسترسی نمی‌دهد. لطفاً لینک ساب‌اسکریپشن را در مرورگر باز کنید، کل متن آن را کپی کرده و در باکس بالا Paste کنید.');
+  }
+  
+  btn.textContent = originalText;
+  btn.disabled = false;
 }
 
 function pasteFromClipboard() {
   navigator.clipboard.readText().then(text => {
     $('rawInput').value = text;
     processInput();
-  }).catch(() => alert('دسترسی به کلیپ‌بورد مقدور نیست. لطفا دستی وارد کنید.'));
+  }).catch(() => alert('دسترسی به کلیپ‌بورد مقدور نیست. لطفا متن را به صورت دستی Paste کنید.'));
 }
 
 function handleFileImport(input) {
@@ -720,13 +773,7 @@ function handleFileImport(input) {
 
 function clearAll() {
   if(confirm('تمام داده‌ها پاک شوند؟')) {
-    $('rawInput').value = '';
-    state.nodes = [];
-    state.selected.clear();
-    renderNodes();
-    $('statInvalid').textContent = '0';
-    $('stickyBar').style.display = 'none';
-    saveToLocal();
+    deleteTempFile(false);
   }
 }
 
@@ -736,7 +783,6 @@ function processInput(save = true) {
   const parsed = parseInput(raw);
   state.nodes = parsed;
   state.selected.clear();
-  $('statInvalid').textContent = faNum(raw.split('\n').filter(l=>l.trim()).length - parsed.length);
   renderNodes();
   if(save) saveToLocal();
 }
@@ -752,6 +798,8 @@ function saveToLocal() {
 }
 
 window.addEventListener('load', () => {
+  checkExistingTempFile(); // Check if there is an active 5-min timer
+  
   if(localStorage.getItem('sc_nodes')) {
     state.nodes = JSON.parse(localStorage.getItem('sc_nodes'));
     $('rawInput').value = localStorage.getItem('sc_input') || '';
@@ -779,7 +827,6 @@ function buildXrayConfig(nodes, warpMode) {
   const outbounds = [];
   const rules = [];
   
-  // Fragment Definition
   if(state.fragment.mode !== 'off') {
     let len = '100-200', interval = '10-20', pack = 'tlshello';
     if(state.fragment.mode === 'manual') {
@@ -797,7 +844,6 @@ function buildXrayConfig(nodes, warpMode) {
     });
   }
 
-  // Node Outbounds
   nodes.forEach((n, i) => {
     const tag = `proxy_${i}`;
     const ob = {
@@ -831,13 +877,12 @@ function buildXrayConfig(nodes, warpMode) {
     outbounds.push(ob);
   });
 
-  // Warp Mode Rules
   if(warpMode !== 'direct') {
     outbounds.push({
       tag: "warp",
       protocol: "wireguard",
       settings: {
-        secretKey: "YOUR_SECRET_KEY_HERE", // Replace if real warp integration is needed
+        secretKey: "YOUR_SECRET_KEY_HERE", 
         address: ["162.159.192.1/32", "2606:4700:d0::1/128"],
         peers: [{ publicKey: "bmXOC+F1FxEMF9N1", endpoint: "engage.cloudflareclient.com:2408" }]
       }
@@ -860,7 +905,6 @@ function buildXrayConfig(nodes, warpMode) {
 }
 
 function buildSingBoxConfig(nodes, warpMode) {
-  // Basic Output structure for Sing-Box
   const outbounds = [];
   nodes.forEach((n, i) => {
     let ob = { type: n.protocol, tag: `proxy-${i}`, server: n.address, server_port: n.port };
