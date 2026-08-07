@@ -2,1031 +2,1070 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>VLESS ⇢ Xray | تبدیلگر و استودیو کانفیگ</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLESS ⇢ Xray | استودیو تبدیلگر کانفیگ</title>
+
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/vazirmatn@latest/arabic-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/vazirmatn@latest/arabic-700-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/lalezar@latest/arabic-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-600-normal.css" rel="stylesheet">
+
 <style>
-/* ═══ CSS VARIABLES & THEMES ═══ */
-:root {
-  --font-body: 'Vazirmatn', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+:root{
+  --bg:#05070d; --panel:rgba(14,22,40,.92); --panel-2:#0e1628; --solid:#0b1120;
+  --code-bg:#04070d; --line:rgba(56,189,248,.14); --line-strong:rgba(56,189,248,.34);
+  --ink:#e2e8f0; --mut:#8ea0b8; --dim:#5b6b82;
+  --cyan:#22d3ee; --sky:#38bdf8; --green:#4ade80; --amber:#fbbf24; --rose:#fb7185; --violet:#a78bfa;
+  --grid:rgba(34,211,238,.045); --orbA:rgba(14,165,233,.35); --orbB:rgba(74,222,128,.22);
+  --mono:'JetBrains Mono',monospace; --body:'Vazirmatn',sans-serif; --disp:'Lalezar','Vazirmatn',sans-serif;
 }
-
-body.theme-glass {
-  --bg-color: rgba(15, 15, 30, 0.6);
-  --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #0f0f1e 100%);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --solid-bg: #0b1120;
-  --panel-bg: rgba(14, 22, 40, 0.85);
-  --code-bg: #04070d;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --accent: #6366f1;
-  --cyan: #22d3ee;
-  --success: #10b981;
-  --danger: #fb7185;
-  --warning: #f59e0b;
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+:root[data-theme=light]{
+  --bg:#e9eef5; --panel:rgba(255,255,255,.94); --panel-2:#f1f5f9; --solid:#ffffff;
+  --code-bg:#0d1524; --line:rgba(2,132,199,.22); --line-strong:rgba(2,132,199,.45);
+  --ink:#0f172a; --mut:#475569; --dim:#7c8ba1;
+  --grid:rgba(2,132,199,.07); --orbA:rgba(14,165,233,.18); --orbB:rgba(16,185,129,.14);
 }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);min-height:100vh;padding:24px clamp(14px,3vw,40px) 60px;overflow-x:hidden;transition:background .4s}
+button,input,select,textarea{font-family:var(--body)}
 
-body.theme-cyber {
-  --bg-color: rgba(10, 1, 24, 0.7);
-  --bg-gradient: linear-gradient(180deg, #0a0118 0%, #1a0b2e 100%);
-  --glass-border: rgba(0, 255, 159, 0.3);
-  --solid-bg: #05010d;
-  --panel-bg: rgba(10, 1, 24, 0.75);
-  --code-bg: #000000;
-  --text-primary: #e0fbfc;
-  --text-secondary: #98f5e1;
-  --accent: #00ff9f;
-  --cyan: #00ff9f;
-  --success: #00ff9f;
-  --danger: #ff0080;
-  --warning: #ffee00;
-  --glass-shadow: 0 0 15px rgba(0, 255, 159, 0.2);
-}
+/* ── ambient ── */
+body::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 78%);
+          mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 78%);
+  animation:gridPan 70s linear infinite}
+@keyframes gridPan{to{background-position:44px 88px,88px 44px}}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:-2;pointer-events:none;opacity:.55}
+.orb-a{width:480px;height:480px;top:-160px;right:-120px;background:radial-gradient(circle,var(--orbA),transparent 65%);animation:drift 16s ease-in-out infinite alternate}
+.orb-b{width:420px;height:420px;bottom:-140px;left:-120px;background:radial-gradient(circle,var(--orbB),transparent 65%);animation:drift 19s ease-in-out infinite alternate-reverse}
+@keyframes drift{from{transform:none}to{transform:translate(-46px,38px) scale(1.12)}}
+#fx{position:fixed;inset:0;z-index:-1;pointer-events:none}
 
-body.theme-light {
-  --bg-color: rgba(255, 255, 255, 0.85);
-  --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --solid-bg: #ffffff;
-  --panel-bg: rgba(255, 255, 255, 0.85);
-  --code-bg: #f1f5f9;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --accent: #3b82f6;
-  --cyan: #0284c7;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
+/* ── header ── */
+.topbar{max-width:1320px;margin:0 auto 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;animation:rise .6s ease both}
+.brand{display:flex;align-items:center;gap:15px}
+.logo{width:58px;height:58px;flex:none;border-radius:14px;background:linear-gradient(145deg,#0e2136,#0a1626);border:1px solid var(--line-strong);display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--cyan);box-shadow:0 0 26px rgba(34,211,238,.18),inset 0 0 18px rgba(34,211,238,.07);position:relative;overflow:hidden}
+:root[data-theme=light] .logo{background:linear-gradient(145deg,#dbeafe,#eff6ff)}
+.logo::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(34,211,238,.28) 50%,transparent 58%);transform:translateX(-130%);animation:sheen 4.5s ease-in-out infinite}
+@keyframes sheen{0%,60%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+.brand h1{font-family:var(--disp);font-weight:400;font-size:clamp(1.6rem,3.4vw,2.3rem);line-height:1;letter-spacing:.5px}
+.brand h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 22px rgba(34,211,238,.5)}
+.brand .tag{color:var(--mut);font-size:.82rem;margin-top:6px}
+.caret{display:inline-block;color:var(--green);font-family:var(--mono);animation:blink 1s steps(1) infinite;margin-inline-start:2px}
+@keyframes blink{50%{opacity:0}}
+.top-side{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.live{display:flex;gap:9px;flex-wrap:wrap}
+.stat-box{min-width:88px;padding:9px 13px;border-radius:12px;text-align:center;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(4px);transition:border-color .25s,transform .25s}
+.stat-box:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.stat-box b{display:block;font-family:var(--mono);font-size:1.15rem;color:var(--cyan)}
+.stat-box span{font-size:.68rem;color:var(--mut)}
+.stat-box.s2 b{color:var(--green)} .stat-box.s3 b{color:var(--amber)} .stat-box.s4 b{color:var(--violet);font-size:.78rem;padding-top:5px}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;font-size:1.05rem;transition:all .25s}
+.icon-btn:hover{border-color:var(--line-strong);transform:translateY(-2px) rotate(8deg);box-shadow:0 6px 18px rgba(34,211,238,.2)}
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-body { font-family: var(--font-body); background: var(--bg-color); background-image: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; }
-#canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+/* ── templates bar ── */
+.tpl-bar{max-width:1320px;margin:0 auto 18px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 15px;background:var(--panel);border:1px solid var(--line);border-radius:14px;animation:rise .6s .06s ease both}
+.tpl-bar .lbl{font-size:.8rem;font-weight:700;color:var(--mut);white-space:nowrap}
+.tpl-chip{font-size:.76rem;padding:6px 13px;border-radius:99px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.tpl-chip:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-1px);box-shadow:0 4px 14px rgba(34,211,238,.15)}
+.tpl-chip .x{color:var(--rose);font-weight:700;cursor:pointer;padding-inline-start:2px}
+.tpl-save{border-style:dashed;color:var(--mut)}
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+/* ── layout ── */
+main{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1fr 1.14fr;gap:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 44px rgba(2,6,17,.35);display:flex;flex-direction:column;overflow:hidden}
+:root[data-theme=light] .panel{box-shadow:0 14px 34px rgba(30,60,90,.12)}
+.reveal{animation:rise .65s ease both}.d2{animation-delay:.12s}.d3{animation-delay:.22s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.p-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(128,160,200,.04)}
+.p-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot-c{background:var(--cyan);box-shadow:0 0 10px var(--cyan)} .dot-g{background:var(--green);box-shadow:0 0 10px var(--green)} .dot-a{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.p-title{font-family:var(--mono);font-size:.76rem;color:var(--mut);letter-spacing:1px}
+.p-title b{color:var(--ink);font-weight:600}
+.p-actions{margin-inline-start:auto;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.mini-btn{font-size:.75rem;color:var(--mut);background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.mini-btn:hover{color:var(--cyan);border-color:var(--line-strong);background:rgba(34,211,238,.08);transform:translateY(-1px)}
+.mini-btn.danger:hover{color:var(--rose);border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.08)}
+.mini-btn.busy{opacity:.6;pointer-events:none}
+.p-body{padding:15px;display:flex;flex-direction:column;gap:13px;flex:1}
 
-.container { max-width: 1280px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+/* ── inputs ── */
+.url-row{display:flex;gap:8px;flex-wrap:wrap}
+.url-row input[type=text]{flex:2;min-width:170px}
+input[type=text],input[type=number],select,textarea{background:var(--code-bg);color:#7dd3fc;border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:.8rem;transition:border-color .25s,box-shadow .25s}
+:root[data-theme=light] input[type=text],:root[data-theme=light] input[type=number],:root[data-theme=light] select{background:#f8fafc;color:#0f172a}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(56,189,248,.14)}
+select{cursor:pointer;color-scheme:dark}
+:root[data-theme=light] select{color-scheme:light}
+.dropzone{position:relative}
+.dropzone.drag::after{content:"📂 فایل را رها کنید";position:absolute;inset:0;display:grid;place-items:center;background:rgba(34,211,238,.12);border:2px dashed var(--cyan);border-radius:12px;font-weight:700;color:var(--cyan);backdrop-filter:blur(3px);pointer-events:none;z-index:3}
+textarea#inputLinks{width:100%;min-height:170px;direction:ltr;text-align:left;font-family:var(--mono);font-size:.8rem;line-height:1.75;resize:vertical;background:var(--code-bg);color:#7dd3fc}
+textarea#inputLinks::placeholder{color:#28405c}
 
-/* ── HEADER ── */
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px 24px; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); flex-wrap: wrap; gap: 15px;}
-.brand { display: flex; align-items: center; gap: 12px; }
-.logo { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--success)); display: grid; place-items: center; font-weight: bold; color: #fff; font-family: var(--font-mono); font-size: 1.1rem; box-shadow: 0 0 15px rgba(34,211,238,.3); flex-shrink: 0;}
-.brand h1 { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
-.brand .tag { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+/* accordions */
+.acc{border:1px solid var(--line);border-radius:12px;background:rgba(128,160,200,.045);overflow:hidden}
+.acc summary{cursor:pointer;padding:10px 14px;font-size:.83rem;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px;user-select:none;transition:color .2s}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::before{content:"▸";color:var(--cyan);transition:transform .25s;font-size:.68rem}
+.acc[open] summary::before{transform:rotate(90deg)}
+.acc summary:hover{color:var(--cyan)}
+.acc-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:12px}
+.frow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:.74rem;color:var(--mut)}
+.fld input,.fld select{min-width:110px}
+.fld.grow{flex:1;min-width:180px}
+.fld textarea{direction:ltr;text-align:left;font-family:var(--mono);font-size:.72rem;min-height:56px;resize:vertical;width:100%}
+.opt{display:flex;align-items:center;gap:9px;font-size:.8rem;color:var(--mut)}
+.switch{position:relative;width:42px;height:22px;flex:none;display:inline-block}
+.switch input{display:none}
+.slider{position:absolute;inset:0;background:var(--panel-2);border:1px solid var(--line);border-radius:99px;cursor:pointer;transition:.25s}
+.slider::before{content:"";position:absolute;width:14px;height:14px;border-radius:50%;top:3px;inset-inline-start:4px;background:#64748b;transition:.25s}
+.switch input:checked + .slider{background:rgba(14,165,233,.35);border-color:var(--sky)}
+.switch input:checked + .slider::before{inset-inline-start:22px;background:var(--sky);box-shadow:0 0 8px var(--sky)}
 
-.live-stats { display: flex; gap: 8px; flex-wrap: wrap; }
-.stat-box { padding: 6px 12px; border-radius: 10px; text-align: center; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); flex: 1; min-width: 70px; }
-body.theme-light .stat-box { background: #fff; }
-.stat-box b { display: block; font-family: var(--font-mono); font-size: 1rem; color: var(--cyan); }
-.stat-box span { font-size: 0.65rem; color: var(--text-secondary); }
+.go-btn{width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;font-weight:700;font-size:1.02rem;color:#04121d;background:linear-gradient(135deg,#0ea5e9,#22d3ee 55%,#5eead4);background-size:200% 100%;box-shadow:0 6px 22px rgba(14,165,233,.35);transition:all .25s}
+.go-btn:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 10px 30px rgba(34,211,238,.45)}
+.go-btn:active{transform:scale(.98)}
+.go-btn small{font-family:var(--mono);font-weight:400;font-size:.66rem;opacity:.75;margin-inline-start:8px}
 
-.controls { display: flex; gap: 10px; align-items: center; width: auto; }
-button, select, input[type="text"], input[type="number"] { font-family: var(--font-body); background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.85rem; width: 100%; }
-body.theme-light button:not(.primary, .danger), body.theme-light select, body.theme-light input { background: #fff; }
-button:hover:not(:disabled), select:hover, input:hover { border-color: var(--cyan); }
-button:disabled { opacity: 0.6; cursor: not-allowed; }
+/* ── output ── */
+.tabs{display:flex;gap:3px;background:var(--code-bg);border:1px solid var(--line);border-radius:9px;padding:3px}
+.tab{font-size:.72rem;color:var(--dim);background:transparent;border:none;border-radius:6px;padding:4px 11px;cursor:pointer;transition:.2s}
+.tab.active{color:#04121d;background:var(--cyan);font-weight:700}
+select.fmt{font-size:.72rem;padding:5px 8px}
+.sum-bar{display:none;gap:12px;flex-wrap:wrap;align-items:center;padding:9px 12px;border-radius:10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.22);font-size:.77rem;color:var(--mut)}
+.sum-bar.on{display:flex;animation:rise .4s ease both}
+.sum-bar b{color:var(--green);font-family:var(--mono)}
+.health{display:none;flex-direction:column;gap:5px;font-size:.74rem;padding:9px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.06)}
+.health.on{display:flex;animation:rise .4s ease both}
+.health div{color:var(--mut)} .health .h-warn::before{content:"⚠ ";color:var(--amber)} .health .h-err::before{content:"✕ ";color:var(--rose)} .health .h-info::before{content:"ℹ ";color:var(--sky)}
+.out-wrap{position:relative;flex:1;min-height:330px}
+#prettyOut,#plainOut,#diffOut{position:absolute;inset:0;width:100%;height:100%;margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-family:var(--mono);font-size:.74rem;line-height:1.7;direction:ltr;text-align:left;overflow:auto;white-space:pre}
+#prettyOut{color:#64748b} #plainOut{color:var(--green)} #diffOut{color:#94a3b8}
+.hidden{display:none!important}
+.tok-key{color:#7dd3fc}.tok-str{color:#86efac}.tok-num{color:var(--amber)}.tok-bool{color:var(--rose)}
+.d-add{background:rgba(74,222,128,.13);color:#86efac;display:block}
+.d-del{background:rgba(251,113,133,.13);color:#fda4af;display:block;text-decoration:line-through}
+.d-ctx{display:block;opacity:.55}
 
-select option, select optgroup { background-color: #1a1a2e; color: #e2e8f0; font-family: var(--font-body); }
-body.theme-cyber select option, body.theme-cyber select optgroup { background-color: #0a0118; color: #e0fbfc; }
-body.theme-light select option, body.theme-light select optgroup { background-color: #ffffff; color: #1e293b; }
+/* ── nodes ── */
+.nodes-panel{max-width:1320px;margin:18px auto 0}
+.search-box{min-width:150px;font-size:.75rem}
+.nodes-list{display:flex;flex-wrap:wrap;gap:9px;max-height:250px;overflow-y:auto;align-content:flex-start}
+.chip{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:.76rem;animation:rise .35s ease both;transition:border-color .2s,transform .2s;cursor:pointer}
+.chip:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.chip-idx{font-family:var(--mono);color:var(--dim);font-size:.68rem;flex:none}
+.chip-name{font-weight:700;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-addr{font-family:var(--mono);color:var(--mut);font-size:.66rem;direction:ltr;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-family:var(--mono);font-size:.6rem;padding:2px 7px;border-radius:99px;border:1px solid;flex:none}
+.b-ws{color:var(--cyan);border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.08)}
+.b-grpc{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
+.b-tcp{color:var(--amber);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.b-h2{color:#f0abfc;border-color:rgba(240,171,252,.4);background:rgba(240,171,252,.08)}
+.b-tls{color:var(--green);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08)}
+.b-reality{color:var(--rose);border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.08)}
+.b-none{color:var(--dim);border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.08)}
+.b-ping{color:var(--green);border-color:rgba(74,222,128,.4)} .b-ping.mid{color:var(--amber);border-color:rgba(251,191,36,.4)} .b-ping.bad{color:var(--rose);border-color:rgba(251,113,133,.4)}
+.empty-note{color:var(--dim);font-size:.8rem;padding:8px 2px}
+.stats-strip{display:flex;gap:22px;flex-wrap:wrap}
+.stat-col{flex:1;min-width:160px}
+.stat-col h4{font-size:.74rem;color:var(--mut);margin-bottom:8px}
+.bar-row{display:flex;align-items:center;gap:8px;font-size:.7rem;margin-bottom:5px}
+.bar-row .bl{width:64px;color:var(--dim);font-family:var(--mono);direction:ltr;text-align:right}
+.bar-track{flex:1;height:7px;background:var(--panel-2);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sky),var(--cyan));animation:grow .7s ease both}
+.bar-fill.f2{background:linear-gradient(90deg,#059669,var(--green))} .bar-fill.f3{background:linear-gradient(90deg,#c026d3,#f0abfc)}
+@keyframes grow{from{width:0!important}}
+.bar-row .bv{color:var(--mut);font-family:var(--mono);min-width:24px}
+.head-count{font-family:var(--mono);font-size:.73rem;color:var(--dim)} .head-count .bad{color:var(--rose)}
 
-button.primary { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; border: none; font-weight: 600; }
-button.primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px rgba(34,211,238,.4); transform: translateY(-1px); }
-button.danger { color: var(--danger); border-color: var(--danger); background: rgba(251,113,133,.08); }
-button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+footer{max-width:1320px;margin:24px auto 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--dim);font-size:.72rem;border-top:1px solid var(--line);padding-top:15px}
+footer .mono{font-family:var(--mono)} footer .dotsep{color:var(--cyan)}
 
-/* ── TEMPLATES ── */
-.tpl-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 18px; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 14px; margin-bottom: 20px; backdrop-filter: blur(20px); }
-.tpl-lbl { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); width: auto; }
-.tpl-chip { font-size: 0.75rem; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--glass-border); background: var(--code-bg); color: var(--text-primary); cursor: pointer; transition: var(--transition); flex-grow: 1; text-align: center; }
-.tpl-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(2,6,17,.7);backdrop-filter:blur(4px);z-index:90;display:none;place-items:center;padding:20px}
+.overlay.on{display:grid;animation:fadeIn .25s ease both}
+@keyframes fadeIn{from{opacity:0}}
+.modal{width:100%;max-width:520px;background:var(--solid);border:1px solid var(--line-strong);border-radius:16px;padding:20px;animation:rise .3s ease both;max-height:85vh;overflow:auto}
+.modal h3{font-family:var(--disp);font-weight:400;font-size:1.3rem;margin-bottom:12px;color:var(--cyan)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:7px 12px;font-size:.8rem}
+.kv dt{color:var(--dim)} .kv dd{font-family:var(--mono);direction:ltr;text-align:left;word-break:break-all;color:var(--ink)}
+.modal .close{margin-top:16px;width:100%}
 
-/* ── MAIN LAYOUT ── */
-.grid-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
+#toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:var(--solid);border:1px solid var(--line-strong);color:var(--ink);padding:10px 20px;border-radius:11px;font-size:.84rem;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0;transform:translateY(14px);transition:all .3s}
+.toast.show{opacity:1;transform:none}
+.toast.warn{border-color:rgba(251,191,36,.5)} .toast.err{border-color:rgba(251,113,133,.55)}
+.toast::before{content:"✓ ";color:var(--green)} .toast.warn::before{content:"⚠ ";color:var(--amber)} .toast.err::before{content:"✕ ";color:var(--rose)}
 
-.card { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--glass-shadow); margin-bottom: 20px; }
-.card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--glass-border); background: rgba(128,160,200,.04); flex-wrap: wrap; gap: 10px; }
-.card-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-.p-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.dot-in { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
-.dot-out { background: var(--success); box-shadow: 0 0 10px var(--success); }
-.dot-node { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
-.card-body { padding: 16px; display: flex; flex-direction: column; gap: 15px; }
-
-/* ── ACCORDIONS (SETTINGS) ── */
-.acc { border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(0,0,0,0.1); overflow: hidden; }
-body.theme-light .acc { background: #f8fafc; }
-.acc summary { cursor: pointer; padding: 12px 14px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; user-select: none; transition: var(--transition); }
-.acc summary:hover { color: var(--cyan); }
-.acc-body { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-.setting-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
-.fld { display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); flex: 1; min-width: 130px; }
-.opt { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; flex: 1; min-width: 140px;}
-
-/* CSS Toggle Switch */
-.switch { position: relative; width: 40px; height: 22px; display: inline-block; flex-shrink: 0; }
-.switch input { display: none; }
-.slider { position: absolute; inset: 0; background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border); border-radius: 99px; transition: .3s; }
-.slider::before { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; top: 3px; right: 4px; background: var(--text-secondary); transition: .3s; }
-.switch input:checked + .slider { background: rgba(34,211,238,.2); border-color: var(--cyan); }
-.switch input:checked + .slider::before { transform: translateX(-18px); background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
-
-textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.75rem; resize: vertical; direction: ltr; line-height: 1.5; }
-
-#tempFileStatus {
-  display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger);
-  color: var(--danger); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;
-  align-items: center; justify-content: space-between; font-size: 0.8rem; font-weight: 600;
-  animation: popIn 0.3s ease;
-}
-@keyframes popIn { from{transform:scale(0.95); opacity:0} to{transform:scale(1); opacity:1} }
-
-/* ── OUTPUT SECTION ── */
-.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; flex-wrap: wrap; width: 100%;}
-.tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: .2s; flex: 1; text-align: center;}
-.tab.active { color: #fff; background: var(--accent); font-weight: 700; }
-.out-wrap { position: relative; min-height: 380px; flex: 1; display: flex; flex-direction: column; }
-#prettyOut, #plainOut, #diffOut { width: 100%; height: 380px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
-#prettyOut { color: #94a3b8; }
-#plainOut { color: var(--success); }
-.hidden { display: none !important; }
-.tok-key { color: #7dd3fc; } .tok-str { color: #86efac; } .tok-num { color: var(--warning); } .tok-bool { color: var(--danger); }
-.d-add { background: rgba(16,185,129,.15); color: #86efac; display: block; }
-.d-del { background: rgba(251,113,133,.15); color: #fda4af; display: block; text-decoration: line-through; }
-.d-ctx { display: block; opacity: 0.6; }
-
-/* ── NODES GRID ── */
-.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
-.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: var(--transition); cursor: pointer; }
-body.theme-light .node-card { background: #fff; }
-.node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
-.node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); }
-
-.node-head { display: flex; justify-content: space-between; align-items: center; }
-.node-flag { font-size: 1.2rem; }
-.node-remark { font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
-.node-meta { display: flex; gap: 5px; flex-wrap: wrap; font-size: 0.65rem; font-family: var(--font-mono); align-items: center; }
-.badge { padding: 3px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--glass-border); }
-
-.b-ws { color: var(--cyan); border-color: rgba(34,211,238,.4); }
-.b-grpc { color: #a78bfa; border-color: rgba(167,139,250,.4); }
-.b-tcp { color: var(--warning); border-color: rgba(251,191,36,.4); }
-.b-tls { color: var(--success); border-color: rgba(16,185,129,.4); }
-.b-reality { color: var(--danger); border-color: rgba(251,113,133,.4); }
-
-.node-actions { display: flex; gap: 6px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px; }
-body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
-
-/* STICKY BAR */
-.sticky-bar { position: sticky; bottom: 15px; z-index: 50; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--accent); border-radius: 16px; padding: 12px 20px; display: none; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.sticky-buttons { display: flex; gap: 10px; }
-@keyframes slideUp { from{transform:translateY(100%); opacity:0} to{transform:none; opacity:1} }
-
-/* QR MODAL */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
-.modal-overlay.active { display: grid; }
-.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--glass-shadow); }
-#qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
-
-/* TOASTS */
-#toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: 90%; max-width: 340px; }
-.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; transform: translateY(15px); transition: all 0.3s; width: 100%; text-align: center; }
-.toast.show { opacity: 1; transform: none; }
-.toast.warn { border-color: var(--warning); } .toast.err { border-color: var(--danger); }
-
-/* ── RESPONSIVE MOBILE TWEAKS ── */
-@media (max-width: 850px) {
-  header { flex-direction: column; align-items: stretch; gap: 15px; }
-  .live-stats { justify-content: space-between; }
-  .controls { width: 100%; flex-wrap: wrap; justify-content: stretch; }
-  .controls select { flex: 1; }
-  .grid-layout { grid-template-columns: 1fr; }
-  .card-header { flex-direction: column; align-items: stretch; }
-  .card-header .controls { flex-direction: row; }
-  .setting-row { flex-direction: column; align-items: stretch; }
-  .sticky-bar { flex-direction: column; text-align: center; border-radius: 12px; bottom: 10px; padding: 14px; }
-  .sticky-buttons { flex-direction: column; width: 100%; }
-  .sticky-buttons button { width: 100%; padding: 12px; font-size: 1rem; }
-}
+textarea::-webkit-scrollbar,#prettyOut::-webkit-scrollbar,#plainOut::-webkit-scrollbar,#diffOut::-webkit-scrollbar,.nodes-list::-webkit-scrollbar,.modal::-webkit-scrollbar{width:9px;height:9px}
+textarea::-webkit-scrollbar-thumb,#prettyOut::-webkit-scrollbar-thumb,#plainOut::-webkit-scrollbar-thumb,#diffOut::-webkit-scrollbar-thumb,.nodes-list::-webkit-scrollbar-thumb,.modal::-webkit-scrollbar-thumb{background:#1e3a55;border-radius:9px;border:2px solid var(--code-bg)}
+@media(max-width:1000px){main{grid-template-columns:1fr}.topbar{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
-<body class="theme-glass">
+<body>
 
-<canvas id="canvas-bg"></canvas>
+<canvas id="fx"></canvas>
+<div class="orb orb-a"></div><div class="orb orb-b"></div>
 
-<div class="container">
-  <header>
-    <div class="brand">
-      <div class="logo">V⇢X</div>
-      <div>
-        <h1>VLESS ⇢ Xray Studio</h1>
-        <p class="tag">تبدیل‌گر قدرتمند با خروجی اختصاصی</p>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">V⇢X</div>
+    <div>
+      <h1>VLESS <em>⇢</em> Xray Studio</h1>
+      <p class="tag">تبدیلگر کامل vless با خروجی Xray / Sing-Box / Clash + تست پینگ و آنالیز<span class="caret">_</span></p>
+    </div>
+  </div>
+  <div class="top-side">
+    <div class="live">
+      <div class="stat-box"><b id="statLines">۰</b><span>خط ورودی</span></div>
+      <div class="stat-box s2"><b id="statValid">۰</b><span>لینک معتبر</span></div>
+      <div class="stat-box s3"><b id="statInvalid">۰</b><span>نامعتبر</span></div>
+      <div class="stat-box s4"><b id="statB64">—</b><span>حالت Base64</span></div>
+    </div>
+    <button class="icon-btn" id="btnTheme" title="تغییر پوسته">🌙</button>
+  </div>
+</header>
+
+<div class="tpl-bar">
+  <span class="lbl">🧩 قالب‌های آماده:</span>
+  <button class="tpl-chip" data-tpl="intelligent">🧠 انتخاب هوشمند</button>
+  <button class="tpl-chip" data-tpl="gaming">🎮 گیمینگ (پینگ کم)</button>
+  <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ</button>
+  <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال</button>
+  <span style="flex:1"></span>
+  <span id="userTpls" style="display:flex;gap:8px;flex-wrap:wrap"></span>
+  <button class="tpl-chip tpl-save" id="btnSaveTpl">＋ ذخیره قالب فعلی</button>
+</div>
+
+<main>
+  <!-- ══ INPUT ══ -->
+  <section class="panel reveal">
+    <div class="p-head">
+      <span class="p-dot dot-c"></span>
+      <span class="p-title"><b>INPUT</b> // ورودی</span>
+      <div class="p-actions">
+        <button class="mini-btn" id="btnSample">🧪 نمونه</button>
+        <button class="mini-btn" id="btnPaste">📋 پیست</button>
+        <button class="mini-btn" id="btnFile">📁 فایل</button>
+        <button class="mini-btn danger" id="btnClear">🗑 پاک کردن</button>
       </div>
     </div>
-    <div class="live-stats">
-      <div class="stat-box"><b id="statLines">۰</b><span>ورودی</span></div>
-      <div class="stat-box"><b id="statValid" style="color:var(--success)">۰</b><span>سالم</span></div>
-      <div class="stat-box"><b id="statInvalid" style="color:var(--danger)">۰</b><span>نامعتبر</span></div>
-    </div>
-    <div class="controls">
-      <select id="themeSelect" onchange="applyTheme(this.value)">
-        <option value="theme-glass">🌙 تم تیره شیشه‌ای</option>
-        <option value="theme-cyber">🤖 تم سایبرپانک</option>
-        <option value="theme-light">☀️ تم روز (روشن)</option>
-      </select>
-    </div>
-  </header>
+    <div class="p-body">
+      <div class="url-row">
+        <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub  — دریافت ساب‌اسکریپشن از URL">
+        <select id="proxySel" title="پروکسی CORS">
+          <option value="corsproxy">corsproxy.io</option>
+          <option value="allorigins">allorigins.win</option>
+          <option value="direct">بدون پروکسی</option>
+        </select>
+        <button class="mini-btn" id="btnFetch">⬇ دریافت</button>
+      </div>
 
-  <div class="tpl-bar">
-    <span class="tpl-lbl">🧩 قالب‌های کاربردی:</span>
-    <button class="tpl-chip" data-tpl="intelligent">🧠 استاندارد (هووشمند)</button>
-    <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ / وب</button>
-    <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (بدون فیلتر)</button>
-  </div>
+      <div class="dropzone" id="dropzone">
+        <textarea id="inputLinks" spellcheck="false"
+          placeholder="vless://uuid@host:443?type=ws&security=tls...&#10;هر لینک در یک خط — یا محتوای Base64 ساب — یا فایل را اینجا بکشید"></textarea>
+      </div>
 
-  <div class="grid-layout">
-    
-    <!-- ══ INPUT & SETTINGS (LEFT) ══ -->
-    <div class="left-col">
-      <section class="card">
-        <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-in"></span> ورودی ساب‌اسکریپشن</span>
-          <div class="controls">
-            <button class="danger" id="btnClear" style="font-size:0.75rem; padding:6px; flex:1;">🗑 پاک‌کردن</button>
-            <button class="primary" onclick="pasteFromClipboard()" style="font-size:0.75rem; padding:6px; flex:1;">📋 پیست مستقیم</button>
+      <details class="acc" open>
+        <summary>⚙️ تنظیمات عمومی</summary>
+        <div class="acc-body">
+          <div class="frow">
+            <label class="fld">پیشوند تگ<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
+            <label class="fld">سطح لاگ
+              <select id="logLevel"><option value="none">none</option><option value="error">error</option><option value="warning" selected>warning</option><option value="info">info</option><option value="debug">debug</option></select>
+            </label>
+          </div>
+          <div class="frow">
+            <label class="opt"><span class="switch"><input type="checkbox" id="swAutoTag"><span class="slider"></span></span>تگ خودکار از Remark</label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>فعال‌سازی Mux</label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>allowInsecure (TLS)</label>
           </div>
         </div>
-        <div class="card-body">
-          <div id="tempFileStatus">
-            <span>⏳ حافظه موقت امنیتی (<b id="tempTime">05:00</b>)</span>
-            <button class="danger" style="padding: 4px 8px; font-size: 0.75rem; background:transparent;" onclick="deleteTempFile()">حذف فـوری</button>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="flex:1;">
-            <button class="primary" id="btnFetch" style="width: auto;">⬇ دریافت</button>
-          </div>
-          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا کپی و پِیست کنید..." spellcheck="false"></textarea>
-        </div>
-      </section>
+      </details>
 
-      <section class="card">
-        <div class="card-header"><span class="card-title">⚙️ منوی تنظیمات</span></div>
-        <div class="card-body" style="padding: 10px;">
-          
-          <details class="acc" open>
-            <summary>🌐 سرور DNS و تستر</summary>
-            <div class="acc-body">
-              <div class="setting-row">
-                <label class="fld">پریست DNS اصلی
-                  <div style="display:flex; gap:6px;">
-                    <select id="dnsPreset" style="flex:1;">
-                      <optgroup label="جهانی">
-                        <option value="Cloudflare">Cloudflare (1.1.1.1)</option>
-                        <option value="Google">Google (8.8.8.8)</option>
-                        <option value="Quad9">Quad9 (9.9.9.9)</option>
-                      </optgroup>
-                      <optgroup label="ایران (ضد تحریم)">
-                        <option value="Shecan">شکن (178.22.122.100)</option>
-                        <option value="Electro">الکترو (78.157.42.101)</option>
-                        <option value="Radar">رادار بازی (10.202.10.10)</option>
-                      </optgroup>
-                    </select>
-                    <button id="btnPingDns" class="primary" style="padding:4px 8px; font-size:0.75rem; width: auto;" onclick="testDnsPings()">📡 تست DNS</button>
-                  </div>
-                </label>
-              </div>
-            </div>
-          </details>
-
-          <details class="acc" open>
-            <summary>📡 تست خودکار گره‌ها (Observatory)</summary>
-            <div class="acc-body">
-              <div class="setting-row">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>روشن بودن Observatory</label>
-                <label class="fld">استراتژی تست
-                  <select id="obsStrategy"><option value="leastPing" selected>leastPing (اتصال به کمترین پینگ)</option><option value="random">random (تصادفی)</option></select>
-                </label>
-              </div>
-              <div class="setting-row" style="margin-top:10px;">
-                <label class="fld">آدرس تست سرور
-                  <select id="probeSel">
-                    <option value="gstatic" selected>Google gstatic 204</option>
-                    <option value="cloudflare">Cloudflare 204</option>
-                  </select>
-                </label>
-                <label class="fld">فاصله زمانی تست
-                  <select id="obsInterval"><option value="1m">۱ دقیقه</option><option value="3m" selected>۳ دقیقه</option><option value="5m">۵ دقیقه</option></select>
-                </label>
-              </div>
-            </div>
-          </details>
-
-          <details class="acc" open>
-            <summary>🧭 قوانین مسیریابی (Routing)</summary>
-            <div class="acc-body">
-              <div class="setting-row">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی دامنه‌های تبلیغات</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>اتصال سایت‌های ایران به اینترنت</label>
-              </div>
-              <div class="setting-row" style="margin-top:10px;">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swQuic"><span class="slider"></span></span>بلاک پروتکل QUIC شبکه</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>ترافیک شبکه خصوصی مستقیـم</label>
-              </div>
-            </div>
-          </details>
-
-          <details class="acc">
-            <summary>⚙️ تنظیمات تکمیلی Inbounds و MUX</summary>
-            <div class="acc-body">
-              <div class="setting-row" style="margin-top:10px;">
-                <label class="fld">پورت Socks<input type="number" id="socksPort" value="10808" dir="ltr"></label>
-                <label class="fld">پورت HTTP<input type="number" id="httpPort" value="10809" dir="ltr"></label>
-              </div>
-              <div class="setting-row">
-                <label class="fld" style="margin-top:10px;">پیشوند گره‌ها<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
-              </div>
-              <div class="setting-row" style="margin-top:10px;">
-                <label class="opt"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>WLAN MUX (ترکیب مسـیرها)</label>
-                <label class="opt"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS (حذف گواهی)</label>
-              </div>
-            </div>
-          </details>
-
-          <button class="primary" id="btnConvert" style="width:100%; padding:14px; margin-top:15px; font-size:1.1rem; box-shadow: 0 4px 15px rgba(34,211,238,.3);">⚡ شروع تبدیل و کپی کانفیگ</button>
-
-        </div>
-      </section>
-    </div>
-
-    <!-- ══ OUTPUT & NODES (RIGHT) ══ -->
-    <div class="right-col">
-      <section class="card">
-        <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته پردازش شده</span>
-          <div class="controls" style="flex-direction: column; width: 100%;">
-            <div class="tabs">
-              <button class="tab active" id="tabPretty">نمایش کد</button>
-              <button class="tab" id="tabPlain">متن خام</button>
-              <button class="tab" id="tabDiff">تغییرات Δ</button>
-            </div>
-            <div style="display:flex; gap:10px; width: 100%; margin-top:5px;">
-              <select id="fmtSel" style="flex: 2; font-size:0.8rem;">
-                <option value="xray">Xray-core JSON</option>
-                <option value="singbox">Sing-Box JSON</option>
-                <option value="clash">Clash Meta YAML</option>
-                <option value="v2rayn">لیست استاندارد</option>
+      <details class="acc" open>
+        <summary>🌐 سرور DNS</summary>
+        <div class="acc-body">
+          <div class="frow">
+            <label class="fld">پریست
+              <select id="dnsPreset">
+                <option value="Cloudflare">Cloudflare</option><option value="Google">Google</option>
+                <option value="Quad9">Quad9</option><option value="OpenDNS">OpenDNS</option>
+                <option value="AdGuard">AdGuard</option><option value="Shecan">شکن (ایران)</option>
+                <option value="Custom">سفارشی</option>
               </select>
-              <button class="primary" id="btnCopy" style="flex: 1; font-size:0.8rem;">📋 کپی متن</button>
-            </div>
+            </label>
+            <label class="fld">DNS اصلی<input type="text" id="dns1" value="1.1.1.1" dir="ltr"></label>
+            <label class="fld">DNS دوم<input type="text" id="dns2" value="1.0.0.1" dir="ltr"></label>
           </div>
         </div>
-        <div class="card-body" style="padding:10px;">
-          <div class="out-wrap">
-            <pre id="prettyOut"><span style="color:#64748b">// کانفیگ تولید شده در اینجا نمایش داده می‌شود...</span></pre>
-            <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
-            <div id="diffOut" class="hidden"></div>
-          </div>
-        </div>
-      </section>
+      </details>
 
-      <section class="card">
-        <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-node"></span> گره‌های شناسایی شده</span>
-        </div>
-        <div class="card-body">
-          <input type="text" id="nodeSearch" placeholder="🔍 جستجوی گره (نام، سرور)..." style="width: 100%; margin-bottom: 10px;">
-          <div class="node-grid" id="nodeList">
-            <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary); font-size:0.9rem;">
-              لطفا متن ساب‌اسکریپشن را وارد کنید.
-            </div>
+      <details class="acc">
+        <summary>📥 ورودی‌ها (Inbounds)</summary>
+        <div class="acc-body">
+          <div class="frow">
+            <label class="fld">پورت Socks<input type="number" id="socksPort" value="10808" dir="ltr"></label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swUdp" checked><span class="slider"></span></span>UDP در Socks</label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swHttp"><span class="slider"></span></span>HTTP Proxy هم اضافه شود</label>
+            <label class="fld">پورت HTTP<input type="number" id="httpPort" value="10809" dir="ltr"></label>
           </div>
         </div>
-      </section>
+      </details>
+
+      <details class="acc" open>
+        <summary>📡 تست خودکار (Observatory) و بالانسر</summary>
+        <div class="acc-body">
+          <div class="frow">
+            <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>فعال</label>
+            <label class="fld">استراتژی
+              <select id="obsStrategy"><option value="leastPing" selected>leastPing (URLTest/Failover)</option><option value="random">random</option></select>
+            </label>
+            <label class="fld">فاصله تست
+              <select id="obsInterval"><option value="1m">۱ دقیقه</option><option value="3m" selected>۳ دقیقه</option><option value="5m">۵ دقیقه</option><option value="10m">۱۰ دقیقه</option><option value="30m">۳۰ دقیقه</option></select>
+            </label>
+          </div>
+          <div class="frow">
+            <label class="fld">آدرس تست (Probe URL)
+              <select id="probeSel">
+                <option value="gstatic" selected>Google gstatic 204</option>
+                <option value="cloudflare">Cloudflare generate_204</option>
+                <option value="apple">Apple Captive</option>
+                <option value="custom">سفارشی</option>
+              </select>
+            </label>
+            <label class="fld grow">آدرس سفارشی<input type="text" id="probeCustom" dir="ltr" placeholder="https://..." style="width:100%"></label>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>🧭 قوانین مسیریابی (Routing)</summary>
+        <div class="acc-body">
+          <div class="frow">
+            <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی تبلیغات</label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>ایران/چین → مستقیم</label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swQuic" checked><span class="slider"></span></span>بلاک QUIC (UDP 443)</label>
+            <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>IP خصوصی → مستقیم</label>
+          </div>
+          <div class="frow">
+            <label class="fld grow">دامنه‌های بلاک (هر خط یک مورد)<textarea id="customBlock" placeholder="example.com&#10;domain:ads.example.net"></textarea></label>
+            <label class="fld grow">دامنه‌های مستقیم (هر خط یک مورد)<textarea id="customDirect" placeholder="domain:internal.co"></textarea></label>
+          </div>
+        </div>
+      </details>
+
+      <button class="go-btn" id="btnConvert">⚡ تولید کانفیگ <small>Ctrl + Enter</small></button>
     </div>
+  </section>
 
-  </div>
-</div>
+  <!-- ══ OUTPUT ══ -->
+  <section class="panel reveal d2">
+    <div class="p-head">
+      <span class="p-dot dot-g"></span>
+      <span class="p-title"><b>OUTPUT</b> // خروجی</span>
+      <div class="p-actions">
+        <div class="tabs">
+          <button class="tab active" id="tabPretty">رنگی</button>
+          <button class="tab" id="tabPlain">ساده</button>
+          <button class="tab" id="tabDiff">مقایسه Δ</button>
+        </div>
+        <select class="fmt" id="fmtSel">
+          <option value="xray">Xray JSON</option>
+          <option value="singbox">Sing-Box JSON</option>
+          <option value="clash">Clash Meta YAML</option>
+          <option value="v2rayn">ساب v2rayN (Base64)</option>
+          <option value="uri">فهرست URI</option>
+        </select>
+        <button class="mini-btn" id="btnCopy">⧉ کپی</button>
+        <button class="mini-btn" id="btnDownload">⬇ دانلود</button>
+        <button class="mini-btn" id="btnReport">📄 گزارش</button>
+      </div>
+    </div>
+    <div class="p-body">
+      <div class="sum-bar" id="sumBar">
+        <span>✅ گره‌ها: <b id="sumCount">۰</b></span>
+        <span>📦 حجم: <b id="sumSize">۰</b></span>
+        <span>⏱ <b id="sumTime">۰</b></span>
+        <span>🩺 اعتبار: <b id="sumHealth">—</b></span>
+      </div>
+      <div class="health" id="healthBox"></div>
+      <div class="out-wrap">
+        <pre id="prettyOut"><span style="color:#334155">// خروجی اینجا نمایش داده می‌شود...</span></pre>
+        <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
+        <div id="diffOut" class="hidden"></div>
+      </div>
+    </div>
+  </section>
+</main>
 
-<!-- STICKY ACTION BAR FOR FAST EXECUTION ON MOBILE DOWN BELOW -->
-<div id="stickyBar" class="sticky-bar">
-  <div class="selection-info" style="font-size: 0.95rem;">
-    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره در لیست بازسازی وجود دارد
+<!-- ══ NODES ══ -->
+<section class="panel nodes-panel reveal d3">
+  <div class="p-head">
+    <span class="p-dot dot-a"></span>
+    <span class="p-title"><b>NODES</b> // گره‌ها</span>
+    <span class="head-count" id="nodesCount"></span>
+    <div class="p-actions">
+      <input type="text" class="search-box" id="nodeSearch" placeholder="🔍 جستجو...">
+      <select id="nodeFilter">
+        <option value="all">همه</option>
+        <option value="net:ws">WS</option><option value="net:grpc">gRPC</option>
+        <option value="net:tcp">TCP</option><option value="net:h2">H2</option>
+        <option value="sec:tls">TLS</option><option value="sec:reality">Reality</option><option value="sec:none">بدون امنیت</option>
+      </select>
+      <select id="nodeSort">
+        <option value="order">ترتیب اصلی</option>
+        <option value="ping">کمترین پینگ</option>
+        <option value="name">نام</option>
+        <option value="port">پورت</option>
+      </select>
+      <button class="mini-btn" id="btnPing">📡 تست پینگ</button>
+      <label class="opt" title="پوشاندن UUID در جزئیات و گزارش"><span class="switch"><input type="checkbox" id="swMask"><span class="slider"></span></span>پوشاندن UUID</label>
+    </div>
   </div>
-  <div class="sticky-buttons">
-    <button onclick="document.getElementById('btnConvert').click();">⚡ ساخت و کپی</button>
-    <button onclick="downloadConfig()">⬇ دانلود فایل</button>
-    <button class="primary" onclick="showQrModal()">📷 نمایش QR</button>
+  <div class="p-body">
+    <details class="acc" id="statsAcc">
+      <summary>📊 آمار و تحلیل</summary>
+      <div class="acc-body"><div class="stats-strip" id="statsStrip"></div></div>
+    </details>
+    <div class="nodes-list" id="nodesList"></div>
+    <button class="mini-btn hidden" id="btnMore" style="align-self:center">نمایش بیشتر</button>
   </div>
-</div>
+</section>
 
-<!-- QR MODAL -->
-<div id="qrModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+<footer>
+  <span>سازگار با <b>Xray-core</b> <span class="dotsep">•</span> Sing-Box <span class="dotsep">•</span> Clash Meta <span class="dotsep">•</span> Reality / TLS <span class="dotsep">•</span> WS / gRPC / TCP / H2</span>
+  <span class="mono">Ctrl+Enter: تولید — Ctrl+S: دانلود — ذخیره خودکار فعال</span>
+</footer>
+
+<div class="overlay" id="overlay">
   <div class="modal">
-    <h3 style="margin-bottom:10px; color:var(--cyan);" id="qrModalTitle">اسکن QR Code</h3>
-    <div id="qrcode"></div>
-    <button class="danger" style="margin-top:20px; width:100%" onclick="document.getElementById('qrModal').classList.remove('active')">بستن پنجره</button>
+    <h3 id="mTitle">جزئیات گره</h3>
+    <dl class="kv" id="mBody"></dl>
+    <button class="go-btn close" id="mClose">بستن</button>
   </div>
 </div>
 
 <div id="toasts"></div>
+<input type="file" id="fileInput" accept=".txt,.json,.sub,.b64,.cfg,.yaml" style="display:none">
 
 <script>
+(function(){
 "use strict";
-const $ = id => document.getElementById(id);
-const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
-const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const faNum=n=>new Intl.NumberFormat('fa-IR').format(n);
+const escHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/** PARTICLES BACKGROUND **/
-const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
-let W, H, particles = [];
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-window.addEventListener('resize', resize); resize();
-for(let i=0; i<35; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
-function animate() {
-  ctx.clearRect(0,0,W,H); const accentColor = getComputedStyle(document.body).getPropertyValue('--cyan').trim();
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = accentColor; ctx.globalAlpha = p.a; ctx.fill(); ctx.globalAlpha = 1;
-  }); requestAnimationFrame(animate);
-} animate();
-
-/** TOAST ALERTS **/
-function toast(msg, type=''){
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = (type==='err'?'❌ ':'') + (type==='warn'?'⚠️ ':'✅ ') + msg;
-  $('toasts').appendChild(t);
-  requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
-}
-
-/** SAFE CLIPBOARD COPY **/
-function copyToClipboard(text, onSuccess) {
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopyTextToClipboard(text, onSuccess));
-  } else {
-    fallbackCopyTextToClipboard(text, onSuccess);
-  }
-}
-function fallbackCopyTextToClipboard(text, onSuccess) {
-  let textArea = document.createElement("textarea");
-  textArea.value = text;
-  textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed"; textArea.style.opacity = "0";
-  document.body.appendChild(textArea);
-  textArea.focus(); textArea.select();
-  try { document.execCommand('copy'); if (onSuccess) onSuccess(); } catch (err) { toast('خطایی در سیستم کپی پیش آمد', 'err'); }
-  document.body.removeChild(textArea);
-}
-
-/** SAFE BASE64 ENCODE (Supports UTF-8/Persian remarks) **/
-function encodeBase64Safe(str) {
-  const bytes = new TextEncoder().encode(str);
-  let bin = '';
-  for(let i=0; i<bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-  return btoa(bin);
-}
-
-/** THEME **/
-function applyTheme(theme) {
-  document.body.className = theme;
-  try{ localStorage.setItem('vx_theme', theme); }catch(e){}
-}
-if(localStorage.getItem('vx_theme')) {
-  const t = localStorage.getItem('vx_theme');
-  $('themeSelect').value = t; applyTheme(t);
-}
-
-/** CONSTANTS & PRESETS **/
-const DNS_PRESETS = {
-  Cloudflare: ['1.1.1.1','1.0.0.1'], Google: ['8.8.8.8','8.8.4.4'], Quad9: ['9.9.9.9','149.112.112.112'],
-  Shecan: ['178.22.122.100','185.51.200.2'], Electro: ['78.157.42.101','78.157.42.100'], Radar: ['10.202.10.10','10.202.10.11']
+/* ═════════ constants ═════════ */
+const DNS_PRESETS={Cloudflare:['1.1.1.1','1.0.0.1'],Google:['8.8.8.8','8.8.4.4'],Quad9:['9.9.9.9','149.112.112.112'],OpenDNS:['208.67.222.222','208.67.220.220'],AdGuard:['94.140.14.14','94.140.15.15'],Shecan:['178.22.122.100','185.51.200.2'],Custom:null};
+const PROBES={gstatic:'https://www.gstatic.com/generate_204',cloudflare:'https://cp.cloudflare.com/generate_204',apple:'https://captive.apple.com/hotspot-detect.html'};
+const PROXY_FNS={direct:u=>u,corsproxy:u=>'https://corsproxy.io/?url='+encodeURIComponent(u),allorigins:u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)};
+const FILENAMES={xray:'final_sub.json',singbox:'singbox_config.json',clash:'clash_config.yaml',v2rayn:'sub_base64.txt',uri:'links.txt'};
+const DEFAULTS={prefix:'proxy-',autoTag:false,mux:false,allowInsecure:false,logLevel:'warning',
+  dns:{preset:'Cloudflare',custom1:'1.1.1.1',custom2:'1.0.0.1'},
+  inbound:{socksPort:10808,httpEnabled:false,httpPort:10809,udp:true},
+  obs:{enabled:true,strategy:'leastPing',probe:'gstatic',customProbe:'',interval:'3m'},
+  routing:{blockAds:true,directIR:true,blockQuic:true,directPrivate:true,customBlock:'',customDirect:''}};
+const BUILTIN={
+  intelligent:{},
+  gaming:{obs:{strategy:'leastPing',interval:'1m',enabled:true},routing:{blockQuic:true},logLevel:'warning'},
+  streaming:{dns:{preset:'Google'},routing:{blockAds:true},obs:{interval:'5m'}},
+  minimal:{obs:{enabled:false},routing:{blockAds:false,directIR:false,blockQuic:false,directPrivate:false,customBlock:'',customDirect:''},logLevel:'none',mux:false}
 };
-const PROBES = { gstatic: 'https://www.gstatic.com/generate_204', cloudflare: 'https://cp.cloudflare.com/generate_204' };
+const SAMPLE=['vless://8f2c3d4e-5a6b-7c8d-9e0f-1a2b3c4d5e6f@server1.example.com:443?type=ws&security=tls&path=%2Fvless-ws&host=cdn.example.com&sni=example.com&fp=chrome&alpn=h2%2Chttp/1.1#Germany-Frankfurt-WS',
+'vless://a1b2c3d4-e5f6-4a5b-8c7d-9e0f1a2b3c4d@198.51.100.10:2053?type=tcp&security=reality&sni=www.microsoft.com&fp=chrome&pbk=SbVKFkJjDdLmPqQW4kHBjxz9sKJDPYsLhO1vD2RnVXc&sid=ab12cd34&spx=%2F&flow=xtls-rprx-vision#Netherlands-Reality-Vision',
+'vless://11112222-3333-4444-5555-666677778888@grpc.example.com:443?type=grpc&security=tls&serviceName=grpc-tunnel&sni=grpc.example.com&fp=firefox#Finland-Helsinki-gRPC',
+'vless://99998888-7777-6666-5555-444433332222@fast.example.net:8443?type=ws&security=tls&path=%2Fapi&sni=fast.example.net&fp=random#Turkey-Istanbul-WS'].join('\n');
+const LS_STATE='vlessx_state_v2',LS_TPL='vlessx_tpls_v2';
 
-const BUILTIN_TPLS = {
-  intelligent: { obs: { strategy: 'leastPing', interval: '3m' }, routing: { blockAds: true, blockQuic: true } },
-  streaming: { dns: { preset: 'Google' }, routing: { blockAds: true }, obs: { interval: '5m' } },
-  minimal: { obs: { enabled: false }, routing: { blockAds: false, directIR: false, blockQuic: false }, proxy: { mux: false } }
-};
+/* ═════════ state ═════════ */
+let nodes=[],invalidCount=0,shownCount=120,testing=false;
+let curFmt='xray',curTab='pretty';
+let textCache={},prevTexts={};
 
-/** STATE **/
-let nodes = [], invalidCount = 0;
-let curFmt = 'xray', curTab = 'pretty';
-let textCache = {}, prevTexts = {};
+/* ═════════ utils ═════════ */
+function toast(msg,type){const t=document.createElement('div');t.className='toast'+(type?' '+type:'');t.textContent=msg;$('toasts').appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),320);},2600);}
+function deepMerge(base,patch){const out=JSON.parse(JSON.stringify(base));for(const k in patch){if(patch[k]&&typeof patch[k]==='object'&&!Array.isArray(patch[k])&&out[k]&&typeof out[k]==='object')Object.assign(out[k],patch[k]);else out[k]=patch[k];}return out;}
+const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+function b64enc(str){const bytes=new TextEncoder().encode(str);let bin='';for(const b of bytes)bin+=String.fromCharCode(b);return btoa(bin);}
+function tryB64(raw){const s=raw.replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');if(!s||s.length%4===1||!/^[A-Za-z0-9+/=]+$/.test(s))return null;try{const p=s+'==='.slice((s.length+3)%4);const bin=atob(p);return new TextDecoder('utf-8').decode(Uint8Array.from(bin,c=>c.charCodeAt(0)));}catch(e){return null;}}
+function resolveInput(raw){if(!raw)return{text:'',b64:false};if(raw.includes('vless://'))return{text:raw,b64:false};const d=tryB64(raw);if(d&&d.includes('vless://'))return{text:d,b64:true};return{text:raw,b64:false};}
+function maskSecret(s){if(!s||s.length<12)return s||'';return s.slice(0,6)+'••••••••'+s.slice(-4);}
 
-/** PARSER ENGINE **/
-function tryB64(raw){
-  const s = raw.replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
-  if(!s || s.length%4===1 || !/^[A-Za-z0-9+/=]+$/.test(s)) return null;
-  try { return new TextDecoder('utf-8').decode(Uint8Array.from(atob(s+'==='.slice((s.length+3)%4)), c=>c.charCodeAt(0))); } catch(e){ return null; }
+/* ═════════ ambient fx ═════════ */
+const cv=$('fx'),cx=cv.getContext('2d');let W,H;
+function fit(){W=cv.width=innerWidth;H=cv.height=innerHeight;}addEventListener('resize',fit);fit();
+const PAL=['34,211,238','74,222,128','148,163,184','167,139,250'];
+const dots=Array.from({length:44},(_,i)=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.6+.4,vx:(Math.random()-.5)*.16,vy:-(Math.random()*.22+.05),a:Math.random()*.38+.12,c:PAL[i%PAL.length]}));
+(function loop(){cx.clearRect(0,0,W,H);for(const d of dots){d.x+=d.vx;d.y+=d.vy;if(d.y<-6){d.y=H+6;d.x=Math.random()*W;}if(d.x<-6)d.x=W+6;if(d.x>W+6)d.x=-6;cx.beginPath();cx.arc(d.x,d.y,d.r,0,7);cx.fillStyle='rgba('+d.c+','+d.a+')';cx.fill();}requestAnimationFrame(loop);})();
+
+/* ═════════ theme ═════════ */
+function applyTheme(t){document.documentElement.dataset.theme=t;$('btnTheme').textContent=t==='light'?'☀️':'🌙';try{localStorage.setItem('vlessx_theme',t);}catch(e){}}
+$('btnTheme').addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));
+try{applyTheme(localStorage.getItem('vlessx_theme')||'dark');}catch(e){applyTheme('dark');}
+
+/* ═════════ settings ═════════ */
+function getSettings(){return{
+  prefix:$('prefix').value.trim()||'proxy-',autoTag:$('swAutoTag').checked,mux:$('swMux').checked,
+  allowInsecure:$('swInsecure').checked,logLevel:$('logLevel').value,
+  dns:{preset:$('dnsPreset').value,custom1:$('dns1').value.trim(),custom2:$('dns2').value.trim()},
+  inbound:{socksPort:parseInt($('socksPort').value)||10808,httpEnabled:$('swHttp').checked,httpPort:parseInt($('httpPort').value)||10809,udp:$('swUdp').checked},
+  obs:{enabled:$('swObs').checked,strategy:$('obsStrategy').value,probe:$('probeSel').value,customProbe:$('probeCustom').value.trim(),interval:$('obsInterval').value},
+  routing:{blockAds:$('swAds').checked,directIR:$('swIR').checked,blockQuic:$('swQuic').checked,directPrivate:$('swPriv').checked,customBlock:$('customBlock').value,customDirect:$('customDirect').value}};}
+function applySettings(s){
+  $('prefix').value=s.prefix;$('swAutoTag').checked=s.autoTag;$('swMux').checked=s.mux;
+  $('swInsecure').checked=s.allowInsecure;$('logLevel').value=s.logLevel;
+  $('dnsPreset').value=s.dns.preset;$('dns1').value=s.dns.custom1;$('dns2').value=s.dns.custom2;
+  $('socksPort').value=s.inbound.socksPort;$('swHttp').checked=s.inbound.httpEnabled;
+  $('httpPort').value=s.inbound.httpPort;$('swUdp').checked=s.inbound.udp;
+  $('swObs').checked=s.obs.enabled;$('obsStrategy').value=s.obs.strategy;$('probeSel').value=s.obs.probe;
+  $('probeCustom').value=s.obs.customProbe;$('obsInterval').value=s.obs.interval;
+  $('swAds').checked=s.routing.blockAds;$('swIR').checked=s.routing.directIR;
+  $('swQuic').checked=s.routing.blockQuic;$('swPriv').checked=s.routing.directPrivate;
+  $('customBlock').value=s.routing.customBlock;$('customDirect').value=s.routing.customDirect;
+  if(DNS_PRESETS[s.dns.preset]){[ $('dns1').value,$('dns2').value]=DNS_PRESETS[s.dns.preset];}
 }
+function persist(){try{localStorage.setItem(LS_STATE,JSON.stringify({input:$('inputLinks').value,settings:getSettings(),fmt:curFmt}));}catch(e){}}
+const persistDeb=debounce(persist,600);
 
-function resolveInput(raw){
-  if(!raw) return '';
-  if(raw.includes('://')) return raw;
-  const d = tryB64(raw); return d && d.includes('://') ? d : raw;
+/* ═════════ parser ═════════ */
+function parseVlessLine(line){
+  try{
+    const u=new URL(line);if(u.protocol!=='vless:')return{error:'پروتکل نامعتبر'};
+    const uuid=u.username,address=decodeURIComponent(u.hostname);
+    if(!uuid||!address)return{error:'آدرس یا UUID ناقص'};
+    const p=u.searchParams;let remark='';try{remark=decodeURIComponent(u.hash.slice(1));}catch(e){remark=u.hash.slice(1);}
+    return{raw:line,uuid,address,port:parseInt(u.port)||443,
+      network:p.get('type')||'tcp',security:p.get('security')||'none',
+      path:p.get('path')||'/',host:p.get('host')||'',sni:p.get('sni')||'',fp:p.get('fp')||'chrome',
+      alpn:(p.get('alpn')||'').split(',').filter(Boolean),flow:p.get('flow')||'',
+      pbk:p.get('pbk')||'',sid:p.get('sid')||'',spx:p.get('spx')||'',
+      serviceName:p.get('serviceName')||'',headerType:p.get('headerType')||'',remark};
+  }catch(e){return{error:'ساختار لینک نامعتبر'};}
 }
-
-function parseNodeLine(line){
-  try {
-    if(line.startsWith('vless://')){
-      const u = new URL(line); const p = u.searchParams;
-      return { proto: 'vless', raw: line, uuid: u.username, address: u.hostname, port: parseInt(u.port)||443, network: p.get('type')||'tcp', security: p.get('security')||'none', path: p.get('path')||'/', host: p.get('host')||'', sni: p.get('sni')||'', fp: p.get('fp')||'chrome', alpn: (p.get('alpn')||'').split(',').filter(Boolean), flow: p.get('flow')||'', pbk: p.get('pbk')||'', sid: p.get('sid')||'', spx: p.get('spx')||'', serviceName: p.get('serviceName')||'', remark: decodeURIComponent(u.hash.slice(1)) };
-    }
-    else if(line.startsWith('vmess://')){
-      const json = JSON.parse(atob(line.slice(8)));
-      return { proto: 'vmess', raw: line, uuid: json.id, address: json.add, port: parseInt(json.port), network: json.net||'tcp', security: json.tls==='tls'?'tls':'none', sni: json.sni||json.host||json.add, host: json.host||'', path: json.path||'/', remark: json.ps||'' };
-    }
-    else if(line.startsWith('trojan://')){
-      const u = new URL(line); const p = u.searchParams;
-      return { proto: 'trojan', raw: line, uuid: u.username, address: u.hostname, port: parseInt(u.port)||443, network: p.get('type')||'tcp', security: 'tls', sni: p.get('sni')||u.hostname, path: p.get('path')||'/', host: p.get('host')||'', remark: decodeURIComponent(u.hash.slice(1)) };
-    }
-    else if(line.startsWith('ss://')){
-      const temp = line.slice(5), hashIdx = temp.indexOf('#');
-      const remark = hashIdx > -1 ? decodeURIComponent(temp.slice(hashIdx+1)) : '';
-      let main = hashIdx > -1 ? temp.slice(0, hashIdx) : temp, auth, rest;
-      if(main.includes('@')) [auth, rest] = main.split('@');
-      else { const d = atob(main); if(d.includes('@')) [auth, rest] = d.split('@'); else return {error:true}; }
-      const [method, ...pwParts] = atob(auth).split(':');
-      const [addr, port] = rest.split(':');
-      return { proto: 'ss', raw: line, method, uuid: pwParts.join(':'), address: addr, port: parseInt(port), remark };
-    }
-    return {error:true};
-  } catch(e) { return {error:true}; }
+function slugTag(s){const r=s.trim().replace(/\s+/g,'-').replace(/[^\p{L}\p{N}_-]/gu,'').slice(0,42);return r||null;}
+function assignTags(){
+  const s=getSettings(),used=new Set();
+  nodes.forEach((n,i)=>{
+    let t;
+    if(s.autoTag&&n.remark){t=s.prefix+slugTag(n.remark);}else{t=s.prefix+(i+1);}
+    let base=t,k=2;while(used.has(t)){t=base+'-'+k++;}
+    used.add(t);n.tag=t;
+  });
 }
-
-function detectCountry(remark) {
-  if(!remark) return '🌐';
-  const r = remark.toUpperCase();
-  const flags = { 'IR':'🇮🇷', 'DE':'🇩🇪', 'US':'🇺🇸', 'NL':'🇳🇱', 'GB':'🇬🇧', 'FR':'🇫🇷', 'JP':'🇯🇵', 'SG':'🇸🇬', 'TR':'🇹🇷', 'CA':'🇨🇦', 'FI':'🇫🇮' };
-  for(const [k,f] of Object.entries(flags)) if(r.includes(k)) return f;
-  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u); return emoji ? emoji[0] : '🌐';
-}
-
-function analyzeInput(){
-  const raw = $('inputLinks').value.trim();
-  const text = resolveInput(raw);
-  const lines = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  
-  nodes = []; invalidCount = 0;
-  
-  lines.forEach((ln, i) => {
-    const pr = parseNodeLine(ln);
-    if(pr.error) { invalidCount++; return; }
-    pr.id = 'node_' + i;
-    pr.flag = detectCountry(pr.remark);
+function parseAll(){
+  const raw=$('inputLinks').value.trim(),res=resolveInput(raw);
+  const lines=res.text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const keepLat={};nodes.forEach(o=>{keepLat[o.raw]=o.latency;});
+  nodes=[];invalidCount=0;
+  for(const ln of lines){
+    if(!ln.startsWith('vless://'))continue;
+    const pr=parseVlessLine(ln);
+    if(pr.error){invalidCount++;continue;}
+    pr.index=nodes.length+1;
+    if(keepLat[ln]!==undefined)pr.latency=keepLat[ln];
     nodes.push(pr);
-  });
-
-  $('statLines').textContent = faNum(lines.length);
-  $('statValid').textContent = faNum(nodes.length);
-  $('statInvalid').textContent = faNum(invalidCount);
-  
-  renderNodes();
-  $('finalCount').textContent = faNum(nodes.length);
-  if(nodes.length > 0) $('stickyBar').style.display = 'flex';
-  else $('stickyBar').style.display = 'none';
+  }
+  assignTags();
+  return{lines:lines.length,b64:res.b64};
 }
 
-/** NODE RENDERING **/
+/* ═════════ live analyze ═════════ */
+function analyze(){
+  const info=parseAll();
+  $('statLines').textContent=faNum(info.lines);
+  $('statValid').textContent=faNum(nodes.length);
+  $('statInvalid').textContent=faNum(invalidCount);
+  $('statB64').textContent=info.b64?'فعال ✓':'—';
+  $('nodesCount').innerHTML=faNum(nodes.length)+' معتبر'+(invalidCount?' <span class="bad">/ '+faNum(invalidCount)+' نامعتبر</span>':'');
+  renderNodes();renderStats();persistDeb();
+}
+
+/* ═════════ nodes UI ═════════ */
+function visibleNodes(){
+  let arr=[...nodes];
+  const q=$('nodeSearch').value.trim().toLowerCase(),f=$('nodeFilter').value;
+  if(q)arr=arr.filter(n=>((n.remark||'')+' '+n.address).toLowerCase().includes(q));
+  if(f.startsWith('net:'))arr=arr.filter(n=>n.network===f.slice(4));
+  else if(f.startsWith('sec:'))arr=arr.filter(n=>n.security===f.slice(4));
+  const sv=$('nodeSort').value,pv=n=>n.latency===undefined?1e9:(n.latency<0?1e8:n.latency);
+  if(sv==='ping')arr.sort((a,b)=>pv(a)-pv(b));
+  else if(sv==='name')arr.sort((a,b)=>(a.remark||a.address).localeCompare(b.remark||b.address,'fa'));
+  else if(sv==='port')arr.sort((a,b)=>a.port-b.port);
+  else arr.sort((a,b)=>a.index-b.index);
+  return arr;
+}
 function renderNodes(){
-  const list = $('nodeList');
-  const q = $('nodeSearch').value.toLowerCase();
-  
-  const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
-  
-  if(!filtered.length) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">گره‌ای مطابق فیلتر یافت نشد.</div>';
-    return;
-  }
-  
-  list.innerHTML = filtered.map((n, index) => {
-    const uriSafe = encodeURIComponent(n.raw);
-    return `
-    <div class="node-card">
-      <div class="node-head">
-        <span class="node-flag">${n.flag}</span>
-        <span class="badge" style="border-color:var(--cyan); color:var(--cyan)">${n.proto.toUpperCase()}</span>
-      </div>
-      <div class="node-remark" title="${escHtml(n.remark)}">${escHtml(n.remark||n.address)}</div>
-      <div class="node-meta">
-        <span class="badge">${n.address}:${n.port}</span>
-        <span class="badge b-${n.network||'tcp'}">${(n.network||'tcp').toUpperCase()}</span>
-        ${n.security==='tls'?'<span class="badge b-tls">TLS</span>':''}
-        ${n.security==='reality'?'<span class="badge b-reality">REALITY</span>':''}
-      </div>
-      <div class="node-actions" style="margin-top:6px;">
-        <button class="primary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 نمـایش QR</button>
-        <button class="danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeNode('${n.id}')">🗑</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function removeNode(id) { 
-  nodes = nodes.filter(n => n.id !== id); 
-  renderNodes(); 
-  $('finalCount').textContent = faNum(nodes.length);
-  if(nodes.length === 0) $('stickyBar').style.display = 'none';
-}
-
-$('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 500); });
-$('nodeSearch').addEventListener('input', renderNodes);
-$('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; analyzeInput(); });
-
-/** DNS PING TESTER (No-CORS) **/
-const dnsURLs = {
-  'Cloudflare': 'https://cloudflare-dns.com/dns-query', 'Google': 'https://dns.google/resolve', 'Quad9': 'https://dns.quad9.net/dns-query',
-  'Shecan': 'https://shecan.ir/favicon.ico', 'Electro': 'https://electrotm.org/favicon.ico', 'Radar': 'https://radar.game/favicon.ico'
-};
-async function testDnsPings() {
-  const btn = $('btnPingDns'); btn.textContent = '⏳ ...'; btn.disabled = true;
-  const promises = Object.keys(dnsURLs).map(async (key) => {
-    const start = Date.now();
-    try {
-      const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 3500);
-      await fetch(dnsURLs[key] + "?t=" + start, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-      clearTimeout(timeoutId); const ping = Date.now() - start;
-      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
-      if(opt) opt.textContent = `${key} (${ping<150?'🟢':(ping<300?'🟡':'🟠')} ${ping}ms)`;
-    } catch (e) {
-      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
-      if(opt) opt.textContent = `${key} (❌ مسدود)`;
-    }
+  const list=$('nodesList');list.innerHTML='';
+  const arr=visibleNodes(),slice=arr.slice(0,shownCount);
+  if(!arr.length){list.innerHTML='<div class="empty-note">'+(nodes.length?'هیچ گره‌ای با این فیلتر پیدا نشد.':'هنوز لینکی پردازش نشده — ورودی را وارد کنید تا گره‌ها زنده فهرست شوند.')+'</div>';}
+  slice.forEach(n=>{
+    const chip=document.createElement('div');chip.className='chip';
+    const netCls={ws:'b-ws',grpc:'b-grpc',tcp:'b-tcp',h2:'b-h2',http:'b-h2',httpupgrade:'b-tcp'}[n.network]||'b-none';
+    const secCls={tls:'b-tls',reality:'b-reality',none:'b-none'}[n.security]||'b-none';
+    let pingHtml='';
+    if(testing&&n.latency===undefined)pingHtml='<span class="badge b-none">…</span>';
+    else if(n.latency!==undefined)pingHtml=n.latency<0?'<span class="badge b-ping bad">✕ تایم‌اوت</span>':'<span class="badge b-ping'+(n.latency<300?'':(n.latency<800?' mid':' bad'))+'">'+faNum(n.latency)+'ms</span>';
+    chip.innerHTML='<span class="chip-idx">'+faNum(n.index)+'</span>'+
+      '<span class="chip-name">'+escHtml(n.remark||n.address)+'</span>'+
+      '<span class="chip-addr">'+escHtml(n.address+':'+n.port)+'</span>'+
+      '<span class="badge '+netCls+'">'+escHtml(n.network)+'</span>'+
+      '<span class="badge '+secCls+'">'+escHtml(n.security)+'</span>'+pingHtml;
+    chip.addEventListener('click',()=>openModal(n));
+    list.appendChild(chip);
   });
-  await Promise.allSettled(promises);
-  btn.textContent = '📡 تست DNS'; btn.disabled = false; toast('تست پینگ سرورهای DNS تمام شد.');
+  const more=$('btnMore');
+  if(arr.length>shownCount){more.classList.remove('hidden');more.textContent='نمایش '+faNum(Math.min(120,arr.length-shownCount))+' گره دیگر ('+faNum(arr.length-shownCount)+' باقی‌مانده)';}
+  else more.classList.add('hidden');
 }
+$('btnMore').addEventListener('click',()=>{shownCount+=120;renderNodes();});
+['nodeSearch','nodeFilter','nodeSort'].forEach(id=>$(id).addEventListener('input',renderNodes));
 
-/** TEMP FILE SYSTEM **/
-let tempFileTimer = null;
-let tempFileInterval = null;
-
-function startTempFileTimer(durationMinutes = 5) {
-  const expireTime = Date.now() + durationMinutes * 60 * 1000;
-  localStorage.setItem('sc_temp_expire', expireTime.toString());
-  $('tempFileStatus').style.display = 'flex';
-  
-  clearInterval(tempFileInterval);
-  tempFileInterval = setInterval(() => {
-    const now = Date.now();
-    const left = expireTime - now;
-    if (left <= 0) deleteTempFile(true);
-    else {
-      const mins = Math.floor(left / 60000).toString().padStart(2, '0');
-      const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
-      $('tempTime').textContent = `${mins}:${secs}`;
-    }
-  }, 1000);
-}
-
-function deleteTempFile(isAuto = false) {
-  clearInterval(tempFileInterval);
-  $('tempFileStatus').style.display = 'none';
-  localStorage.removeItem('sc_temp_expire');
-  $('inputLinks').value = '';
-  analyzeInput();
-  if(isAuto) toast("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت پاک شد.", 'warn');
-}
-
-/** FETCH FROM URL **/
-$('btnFetch').addEventListener('click', async () => {
-  const url = $('subUrl').value.trim(); if(!url) return toast('آدرس ساب‌اسکریپشن خالی است', 'warn');
-  const btn = $('btnFetch'); btn.textContent = '⏳ در حال دریافت...'; btn.disabled = true;
-  
-  const proxies = [
-    '', 
-    'https://api.allorigins.win/raw?url=',
-    'https://api.codetabs.com/v1/proxy?quest=',
-    'https://corsproxy.io/?'
-  ];
-
-  let success = false;
-
-  for (let proxy of proxies) {
-    try {
-      const fetchUrl = proxy ? proxy + encodeURIComponent(url) : url;
-      let res = await fetch(fetchUrl);
-      if (!res.ok) continue; 
-      
-      let text = await res.text();
-      if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html') && !text.trim().toLowerCase().startsWith('<!doctype')) {
-        $('inputLinks').value = text;
-        analyzeInput();
-        startTempFileTimer(5);
-        toast('ساب‌اسکریپشن به درستی دریافت شد ✓');
-        success = true;
-        break; 
-      }
-    } catch (err) { }
-  }
-
-  if (!success) toast('دریافت با خطا مواجه شد. لطفاً متن ساب را دستی پیست کنید.', 'err');
-  btn.textContent = '⬇ دریافت'; btn.disabled = false;
-});
-
-function pasteFromClipboard() {
-  navigator.clipboard.readText().then(text => { $('inputLinks').value = text; analyzeInput(); toast('پیست شد ✓'); }).catch(() => toast('دسترسی به کلیپ‌بورد برای مرورگر فعلی محدود است.', 'err'));
-}
-
-/** ═════ THE CORE: GENERATORS (Xray, Sing-Box, Clash) ═════ **/
-function getSettings() {
-  return {
-    prefix: $('prefix').value.trim()||'proxy-', mux: $('swMux').checked, allowInsecure: $('swInsecure').checked,
-    dns: DNS_PRESETS[$('dnsPreset').value] || DNS_PRESETS.Cloudflare,
-    inbound: { socksPort: parseInt($('socksPort').value)||10808, httpPort: parseInt($('httpPort').value)||10809 },
-    obs: { enabled: $('swObs').checked, strategy: $('obsStrategy').value, probe: PROBES[$('probeSel').value]||PROBES.gstatic, interval: $('obsInterval').value },
-    routing: { blockAds: $('swAds').checked, directIR: $('swIR').checked, blockQuic: $('swQuic').checked, directPrivate: $('swPriv').checked }
-  };
-}
-
-function buildXray(list, s) {
-  const rules = [];
-  if(s.routing.blockQuic) rules.push({network:'udp', outboundTag:'block', port:'443', type:'field'});
-  rules.push({balancerTag:'proxy-round', domain:['geosite:google'], type:'field'});
-  
-  if(s.routing.directPrivate) {
-     rules.push({ip:['geoip:private'], outboundTag:'direct', type:'field'});
-     rules.push({domain:['geosite:private'], outboundTag:'direct', type:'field'});
-  }
-  if(s.routing.directIR) {
-     rules.push({ip:['geoip:cn','geoip:ir'], outboundTag:'direct', type:'field'});
-     rules.push({domain:['geosite:cn'], outboundTag:'direct', type:'field'});
-  }
-  
-  rules.push({inboundTag:['domestic-dns'], outboundTag:'direct', type:'field'});
-  rules.push({balancerTag:'proxy-round', inboundTag:['dns-module'], type:'field'});
-  rules.push({balancerTag:'proxy-round', network:'tcp,udp', type:'field'});
-
-  const primaryDns = s.dns[0] || "1.1.1.1";
-
-  const outbounds = list.map((n, i) => {
-    const ob = { 
-      mux: { concurrency: s.mux ? 8 : -1, enabled: !!s.mux },
-      protocol: n.proto, 
-      settings: {}, 
-      streamSettings: { network: n.network||'tcp', security: n.security||'none' },
-      tag: s.prefix + (i + 1)
-    };
-    
-    if(n.proto === 'vless'){
-      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ encryption: "none", id: n.uuid, level: 8 }] }];
-      if(n.flow) ob.settings.vnext[0].users[0].flow = n.flow;
-      
-      if(n.security === 'reality') {
-         ob.streamSettings.realitySettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", publicKey: n.pbk, shortId: n.sid, spiderX: n.spx };
-      } else if (n.security === 'tls') {
-         ob.streamSettings.tlsSettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp||"chrome", alpn: n.alpn.length?n.alpn:["http/1.1"] };
-      }
-      if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
-      else if(n.network === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.serviceName||'grpc' };
-    } 
-    else if(n.proto === 'vmess'){
-      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, alterId: 0, level: 8 }] }];
-      if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp||"chrome" };
-      if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
-    }
-    else if(n.proto === 'trojan'){
-      ob.settings.servers = [{ address: n.address, port: n.port, password: n.uuid, level: 8 }];
-      if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp||"chrome" };
-      if(n.network === 'ws') ob.streamSettings.wsSettings = { headers: {Host: n.host||n.sni||n.address}, path: n.path||"/" };
-    }
-    else if(n.proto === 'ss'){ ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.uuid, level: 8 }]; }
-    
-    return ob;
+/* ═════════ stats ═════════ */
+function flagCC(s){const m=String(s).match(/[\u{1F1E6}-\u{1F1FF}]{2}/u);if(!m)return null;return String.fromCodePoint(...[...m[0]].map(c=>c.codePointAt(0)-0x1F1E6+65));}
+function barBlock(title,map,cls){
+  const total=Object.values(map).reduce((a,b)=>a+b,0)||1;
+  let h='<div class="stat-col"><h4>'+title+'</h4>';
+  Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(([k,v])=>{
+    h+='<div class="bar-row"><span class="bl">'+escHtml(k)+'</span><span class="bar-track"><span class="bar-fill '+cls+'" style="width:'+Math.round(v/total*100)+'%"></span></span><span class="bv">'+faNum(v)+'</span></div>';
   });
+  return h+'</div>';
+}
+function renderStats(){
+  const nets={},secs={},ccs={};
+  nodes.forEach(n=>{nets[n.network]=(nets[n.network]||0)+1;secs[n.security]=(secs[n.security]||0)+1;const cc=flagCC(n.remark);if(cc)ccs[cc]=(ccs[cc]||0)+1;});
+  const lat=nodes.filter(n=>n.latency>0).map(n=>n.latency);
+  const avg=lat.length?Math.round(lat.reduce((a,b)=>a+b,0)/lat.length):null;
+  let h='';
+  if(Object.keys(nets).length)h+=barBlock('پروتکل اتصال',nets,'');
+  if(Object.keys(secs).length)h+=barBlock('لایه امنیت',secs,'f2');
+  if(Object.keys(ccs).length)h+=barBlock('کشورها (از Remark)',ccs,'f3');
+  h+='<div class="stat-col"><h4>خلاصه</h4>'+
+     '<div class="bar-row"><span class="bl">ports</span><span style="color:var(--mut)">رایج‌ترین: '+escHtml(String(mode(nodes.map(n=>n.port))||'—'))+'</span></div>'+
+     '<div class="bar-row"><span class="bl">ping avg</span><span style="color:var(--mut)">'+(avg!==null?faNum(avg)+' ms':'تست نشده')+'</span></div>'+
+     '<div class="bar-row"><span class="bl">tested</span><span style="color:var(--mut)">'+faNum(nodes.filter(n=>n.latency!==undefined).length)+' / '+faNum(nodes.length)+'</span></div></div>';
+  $('statsStrip').innerHTML=h||'<div class="empty-note">داده‌ای برای تحلیل وجود ندارد.</div>';
+  function mode(a){const m={};let best=null; a.forEach(x=>{m[x]=(m[x]||0)+1;if(!best||m[x]>m[best])best=x;});return best;}
+}
 
-  const dnsHosts = {
-    "domain:googleapis.cn": "googleapis.com",
-    "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
-    "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
-    "dns.cloudflare.com": ["104.16.132.229", "104.16.133.229", "2606:4700::6810:84e5", "2606:4700::6810:85e5"],
-    "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"]
-  };
-
-  const cfg = {
-    dns: {
-      hosts: dnsHosts,
-      servers: [
-        primaryDns,
-        { address: primaryDns, domains: ["geosite:google"] },
-        { address: "223.5.5.5", domains: ["domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "geosite:cn"], expectIPs: ["geoip:cn"], skipFallback: true, tag: "domestic-dns" }
-      ],
-      tag: "dns-module"
-    },
-    inbounds: [
-      { listen: '127.0.0.1', port: s.inbound.socksPort, protocol: 'socks', settings: { auth: "noauth", udp: true, userLevel: 8 }, sniffing: { destOverride: ['http','tls'], enabled: true, routeOnly: false }, tag: 'socks' },
-      { listen: '127.0.0.1', port: s.inbound.httpPort, protocol: 'http', tag: 'http-in' }
-    ],
-    log: { loglevel: "warning" },
-    observatory: { enableConcurrency: true, probeInterval: s.obs.interval, probeUrl: s.obs.probe, subjectSelector: [s.prefix] },
-    outbounds: [...outbounds, {protocol:'freedom', settings:{domainStrategy:"UseIP"}, tag:'direct'}, {protocol:'blackhole', settings:{response:{type:"http"}}, tag:'block'}],
-    policy: { levels: { "8": { connIdle: 300, downlinkOnly: 1, handshake: 4, uplinkOnly: 1 } }, system: { statsOutboundDownlink: true, statsOutboundUplink: true } },
-    remarks: "V⇢X Intelligent Config",
-    routing: { balancers: [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }], domainStrategy: 'AsIs', rules: rules },
-    stats: {}
-  };
-  
-  if(!s.obs.enabled) delete cfg.observatory;
-  
+/* ═════════ generators ═════════ */
+function probeUrlOf(s){return s.obs.probe==='custom'?(s.obs.customProbe||PROBES.gstatic):PROBES[s.obs.probe];}
+function dnsServersOf(s){const pr=DNS_PRESETS[s.dns.preset];return pr?[...pr]:[s.dns.custom1||'1.1.1.1',s.dns.custom2].filter(Boolean);}
+function buildDns(s){const srv=dnsServersOf(s),main=srv[0];return{
+  hosts:{'domain:googleapis.cn':'googleapis.com','dns.google':['8.8.8.8','8.8.4.4','2001:4860:4860::8888'],'dns.cloudflare.com':['104.16.132.229','104.16.133.229'],'one.one.one.one':['1.1.1.1','1.0.0.1']},
+  servers:[main,{address:main,domains:['geosite:google']},{address:'223.5.5.5',domains:['domain:alidns.com','domain:doh.pub','geosite:cn'],expectIPs:['geoip:cn'],skipFallback:true,tag:'domestic-dns'}],
+  tag:'dns-module'};}
+function xrayOutbound(n,s){
+  const user={encryption:'none',id:n.uuid,level:8};if(n.flow)user.flow=n.flow;
+  const o={mux:{concurrency:s.mux?8:-1,enabled:s.mux},protocol:'vless',
+    settings:{vnext:[{address:n.address,port:n.port,users:[user]}]},
+    streamSettings:{network:n.network},tag:n.tag};
+  const ss=o.streamSettings;
+  if(n.network==='ws'){const w={headers:{}};if(n.host)w.headers.Host=n.host;if(n.path)w.path=n.path;ss.wsSettings=w;}
+  else if(n.network==='grpc')ss.grpcSettings={serviceName:n.serviceName||'grpc',multiMode:false};
+  else if(n.network==='h2'||n.network==='http')ss.httpSettings={host:n.host?[n.host]:[],path:n.path};
+  else if(n.network==='httpupgrade'){const h={};if(n.host)h.host=n.host;if(n.path)h.path=n.path;ss.httpupgradeSettings=h;}
+  else if(n.network==='tcp'&&n.headerType==='http')ss.tcpSettings={header:{type:'http',request:{headers:n.host?{Host:[n.host]}:{},path:[n.path]}}};
+  if(n.security==='tls'){ss.security='tls';const t={allowInsecure:s.allowInsecure,show:false};if(n.sni)t.serverName=n.sni;if(n.fp)t.fingerprint=n.fp;if(n.alpn.length)t.alpn=n.alpn;ss.tlsSettings=t;}
+  else if(n.security==='reality'){ss.security='reality';const r={show:false};if(n.sni)r.serverName=n.sni;if(n.fp)r.fingerprint=n.fp;if(n.pbk)r.publicKey=n.pbk;if(n.sid)r.shortId=n.sid;if(n.spx)r.spiderX=n.spx;ss.realitySettings=r;}
+  return o;
+}
+function linesOf(v){return String(v||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);}
+function buildXray(list,s){
+  const rules=[];
+  if(s.routing.blockQuic)rules.push({network:'udp',port:'443',outboundTag:'block',type:'field'});
+  if(s.routing.blockAds)rules.push({domain:['geosite:category-ads-all'],outboundTag:'block',type:'field'});
+  rules.push({balancerTag:'proxy-round',domain:['geosite:google'],type:'field'});
+  if(s.routing.directPrivate){rules.push({ip:['geoip:private'],outboundTag:'direct',type:'field'});rules.push({domain:['geosite:private'],outboundTag:'direct',type:'field'});}
+  if(s.routing.directIR){rules.push({ip:['geoip:cn','geoip:ir'],outboundTag:'direct',type:'field'});rules.push({domain:['geosite:cn'],outboundTag:'direct',type:'field'});}
+  const cb=linesOf(s.routing.customBlock);if(cb.length)rules.push({domain:cb,outboundTag:'block',type:'field'});
+  const cd=linesOf(s.routing.customDirect);if(cd.length)rules.push({domain:cd,outboundTag:'direct',type:'field'});
+  rules.push({inboundTag:['domestic-dns'],outboundTag:'direct',type:'field'});
+  rules.push({balancerTag:'proxy-round',inboundTag:['dns-module'],type:'field'});
+  rules.push({balancerTag:'proxy-round',network:'tcp,udp',type:'field'});
+  const inbounds=[{listen:'127.0.0.1',port:s.inbound.socksPort,protocol:'socks',settings:{auth:'noauth',udp:s.inbound.udp,userLevel:8},sniffing:{destOverride:['http','tls'],enabled:true,routeOnly:false},tag:'socks'}];
+  if(s.inbound.httpEnabled)inbounds.push({listen:'127.0.0.1',port:s.inbound.httpPort,protocol:'http',settings:{userLevel:8},tag:'http'});
+  const cfg={dns:buildDns(s),inbounds,log:{loglevel:s.logLevel},
+    outbounds:list.map(n=>xrayOutbound(n,s)),
+    policy:{levels:{'8':{connIdle:300,downlinkOnly:1,handshake:4,uplinkOnly:1}},system:{statsOutboundDownlink:true,statsOutboundUplink:true}},
+    remarks:'javidsub Intelligent Selection',
+    routing:{balancers:[{selector:[s.prefix],strategy:{type:s.obs.strategy},tag:'proxy-round'}],domainStrategy:'AsIs',rules},stats:{}};
+  if(s.obs.enabled)cfg.observatory={enableConcurrency:true,probeInterval:s.obs.interval,probeUrl:probeUrlOf(s),subjectSelector:[s.prefix]};
+  cfg.outbounds.push({protocol:'freedom',settings:{domainStrategy:'UseIP'},tag:'direct'});
+  cfg.outbounds.push({protocol:'blackhole',settings:{response:{type:'http'}},tag:'block'});
   return cfg;
 }
-
-function buildSingBox(list, s) {
-  const tags = list.map((n,i) => s.prefix + (i+1));
-  const outbounds = list.map((n,i) => {
-    const ob = { type: n.proto, tag: s.prefix + (i+1), server: n.address, server_port: n.port };
-    if(n.proto === 'vless' || n.proto === 'vmess') ob.uuid = n.uuid;
-    if(n.proto === 'trojan') ob.password = n.uuid;
-    if(n.proto === 'ss') { ob.method = n.method; ob.password = n.uuid; }
-    
-    if(n.flow) ob.flow = n.flow;
-    if(n.security === 'tls' || n.security === 'reality') {
-      ob.tls = { enabled: true, server_name: n.sni, insecure: s.allowInsecure };
-      if(n.security === 'reality') ob.tls.reality = { enabled: true, public_key: n.pbk, short_id: n.sid };
-      if(n.fp) ob.tls.utls = { enabled: true, fingerprint: n.fp };
-    }
-    if(n.network === 'ws') ob.transport = { type: 'ws', path: n.path||'/', headers: {Host: n.host||n.sni||n.address} };
-    else if(n.network === 'grpc') ob.transport = { type: 'grpc', service_name: n.serviceName||'grpc' };
-    return ob;
-  });
-
-  return {
-    log: { level: "warn" },
-    dns: { servers: [{ address: s.dns[0], tag: 'dns-main' }], rules: [{ outbound: 'any', server: 'dns-main' }] },
-    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: s.inbound.socksPort }],
-    outbounds: [
-      ...outbounds,
-      { type: 'urltest', tag: 'auto', outbounds: tags, url: s.obs.probe, interval: s.obs.interval },
-      { type: 'direct', tag: 'direct' }, { type: 'block', tag: 'block' }
+function buildSingBox(list,s){
+  const tags=list.map(n=>n.tag),main=dnsServersOf(s)[0],sec=intervalSec(s.obs.interval);
+  return{
+    log:{level:s.logLevel==='none'?'panic':(s.logLevel==='warning'?'warn':s.logLevel)},
+    dns:{servers:[{tag:'dns-main',address:main}],rules:[{outbound:'any',server:'dns-main'}]},
+    inbounds:[{type:'mixed',tag:'mixed-in',listen:'127.0.0.1',listen_port:s.inbound.socksPort,sniff:true}],
+    outbounds:[
+      ...list.map(n=>{
+        const o={type:'vless',tag:n.tag,server:n.address,port:n.port,uuid:n.uuid};
+        if(n.flow)o.flow=n.flow;
+        if(n.security==='tls'||n.security==='reality'){
+          o.tls={enabled:true};if(n.sni)o.tls.server_name=n.sni;
+          if(n.fp)o.tls.utls={enabled:true,fingerprint:n.fp};
+          if(n.security==='tls'&&s.allowInsecure)o.tls.insecure=true;
+          if(n.security==='reality'){o.tls.reality={enabled:true};if(n.pbk)o.tls.reality.public_key=n.pbk;if(n.sid)o.tls.reality.short_id=n.sid;}
+        }
+        if(n.network==='ws')o.transport={type:'ws',path:n.path,headers:n.host?{Host:n.host}:undefined};
+        else if(n.network==='grpc')o.transport={type:'grpc',service_name:n.serviceName||'grpc'};
+        else if(n.network==='h2'||n.network==='http')o.transport={type:'http',path:n.path,host:n.host?[n.host]:undefined};
+        else if(n.network==='httpupgrade')o.transport={type:'httpupgrade',host:n.host||undefined,path:n.path};
+        return o;
+      }),
+      {type:'urltest',tag:'auto',outbounds:tags,url:probeUrlOf(s),interval:sec+'s'},
+      {type:'direct',tag:'direct'},{type:'block',tag:'block'}
     ],
-    route: { rules: [
-      { protocol: 'dns', outbound: 'direct' },
-      ...(s.routing.blockAds ? [{ rule_set: 'geosite-category-ads-all', outbound: 'block' }] : []),
-      ...(s.routing.directIR ? [{ rule_set: ['geoip-ir', 'geosite-ir'], outbound: 'direct' }] : []),
-      { network: 'udp', port: 443, outbound: 'block' }
-    ], final: 'auto' }
+    route:{rules:[
+      {protocol:'dns',outbound:'dns-out'},{ip_is_private:true,outbound:'direct'},
+      ...(s.routing.blockAds?[{rule_set:'geosite-category-ads-all',outbound:'block'}]:[]),
+      ...(s.routing.directIR?[{rule_set:['geoip-cn','geosite-cn','geoip-ir'],outbound:'direct'}]:[]),
+      {network:'udp',port:443,outbound:'block'}],
+      rule_set:[{type:'remote',tag:'geosite-category-ads-all',url:'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs'},
+        {type:'remote',tag:'geoip-cn',url:'https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs'},
+        {type:'remote',tag:'geosite-cn',url:'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs'},
+        {type:'remote',tag:'geoip-ir',url:'https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-ir.srs'}],
+      final:'auto'}
   };
 }
-
-function buildClash(list, s) {
-  const L = []; const p = x => L.push(x);
-  p('mixed-port: ' + s.inbound.socksPort); p('mode: rule'); p('allow-lan: false');
-  p('dns:\n  enable: true\n  enhanced-mode: fake-ip\n  nameserver:\n    - '+s.dns[0]);
-  p('proxies:');
-  list.forEach((n,i) => {
-    const tag = s.prefix + (i+1);
-    p('  - name: "'+tag+'"\n    type: '+n.proto+'\n    server: '+n.address+'\n    port: '+n.port+'\n    '+(n.proto==='ss'?'password':'uuid')+': "'+n.uuid+'"');
-    if(n.proto==='vless') p('    network: '+(n.network==='grpc'?'grpc':(n.network==='ws'?'ws':'tcp')));
-    if(n.flow) p('    flow: '+n.flow);
-    if(n.security==='tls' || n.security==='reality'){
-      p('    tls: true\n    servername: "'+n.sni+'"');
-      if(s.allowInsecure) p('    skip-cert-verify: true');
-      if(n.security==='reality') p('    reality-opts:\n      public-key: '+n.pbk+(n.sid?'\n      short-id: '+n.sid:''));
+function intervalSec(v){return{['1m']:60,['3m']:180,['5m']:300,['10m']:600,['30m']:1800}[v]||180;}
+function buildClash(list,s){
+  const q=v=>"'"+String(v).replace(/'/g,"''")+"'",L=[],push=x=>L.push(x);
+  push('mixed-port: 7890');push('allow-lan: false');push('mode: rule');
+  push('log-level: '+(s.logLevel==='none'?'silent':s.logLevel));push('udp: '+(s.inbound.udp?'true':'false'));
+  push('dns:');push('  enable: true');push('  enhanced-mode: fake-ip');
+  push('  nameserver:');dnsServersOf(s).forEach(d=>push('    - '+d));
+  push('proxies:');
+  list.forEach(n=>{
+    push('  - name: '+q(n.tag));push('    type: vless');push('    server: '+q(n.address));
+    push('    port: '+n.port);push('    uuid: '+q(n.uuid));
+    push('    network: '+(n.network==='httpupgrade'?'ws':(n.network==='h2'?'http':n.network)));
+    push('    udp: true');
+    if(n.flow)push('    flow: '+q(n.flow));
+    if(n.security==='tls'||n.security==='reality'){
+      push('    tls: true');if(n.sni)push('    servername: '+q(n.sni));
+      if(n.fp)push('    client-fingerprint: '+q(n.fp));
+      if(n.security==='tls'&&s.allowInsecure)push('    skip-cert-verify: true');
+      if(n.security==='reality'){push('    reality-opts:');if(n.pbk)push('      public-key: '+q(n.pbk));if(n.sid)push('      short-id: '+q(n.sid));}
     }
-    if(n.network==='ws') p('    ws-opts:\n      path: "'+(n.path||'/')+'"'+'\n      headers:\n        Host: '+(n.host||n.sni||n.address));
-    else if(n.network==='grpc') p('    grpc-opts:\n      grpc-service-name: "'+(n.serviceName||'grpc')+'"');
+    if(n.network==='ws'){push('    ws-opts:');push('      path: '+q(n.path));if(n.host){push('      headers:');push('        Host: '+q(n.host));}}
+    else if(n.network==='grpc'){push('    grpc-opts:');push('      grpc-service-name: '+q(n.serviceName||'grpc'));}
+    else if(n.network==='h2'||n.network==='http'){push('    h2-opts:');push('      path: '+q(n.path));if(n.host)push('      host:');push('        - '+q(n.host));}
+    else if(n.network==='httpupgrade'){push('    httpupgrade-opts:');push('      path: '+q(n.path));if(n.host)push('      host: '+q(n.host));}
   });
-  p('proxy-groups:\n  - name: AUTO\n    type: url-test\n    url: '+s.obs.probe+'\n    interval: 180\n    proxies:');
-  list.forEach((n,i) => p('      - "'+(s.prefix + (i+1))+'"'));
-  p('rules:');
-  if(s.routing.blockAds) p('  - GEOSITE,category-ads-all,REJECT');
-  if(s.routing.directIR) { p('  - GEOIP,IR,DIRECT'); p('  - GEOSITE,IR,DIRECT'); }
-  if(s.routing.directPrivate) p('  - GEOSITE,private,DIRECT');
-  p('  - MATCH,AUTO');
+  const tags=list.map(n=>q(n.tag));
+  push('proxy-groups:');
+  push('  - name: AUTO');push('    type: url-test');push('    url: '+probeUrlOf(s));
+  push('    interval: '+intervalSec(s.obs.interval));push('    proxies:');tags.forEach(t=>push('      - '+t));
+  push('  - name: SELECT');push('    type: select');push('    proxies:');push('      - AUTO');push('      - DIRECT');
+  push('rules:');
+  if(s.routing.blockAds)push('  - GEOSITE,category-ads-all,REJECT');
+  if(s.routing.directIR){push('  - GEOIP,IR,DIRECT');push('  - GEOIP,CN,DIRECT');push('  - GEOSITE,cn,DIRECT');}
+  if(s.routing.directPrivate)push('  - GEOSITE,private,DIRECT');
+  linesOf(s.routing.customBlock).forEach(d=>push('  - '+d+',REJECT'));
+  linesOf(s.routing.customDirect).forEach(d=>push('  - '+d+',DIRECT'));
+  push('  - MATCH,SELECT');
   return L.join('\n');
 }
-
-/** DIFF WORKER **/
-function lcsLocal(a,b){
-  const n=a.length, m=b.length; if(n*m>4000000) return {tooBig:true};
-  const W=m+1, dp=new Uint32Array((n+1)*W);
-  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
-  const out=[]; let i=0, j=0;
-  while(i<n&&j<m){ if(a[i]===b[j]){ out.push([0,a[i]]); i++; j++; } else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){ out.push([-1,a[i]]); i++; } else { out.push([1,b[j]]); j++; } }
-  while(i<n) out.push([-1,a[i++]]); while(j<m) out.push([1,b[j++]]);
-  return {rows:out};
-}
-function renderDiff(){
-  const box=$('diffOut'), cur=textCache[curFmt]||'', prev=prevTexts[curFmt];
-  if(!cur){ box.innerHTML = '<span class="d-ctx">// خروجی فعلی خالی است</span>'; return; }
-  if(!prev){ box.innerHTML = '<span class="d-ctx">// برای مقایسه: تنظیمات را تغییر دهید و دوباره تولید کنید. <br> <span style="color:#86efac">سبز = اضافه شده</span> | <span style="color:#fda4af">قرمز = حذف شده</span></span>'; return; }
-  if(cur === prev){ box.innerHTML = '<span style="color:#86efac">✔ هیچ تغییری نسبت به نسخه قبل وجود ندارد.</span>'; return; }
-  const res = lcsLocal(prev.split('\n'), cur.split('\n'));
-  if(res.tooBig){ box.innerHTML='<span style="color:#f59e0b">⚠ حجم فایل برای مقایسه بیش از حد بزرگ است.</span>'; return; }
-  box.innerHTML = res.rows.slice(0, 4000).map(r => {
-    const t = escHtml(r[1])||'&nbsp;';
-    return r[0]===0 ? '<span class="d-ctx">  '+t+'</span>' : (r[0]===1 ? '<span class="d-add">+ '+t+'</span>' : '<span class="d-del">- '+t+'</span>');
-  }).join('');
-}
-
-/** GENERATE & RENDER **/
-function syntaxHighlight(str, fmt) {
-  let esc = escHtml(str);
-  if(fmt==='xray' || fmt==='singbox') return esc.replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g, m => {
-    return `<span class="${m.startsWith('"') ? (/"\s*:$/.test(m) ? 'tok-key' : 'tok-str') : (/[a-z]/.test(m) ? 'tok-bool' : 'tok-num')}">${m}</span>`;
-  });
-  if(fmt==='clash') return esc.replace(/^(\s*-\s)|^([A-Za-z][\w-]*:)|(\s{2,})([A-Za-z][\w-]*:)/gm, (m,a,b,i,d) => {
-    if(a) return `<span class="tok-bool">${a}</span>`; if(b) return `<span class="tok-key">${b}</span>`; return `${i}<span class="tok-key">${d}</span>`;
-  });
-  return `<span style="color:#86efac">${esc}</span>`;
-}
-
-function processGenerate() {
-  if(!nodes.length) return toast('ابتدا لینک ورودی را وارد کنید', 'warn');
-  const s = getSettings();
-  curFmt = $('fmtSel').value;
-  if(textCache[curFmt]) prevTexts[curFmt] = textCache[curFmt];
-  
-  try {
-    let outStr = '';
-    if(curFmt === 'xray') outStr = JSON.stringify(buildXray(nodes, s), null, 2);
-    else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(nodes, s), null, 2);
-    else if(curFmt === 'clash') outStr = buildClash(nodes, s);
-    else if(curFmt === 'v2rayn') outStr = encodeBase64Safe(nodes.map(n=>n.raw).join('\n'));
-    
-    textCache[curFmt] = outStr;
-    
-    $('prettyOut').innerHTML = syntaxHighlight(outStr, curFmt);
-    $('plainOut').value = outStr;
-    renderDiff();
-    
-    copyToClipboard(outStr, () => {
-      toast('کانفیگ ' + curFmt.toUpperCase() + ' تولید و در کلیپ‌بورد کپی شد ✓');
-    });
-    
-    // Auto scroll down for user logic tracking in small screens
-    if (window.innerWidth <= 850) $('fmtSel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  } catch(e) {
-    toast('خطایی در تولید کانفیگ پیش آمد. مجدداً ساب خود را وارد کنید.', 'err');
-    console.error(e);
+function buildByFmt(fmt){
+  const s=getSettings(),list=nodes.filter(n=>n.latency===undefined||n.latency>=0||!excludeOffline);
+  switch(fmt){
+    case 'xray':return JSON.stringify(buildXray(list,s),null,2);
+    case 'singbox':return JSON.stringify(buildSingBox(list,s),null,2);
+    case 'clash':return buildClash(list,s);
+    case 'v2rayn':return b64enc(list.map(n=>n.raw).join('\n'));
+    case 'uri':return list.map(n=>n.raw).join('\n');
   }
+  return '';
+}
+let excludeOffline=false;
+
+/* ═════════ highlight ═════════ */
+function escJ(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function highlight(text,fmt){
+  const e=escJ(text);
+  if(fmt==='xray'||fmt==='singbox'){
+    return e.replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,function(m){
+      let c='tok-num';if(m.startsWith('"'))c=/"\s*:$/.test(m)?'tok-key':'tok-str';else if(/[a-z]/.test(m))c='tok-bool';
+      return '<span class="'+c+'">'+m+'</span>';});
+  }
+  if(fmt==='clash')return e.replace(/^(\s*-\s)|^([A-Za-z][\w-]*:)|(\s{2,})([A-Za-z][\w-]*:)/gm,function(m,a,b,i,d){
+    if(a)return '<span class="tok-bool">'+a+'</span>';if(b)return '<span class="tok-key">'+b+'</span>';
+    return i+'<span class="tok-key">'+d+'</span>';});
+  return '<span style="color:#86efac">'+e+'</span>';
 }
 
-$('btnConvert').addEventListener('click', processGenerate);
-$('fmtSel').addEventListener('change', processGenerate);
+/* ═════════ convert & output ═════════ */
+function healthCheck(s){
+  const out=[];
+  nodes.forEach(n=>{
+    if(n.security==='none')out.push({lv:'warn',msg:'«'+(n.remark||n.address)+'» بدون رمزنگاری (security=none) است.'});
+    if(n.security==='tls'&&!n.sni)out.push({lv:'warn',msg:'«'+(n.remark||n.address)+'» از TLS بدون SNI استفاده می‌کند.'});
+    if(n.security==='reality'&&!n.pbk)out.push({lv:'err',msg:'«'+(n.remark||n.address)+'» Reality بدون کلید عمومی (pbk) است.'});
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(n.uuid))out.push({lv:'info',msg:'UUID «'+(n.remark||n.address)+'» قالب استاندارد ندارد.'});
+  });
+  const seen=new Set();nodes.forEach(n=>{const k=n.address+':'+n.port;if(seen.has(k))out.push({lv:'info',msg:'آدرس تکراری: '+k});seen.add(k);});
+  if(s.obs.strategy==='leastPing'&&!s.obs.enabled)out.push({lv:'warn',msg:'استراتژی leastPing بدون Observatory کارایی ندارد.'});
+  return out.slice(0,8);
+}
+function renderOutput(){
+  const text=textCache[curFmt]||'';
+  $('prettyOut').innerHTML=text?highlight(text,curFmt):'<span style="color:#334155">// خروجی اینجا نمایش داده می‌شود...</span>';
+  $('plainOut').value=text;
+  renderDiff();
+}
+function convert(){
+  const t0=performance.now();
+  parseAll();renderNodes();renderStats();
+  if(!nodes.length){toast('هیچ لینک vless معتبری پیدا نشد','warn');return;}
+  if(textCache[curFmt])prevTexts[curFmt]=textCache[curFmt];
+  const text=buildByFmt(curFmt);textCache[curFmt]=text;
+  const s=getSettings(),ms=Math.max(1,Math.round(performance.now()-t0));
+  $('sumCount').textContent=faNum(nodes.length);
+  $('sumSize').textContent=faNum((new Blob([text]).size/1024).toFixed(1))+' KB';
+  $('sumTime').textContent=faNum(ms)+' ms';
+  const warns=healthCheck(s);
+  $('sumHealth').textContent=warns.length?faNum(warns.length)+' هشدار':'تأیید شد ✓';
+  $('sumHealth').style.color=warns.length?'var(--amber)':'var(--green)';
+  const hb=$('healthBox');
+  if(warns.length){hb.classList.add('on');hb.innerHTML=warns.map(w=>'<div class="h-'+w.lv+'">'+escHtml(w.msg)+'</div>').join('');}
+  else hb.classList.remove('on');
+  $('sumBar').classList.add('on');
+  setTab('pretty');renderOutput();persist();
+  toast(faNum(nodes.length)+' گره با موفقیت به '+fmtName(curFmt)+' تبدیل شد');
+}
+function fmtName(f){return{xray:'Xray JSON',singbox:'Sing-Box',clash:'Clash Meta',v2rayn:'ساب Base64',uri:'فهرست URI'}[f];}
+$('btnConvert').addEventListener('click',convert);
+$('fmtSel').addEventListener('change',()=>{
+  curFmt=$('fmtSel').value;
+  if(nodes.length){const t=buildByFmt(curFmt);if(textCache[curFmt]&&textCache[curFmt]!==t)prevTexts[curFmt]=textCache[curFmt];textCache[curFmt]=t;renderOutput();$('sumBar').classList.add('on');$('sumCount').textContent=faNum(nodes.length);$('sumSize').textContent=faNum((new Blob([t]).size/1024).toFixed(1))+' KB';}
+  else renderOutput();
+});
 
-/** TABS **/
-function setTab(t) {
-  curTab = t;
-  ['Pretty','Plain','Diff'].forEach(k => $('tab'+k).classList.remove('active'));
-  $(t==='pretty'?'tabPretty':(t==='plain'?'tabPlain':'tabDiff')).classList.add('active');
-  $('prettyOut').classList.toggle('hidden', t!=='pretty');
-  $('plainOut').classList.toggle('hidden', t!=='plain');
-  $('diffOut').classList.toggle('hidden', t!=='diff');
+/* tabs */
+function setTab(t){curTab=t;
+  ['Pretty','Plain','Diff'].forEach(k=>{const b=$('tab'+k);if(b)b.classList.remove('active');});
+  ({pretty:'tabPretty',plain:'tabPlain',diff:'tabDiff'})[t]&&$(({pretty:'tabPretty',plain:'tabPlain',diff:'tabDiff'})[t]).classList.add('active');
+  $('prettyOut').classList.toggle('hidden',t!=='pretty');
+  $('plainOut').classList.toggle('hidden',t!=='plain');
+  $('diffOut').classList.toggle('hidden',t!=='diff');
 }
 $('tabPretty').addEventListener('click',()=>setTab('pretty'));
 $('tabPlain').addEventListener('click',()=>setTab('plain'));
 $('tabDiff').addEventListener('click',()=>setTab('diff'));
 
-/** APPLY TEMPLATES **/
-document.querySelectorAll('[data-tpl]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tpl = BUILTIN_TPLS[btn.dataset.tpl];
-    if(tpl.obs) { $('swObs').checked = tpl.obs.enabled!==false; $('obsStrategy').value = tpl.obs.strategy||'leastPing'; $('obsInterval').value = tpl.obs.interval||'3m'; }
-    if(tpl.routing) { $('swAds').checked = !!tpl.routing.blockAds; $('swQuic').checked = !!tpl.routing.blockQuic; $('swIR').checked = tpl.routing.directIR!==false; }
-    if(tpl.dns) $('dnsPreset').value = tpl.dns.preset;
-    if(tpl.proxy) $('swMux').checked = !!tpl.proxy.mux;
-    toast(`قالب «${btn.textContent}» با موفقیت اعمال شد.`);
+/* ═════════ diff (worker + fallback) ═════════ */
+const DIFF_SRC='self.onmessage=function(e){self.postMessage(lcs(e.data.a,e.data.b));};'+
+'function lcs(a,b){var n=a.length,m=b.length;if(n*m>4000000)return{tooBig:true};'+
+'var W=m+1,dp=new Uint32Array((n+1)*W),i,j;'+
+'for(i=n-1;i>=0;i--)for(j=m-1;j>=0;j--)dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);'+
+'var out=[];i=0;j=0;while(i<n&&j<m){if(a[i]===b[j]){out.push([0,a[i]]);i++;j++;}else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){out.push([-1,a[i]]);i++;}else{out.push([1,b[j]]);j++;}}'+
+'while(i<n)out.push([-1,a[i++]]);while(j<m)out.push([1,b[j++]]);return{rows:out};}';
+let diffWorker=null;
+try{diffWorker=new Worker(URL.createObjectURL(new Blob([DIFF_SRC],{type:'application/javascript'})));}catch(e){diffWorker=null;}
+function lcsLocal(a,b){const n=a.length,m=b.length;if(n*m>4000000)return{tooBig:true};const W=m+1,dp=new Uint32Array((n+1)*W);
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
+  const out=[];let i=0,j=0;
+  while(i<n&&j<m){if(a[i]===b[j]){out.push([0,a[i]]);i++;j++;}else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){out.push([-1,a[i]]);i++;}else{out.push([1,b[j]]);j++;}}
+  while(i<n)out.push([-1,a[i++]]);while(j<m)out.push([1,b[j++]]);return{rows:out};}
+function renderDiff(){
+  const box=$('diffOut'),cur=textCache[curFmt]||'',prev=prevTexts[curFmt];
+  if(!cur){box.innerHTML='<span style="color:#334155">// هنوز خروجی‌ای تولید نشده است.</span>';return;}
+  if(!prev){box.innerHTML='<span style="color:#334155">// برای مقایسه: پس از تولید، تنظیمات را تغییر دهید و دوباره «تولید کانفیگ» را بزنید.\n// <span style="color:#86efac">سبز = اضافه‌شده</span> — <span style="color:#fda4af">قرمز = حذف‌شده</span></span>';return;}
+  if(prev===cur){box.innerHTML='<span style="color:#86efac">✔ هیچ تغییری نسبت به نسخه قبل وجود ندارد.</span>';return;}
+  box.innerHTML='<span style="color:#334155">در حال محاسبه تفاوت‌ها...</span>';
+  const a=prev.split('\n'),b=cur.split('\n');
+  const draw=res=>{
+    if(res.tooBig){box.innerHTML='<span style="color:#fbbf24">⚠ فایل برای مقایسه خط‌به‌خط خیلی بزرگ است.</span>';return;}
+    const rows=res.rows.slice(0,4000);
+    box.innerHTML=rows.map(r=>{
+      const t=escHtml(r[1])||'&nbsp;';
+      return r[0]===0?'<span class="d-ctx">  '+t+'</span>':r[0]===1?'<span class="d-add">+ '+t+'</span>':'<span class="d-del">- '+t+'</span>';
+    }).join('')+(res.rows.length>4000?'\n<span style="color:#334155">... ('+faNum(res.rows.length-4000)+' خط دیگر)</span>':'');
+  };
+  if(diffWorker){const h=e=>{diffWorker.removeEventListener('message',h);draw(e.data);};diffWorker.addEventListener('message',h);diffWorker.postMessage({a,b});}
+  else setTimeout(()=>draw(lcsLocal(a,b)),30);
+}
+
+/* ═════════ copy / download / report ═════════ */
+async function copyResult(){
+  const t=textCache[curFmt];if(!t){toast('ابتدا خروجی تولید کنید','warn');return;}
+  try{await navigator.clipboard.writeText(t);toast('خروجی '+fmtName(curFmt)+' کپی شد ✓');}
+  catch(e){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('کپی شد ✓');}catch(_){toast('کپی ناموفق بود','err');}ta.remove();}
+}
+function downloadResult(){
+  const t=textCache[curFmt];if(!t){toast('ابتدا خروجی تولید کنید','warn');return;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/octet-stream'}));
+  a.download=FILENAMES[curFmt];a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('فایل '+FILENAMES[curFmt]+' دانلود شد');
+}
+function downloadReport(){
+  if(!nodes.length){toast('گره‌ای برای گزارش وجود ندارد','warn');return;}
+  const mask=$('swMask').checked,s=getSettings();
+  const nets={},secs={};nodes.forEach(n=>{nets[n.network]=(nets[n.network]||0)+1;secs[n.security]=(secs[n.security]||0)+1;});
+  let r='════ گزارش VLESS Studio ════\nتاریخ: '+new Date().toLocaleString('fa-IR')+'\nتعداد گره: '+nodes.length+' | نامعتبر: '+invalidCount+'\n';
+  r+='پروتکل‌ها: '+Object.entries(nets).map(([k,v])=>k+'='+v).join(', ')+'\n';
+  r+='امنیت: '+Object.entries(secs).map(([k,v])=>k+'='+v).join(', ')+'\n';
+  r+='DNS: '+dnsServersOf(s).join(', ')+' | Probe: '+probeUrlOf(s)+'\n\n──── گره‌ها ────\n';
+  nodes.forEach(n=>{r+='['+n.tag+'] '+(n.remark||'(بدون نام)')+' — '+n.address+':'+n.port+' | '+n.network+'/'+n.security+' | uuid: '+(mask?maskSecret(n.uuid):n.uuid)+(n.latency!==undefined?' | ping: '+(n.latency<0?'FAIL':n.latency+'ms'):'')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r],{type:'text/plain;charset=utf-8'}));
+  a.download='vless_report.txt';a.click();toast('گزارش دانلود شد');
+}
+$('btnCopy').addEventListener('click',copyResult);
+$('btnDownload').addEventListener('click',downloadResult);
+$('btnReport').addEventListener('click',downloadReport);
+
+/* ═════════ ping test ═════════ */
+function pingNode(addr,port,timeout){
+  return new Promise(res=>{
+    let done=false;const t0=performance.now();
+    const fin=ok=>{if(done)return;done=true;res({ok,ms:ok?Math.max(1,Math.round(performance.now()-t0)):-1});};
+    const host=addr.includes(':')?'['+addr+']':addr;let ws;
+    try{ws=new WebSocket('ws://'+host+':'+port);}catch(e){return fin(false);}
+    const tm=setTimeout(()=>{try{ws.close();}catch(e){}fin(false);},timeout);
+    ws.onopen=()=>{clearTimeout(tm);try{ws.close();}catch(e){}fin(true);};
+    ws.onerror=()=>{clearTimeout(tm);fin(true);};
+    ws.onclose=()=>{clearTimeout(tm);fin(true);};
   });
+}
+async function pingAll(){
+  if(!nodes.length){toast('گره‌ای برای تست وجود ندارد','warn');return;}
+  if(testing)return;testing=true;nodes.forEach(n=>{delete n.latency;});
+  $('btnPing').classList.add('busy');$('btnPing').textContent='📡 در حال تست...';
+  renderNodes();
+  const q=[...nodes],N=Math.min(8,nodes.length);
+  await Promise.all(Array.from({length:N},async()=>{
+    while(q.length){const n=q.shift();const r=await pingNode(n.address,n.port,4500);n.latency=r.ok?r.ms:-1;renderNodes();}
+  }));
+  testing=false;$('btnPing').classList.remove('busy');$('btnPing').textContent='📡 تست پینگ';
+  const ok=nodes.filter(n=>n.latency>=0).length;
+  renderNodes();renderStats();
+  toast('تست انجام شد — '+faNum(ok)+' گره در دسترس (نتیجه تقریبی TCP)','');
+}
+$('btnPing').addEventListener('click',pingAll);
+
+/* ═════════ import: file / url / dnd / paste ═════════ */
+function loadText(t,label){$('inputLinks').value=t;shownCount=120;analyze();toast(label);}
+$('btnFile').addEventListener('click',()=>$('fileInput').click());
+$('fileInput').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();rd.onload=()=>loadText(rd.result,'فایل «'+f.name+'» بارگذاری شد');rd.readAsText(f);
+  e.target.value='';
+});
+const dz=$('dropzone');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+dz.addEventListener('drop',e=>{
+  const f=e.dataTransfer.files[0];
+  if(f){const rd=new FileReader();rd.onload=()=>loadText(rd.result,'فایل «'+f.name+'» رها شد');rd.readAsText(f);}
+});
+$('btnFetch').addEventListener('click',async()=>{
+  const url=$('subUrl').value.trim();
+  if(!url){toast('آدرس ساب‌اسکریپشن را وارد کنید','warn');return;}
+  const btn=$('btnFetch');btn.classList.add('busy');btn.textContent='⏳ در حال دریافت...';
+  try{
+    const ctrl=new AbortController();const tm=setTimeout(()=>ctrl.abort(),20000);
+    const res=await fetch(PROXY_FNS[$('proxySel').value](url),{signal:ctrl.signal});
+    clearTimeout(tm);
+    if(!res.ok)throw new Error(res.status);
+    loadText(await res.text(),'ساب‌اسکریپشن از URL دریافت شد ✓');
+  }catch(e){toast('دریافت ناموفق بود — پروکسی دیگری را امتحان کنید','err');}
+  btn.classList.remove('busy');btn.textContent='⬇ دریافت';
+});
+$('btnPaste').addEventListener('click',async()=>{
+  try{const t=await navigator.clipboard.readText();if(t)loadText(t,'از کلیپ‌بورد چسبانده شد');else toast('کلیپ‌بورد خالی است','warn');}
+  catch(e){toast('دسترسی کلیپ‌بورد مسدود است','err');}
+});
+$('btnSample').addEventListener('click',()=>loadText(SAMPLE,'لینک‌های نمونه بارگذاری شد'));
+$('btnClear').addEventListener('click',()=>{
+  $('inputLinks').value='';nodes=[];invalidCount=0;textCache={};prevTexts={};
+  $('sumBar').classList.remove('on');$('healthBox').classList.remove('on');
+  $('prettyOut').innerHTML='<span style="color:#334155">// خروجی اینجا نمایش داده می‌شود...</span>';$('plainOut').value='';
+  try{localStorage.removeItem(LS_STATE);}catch(e){}
+  analyze();toast('همه‌چیز پاک شد');
 });
 
-/** COPY & MODAL **/
-function copyConfig(e) {
-  if(!textCache[curFmt]) return processGenerate();
-  copyToClipboard(textCache[curFmt], () => {
-     const btn = e.target; const old = btn.textContent;
-     btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 1500);
+/* ═════════ templates ═════════ */
+function userTpls(){try{return JSON.parse(localStorage.getItem(LS_TPL)||'{}');}catch(e){return{};}}
+function renderTpls(){
+  const box=$('userTpls');box.innerHTML='';
+  Object.keys(userTpls()).forEach(name=>{
+    const c=document.createElement('button');c.className='tpl-chip';
+    c.innerHTML='⭐ '+escHtml(name)+' <span class="x" title="حذف">✕</span>';
+    c.querySelector('.x').addEventListener('click',e=>{e.stopPropagation();const t=userTpls();delete t[name];try{localStorage.setItem(LS_TPL,JSON.stringify(t));}catch(_){}renderTpls();toast('قالب حذف شد');});
+    c.addEventListener('click',()=>{applySettings(deepMerge(DEFAULTS,userTpls()[name]));analyze();toast('قالب «'+name+'» اعمال شد');});
+    box.appendChild(c);
   });
 }
+document.querySelectorAll('[data-tpl]').forEach(b=>b.addEventListener('click',()=>{
+  applySettings(deepMerge(DEFAULTS,BUILTIN[b.dataset.tpl]));analyze();
+  toast('قالب «'+b.textContent.trim()+'» اعمال شد');
+}));
+$('btnSaveTpl').addEventListener('click',()=>{
+  const name=prompt('نام قالب:');if(!name)return;
+  const t=userTpls();t[name.trim()]=getSettings();
+  try{localStorage.setItem(LS_TPL,JSON.stringify(t));}catch(e){}
+  renderTpls();toast('قالب «'+name.trim()+'» ذخیره شد ✓');
+});
 
-function downloadConfig() {
-  if(!textCache[curFmt]) processGenerate();
-  const blob = new Blob([textCache[curFmt]], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `config_${curFmt}_${Date.now()}.json`; a.click(); URL.revokeObjectURL(a.href);
+/* ═════════ node modal ═════════ */
+function openModal(n){
+  const mask=$('swMask').checked;
+  $('mTitle').textContent=n.remark||n.address;
+  const rows=[['تگ',n.tag],['آدرس',n.address+':'+n.port],['UUID',mask?maskSecret(n.uuid):n.uuid],
+    ['پروتکل',n.network],['امنیت',n.security],['SNI',n.sni||'—'],['Host',n.host||'—'],
+    ['Path',n.path||'—'],['Fingerprint',n.fp],['Flow',n.flow||'—'],
+    ['Public Key',n.pbk?(mask?maskSecret(n.pbk):n.pbk):'—'],['Short ID',n.sid||'—'],
+    ['ALPN',n.alpn.join(', ')||'—'],['Remark',n.remark||'—'],
+    ['پینگ',n.latency===undefined?'تست نشده':(n.latency<0?'✕ تایم‌اوت':n.latency+' ms')]];
+  $('mBody').innerHTML=rows.map(r=>'<dt>'+r[0]+'</dt><dd>'+escHtml(r[1])+'</dd>').join('');
+  $('overlay').classList.add('on');
 }
+$('mClose').addEventListener('click',()=>$('overlay').classList.remove('on'));
+$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))$('overlay').classList.remove('on');});
+$('swMask').addEventListener('change',()=>{toast($('swMask').checked?'پوشاندن UUID فعال شد':'پوشاندن UUID غیرفعال شد');});
 
-function showQrModal(uri = '') {
-  if(!uri) { 
-     if(!textCache[curFmt]) processGenerate(); 
-     uri = encodeURIComponent(textCache[curFmt]); 
-  }
-  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
-  new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
-}
+/* ═════════ settings live ═════════ */
+$('dnsPreset').addEventListener('change',()=>{
+  const p=DNS_PRESETS[$('dnsPreset').value];
+  if(p){$('dns1').value=p[0];$('dns2').value=p[1];}
+});
+document.querySelectorAll('.acc input,.acc select,.acc textarea').forEach(el=>{
+  el.addEventListener('change',()=>{assignTags();if(nodes.length&&(textCache[curFmt]!==undefined)){const t=buildByFmt(curFmt);if(textCache[curFmt]&&textCache[curFmt]!==t)prevTexts[curFmt]=textCache[curFmt];textCache[curFmt]=t;renderOutput();}renderNodes();persistDeb();});
+});
+$('inputLinks').addEventListener('input',debounce(()=>{shownCount=120;analyze();},300));
 
-// Initial Loading Fallback
-$('plainOut').value = '';
+/* ═════════ keyboard ═════════ */
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();convert();}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();downloadResult();}
+  if(e.key==='Escape')$('overlay').classList.remove('on');
+});
+
+/* ═════════ init / restore ═════════ */
+(function init(){
+  renderTpls();
+  try{
+    const saved=JSON.parse(localStorage.getItem(LS_STATE)||'null');
+    if(saved&&saved.input){
+      $('inputLinks').value=saved.input;
+      if(saved.settings)applySettings(deepMerge(DEFAULTS,saved.settings));
+      if(saved.fmt){curFmt=saved.fmt;$('fmtSel').value=curFmt;}
+      analyze();toast('آخرین جلسه شما به‌صورت خودکار بازگردانی شد ✓');
+      return;
+    }
+  }catch(e){}
+  analyze();
+})();
+})();
 </script>
 </body>
 </html>
