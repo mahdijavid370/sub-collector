@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sub-Collector | تبدیلگر پیشرفته ساب‌اسکریپشن</title>
+<title>VLESS ⇢ Xray | تبدیلگر و استودیو کانفیگ</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/* ═══ CSS VARIABLES ═══ */
+/* ═══ CSS VARIABLES & THEMES ═══ */
 :root {
   --font-body: 'Vazirmatn', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -17,11 +17,15 @@ body.theme-glass {
   --bg-color: rgba(15, 15, 30, 0.6);
   --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #0f0f1e 100%);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --solid-bg: #0b1120;
+  --panel-bg: rgba(14, 22, 40, 0.85);
+  --code-bg: #04070d;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --accent: #6366f1;
+  --cyan: #22d3ee;
   --success: #10b981;
-  --danger: #ef4444;
+  --danger: #fb7185;
   --warning: #f59e0b;
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -30,9 +34,13 @@ body.theme-cyber {
   --bg-color: rgba(10, 1, 24, 0.7);
   --bg-gradient: linear-gradient(180deg, #0a0118 0%, #1a0b2e 100%);
   --glass-border: rgba(0, 255, 159, 0.3);
+  --solid-bg: #05010d;
+  --panel-bg: rgba(10, 1, 24, 0.75);
+  --code-bg: #000000;
   --text-primary: #e0fbfc;
   --text-secondary: #98f5e1;
   --accent: #00ff9f;
+  --cyan: #00ff9f;
   --success: #00ff9f;
   --danger: #ff0080;
   --warning: #ffee00;
@@ -43,9 +51,13 @@ body.theme-light {
   --bg-color: rgba(255, 255, 255, 0.85);
   --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
   --glass-border: rgba(0, 0, 0, 0.1);
+  --solid-bg: #ffffff;
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --code-bg: #f1f5f9;
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --accent: #3b82f6;
+  --cyan: #0284c7;
   --success: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
@@ -53,16 +65,7 @@ body.theme-light {
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-body {
-  font-family: var(--font-body);
-  background: var(--bg-color);
-  background-image: var(--bg-gradient);
-  color: var(--text-primary);
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-}
-
+body { font-family: var(--font-body); background: var(--bg-color); background-image: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; }
 #canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -72,873 +75,809 @@ body {
 
 .container { max-width: 1280px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px 24px;
-  background: var(--bg-color); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow);
-}
+/* ── HEADER ── */
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px 24px; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); flex-wrap: wrap; gap: 15px;}
 .brand { display: flex; align-items: center; gap: 12px; }
-.logo {
-  width: 40px; height: 40px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--success));
-  display: grid; place-items: center; font-weight: bold; color: #fff;
-}
-.brand h1 { font-size: 1.2rem; font-weight: 700; line-height: 1.2; }
+.logo { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--success)); display: grid; place-items: center; font-weight: bold; color: #fff; font-family: var(--font-mono); font-size: 1.1rem; box-shadow: 0 0 15px rgba(34,211,238,.3); }
+.brand h1 { font-size: 1.3rem; font-weight: 700; line-height: 1.2; }
+.brand .tag { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
 
-.controls { display: flex; gap: 10px; }
-button, select, input[type="text"], input[type="number"] {
-  font-family: var(--font-body); background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
-  color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: var(--transition);
-}
+.live-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-box { padding: 8px 12px; border-radius: 12px; text-align: center; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); min-width: 80px; }
+body.theme-light .stat-box { background: #fff; }
+.stat-box b { display: block; font-family: var(--font-mono); font-size: 1.1rem; color: var(--cyan); }
+.stat-box span { font-size: 0.7rem; color: var(--text-secondary); }
+
+.controls { display: flex; gap: 10px; align-items: center; }
+button, select, input[type="text"], input[type="number"] { font-family: var(--font-body); background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.85rem; }
 body.theme-light button:not(.primary), body.theme-light select, body.theme-light input { background: #fff; }
-button:hover, select:hover, input:hover { border-color: var(--accent); }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
+button:hover:not(:disabled), select:hover, input:hover { border-color: var(--cyan); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-button.primary { background: var(--accent); color: #fff; border: none; font-weight: 600; }
-button.primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px var(--accent); }
-button.danger { color: var(--danger); border-color: var(--danger); }
-button.danger:hover { background: var(--danger); color: #fff; }
-.icon-btn { padding: 8px 12px; font-size: 1.1rem; }
+/* DROPDOWN READABILITY FIX */
+select option, select optgroup { background-color: #1a1a2e; color: #e2e8f0; font-family: var(--font-body); }
+body.theme-cyber select option, body.theme-cyber select optgroup { background-color: #0a0118; color: #e0fbfc; }
+body.theme-light select option, body.theme-light select optgroup { background-color: #ffffff; color: #1e293b; }
 
-.card {
-  background: var(--bg-color); backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border); border-radius: 16px;
-  padding: 20px; margin-bottom: 20px; box-shadow: var(--glass-shadow);
-}
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border); }
-.card-title { font-weight: 700; font-size: 1.1rem; }
+button.primary { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; border: none; font-weight: 600; }
+button.primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px rgba(34,211,238,.4); transform: translateY(-1px); }
+button.danger { color: var(--danger); border-color: var(--danger); background: rgba(251,113,133,.08); }
+button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
 
-#tempFileStatus {
-  display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger);
-  color: var(--danger); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px;
-  align-items: center; justify-content: space-between; font-size: 0.9rem; font-weight: 600;
-  animation: popIn 0.3s ease;
-}
+/* ── TEMPLATES ── */
+.tpl-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 18px; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 14px; margin-bottom: 20px; backdrop-filter: blur(20px); }
+.tpl-lbl { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
+.tpl-chip { font-size: 0.75rem; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--glass-border); background: var(--code-bg); color: var(--text-primary); cursor: pointer; transition: var(--transition); }
+.tpl-chip:hover { border-color: var(--cyan); color: var(--cyan); }
 
-textarea {
-  width: 100%; height: 120px; background: rgba(0,0,0,0.15);
-  border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px;
-  color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;
-  resize: vertical; direction: ltr; line-height: 1.5;
-}
-body.theme-light textarea { background: #fff; }
+/* ── MAIN LAYOUT ── */
+.grid-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
+@media (max-width: 1000px) { .grid-layout { grid-template-columns: 1fr; } }
 
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
-.stat-item { text-align: center; padding: 12px; background: rgba(0,0,0,0.1); border-radius: 10px; border: 1px solid var(--glass-border); }
-.stat-val { font-size: 1.5rem; font-weight: bold; color: var(--accent); font-family: var(--font-mono); }
-.stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+.card { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--glass-shadow); margin-bottom: 20px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--glass-border); background: rgba(128,160,200,.04); flex-wrap: wrap; gap: 10px; }
+.card-title { font-weight: 700; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.p-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot-in { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.dot-out { background: var(--success); box-shadow: 0 0 10px var(--success); }
+.dot-node { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 15px; }
 
-.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-.setting-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; }
-.setting-group input, .setting-group select { width: 100%; }
+/* ── ACCORDIONS (SETTINGS) ── */
+.acc { border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(0,0,0,0.1); overflow: hidden; }
+body.theme-light .acc { background: #f8fafc; }
+.acc summary { cursor: pointer; padding: 12px 16px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; user-select: none; transition: var(--transition); }
+.acc summary:hover { color: var(--cyan); }
+.acc-body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.setting-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+.fld { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); flex: 1; min-width: 120px; }
+.opt { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; }
 
-.fragment-modes { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; background: rgba(0,0,0,0.1); padding: 4px; border-radius: 8px; }
-.mode-btn { flex: 1; padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: var(--transition); opacity: 0.7; min-width: 100px; }
-.mode-btn.active { background: var(--accent); color: #fff; opacity: 1; }
-.fragment-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+/* CSS Toggle Switch */
+.switch { position: relative; width: 40px; height: 22px; display: inline-block; }
+.switch input { display: none; }
+.slider { position: absolute; inset: 0; background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border); border-radius: 99px; transition: .3s; }
+.slider::before { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; top: 3px; right: 4px; background: var(--text-secondary); transition: .3s; }
+.switch input:checked + .slider { background: rgba(34,211,238,.2); border-color: var(--cyan); }
+.switch input:checked + .slider::before { transform: translateX(-18px); background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
 
-.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
-.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
-.node-card {
-  background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
-  border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px;
-  transition: var(--transition); cursor: pointer;
-}
+textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; resize: vertical; direction: ltr; line-height: 1.5; }
+
+/* ── OUTPUT SECTION ── */
+.tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; }
+.tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 4px 12px; cursor: pointer; transition: .2s; }
+.tab.active { color: #fff; background: var(--accent); font-weight: 700; }
+.out-wrap { position: relative; min-height: 380px; flex: 1; display: flex; flex-direction: column; }
+#prettyOut, #plainOut, #diffOut { width: 100%; height: 380px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
+#prettyOut { color: #94a3b8; }
+#plainOut { color: var(--success); }
+.hidden { display: none !important; }
+.tok-key { color: #7dd3fc; } .tok-str { color: #86efac; } .tok-num { color: var(--warning); } .tok-bool { color: var(--danger); }
+.d-add { background: rgba(16,185,129,.15); color: #86efac; display: block; }
+.d-del { background: rgba(251,113,133,.15); color: #fda4af; display: block; text-decoration: line-through; }
+.d-ctx { display: block; opacity: 0.6; }
+
+/* ── NODES GRID ── */
+.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
+.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: var(--transition); cursor: pointer; }
 body.theme-light .node-card { background: #fff; }
-.node-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-.node-card.selected { border-color: var(--success); background: rgba(16, 185, 129, 0.1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+.node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
+.node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); }
 
 .node-head { display: flex; justify-content: space-between; align-items: center; }
-.node-flag { font-size: 1.4rem; line-height: 1; }
-.node-remark { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
-.node-meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.7rem; font-family: var(--font-mono); }
-.badge { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.1); }
-.badge.vless { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
-.badge.vmess { color: #a78bfa; border-color: rgba(167,139,250,0.3); }
-.badge.trojan { color: #f472b6; border-color: rgba(244,114,182,0.3); }
-.badge.ss { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
-.badge.ws { color: #4ade80; }
-.badge.grpc { color: #f87171; }
-.badge.tls { color: #22d3ee; }
-.badge.reality { color: #fb7185; }
+.node-flag { font-size: 1.2rem; }
+.node-remark { font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
+.node-meta { display: flex; gap: 5px; flex-wrap: wrap; font-size: 0.65rem; font-family: var(--font-mono); align-items: center; }
+.badge { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--glass-border); }
 
-.node-actions { display: flex; gap: 6px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
-body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
-.action-icon { font-size: 1rem; cursor: pointer; padding: 4px 6px; border-radius: 6px; color: var(--text-secondary); transition: var(--transition); }
-.action-icon:hover { color: var(--accent); background: rgba(255,255,255,0.1); }
-.action-icon.del:hover { color: var(--danger); }
+.b-ws { color: var(--cyan); border-color: rgba(34,211,238,.4); }
+.b-grpc { color: #a78bfa; border-color: rgba(167,139,250,.4); }
+.b-tcp { color: var(--warning); border-color: rgba(251,191,36,.4); }
+.b-tls { color: var(--success); border-color: rgba(16,185,129,.4); }
+.b-reality { color: var(--danger); border-color: rgba(251,113,133,.4); }
 
-/* STICKY BAR */
-.sticky-bar {
-  position: sticky; bottom: 20px; z-index: 50;
-  background: var(--bg-color); backdrop-filter: blur(20px);
-  border: 1px solid var(--accent); border-radius: 16px; padding: 12px 20px;
-  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes slideUp { from{transform:translateY(100%); opacity:0} to{transform:none; opacity:1} }
+.ping-good { color: var(--success); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.1); }
+.ping-mid { color: var(--warning); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.1); }
+.ping-bad { color: var(--danger); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.1); }
 
-/* MODAL */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-  z-index: 100; display: none; place-items: center; padding: 20px;
-}
+.node-actions { display: flex; gap: 6px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px; }
+body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
+
+/* QR MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
 .modal-overlay.active { display: grid; }
-.modal {
-  background: var(--bg-color); border: 1px solid var(--glass-border);
-  border-radius: 20px; padding: 24px; width: 100%; max-width: 400px;
-  text-align: center; box-shadow: var(--glass-shadow);
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes popIn { from{transform:scale(0.8); opacity:0} to{transform:scale(1); opacity:1} }
+.modal { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: var(--glass-shadow); }
 #qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
 
-@media (max-width: 768px) {
-  header { flex-direction: column; align-items: stretch; }
-  .controls { justify-content: space-between; }
-  .fragment-inputs { grid-template-columns: 1fr; }
-  .node-grid { grid-template-columns: 1fr; }
-  .sticky-bar { flex-direction: column; text-align: center; }
-  .sticky-bar div { width: 100%; display: flex; justify-content: center; gap: 10px; }
-  .settings-grid { grid-template-columns: 1fr; }
-}
+/* TOASTS */
+#toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none;}
+.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 10px 20px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; transform: translateY(15px); transition: all 0.3s; }
+.toast.show { opacity: 1; transform: none; }
+.toast.warn { border-color: var(--warning); } .toast.err { border-color: var(--danger); }
 </style>
 </head>
 <body class="theme-glass">
+
 <canvas id="canvas-bg"></canvas>
+
 <div class="container">
   <header>
     <div class="brand">
-      <div class="logo">SC</div>
-      <h1>Sub-Collector <span style="font-size:0.6em; opacity:0.7; font-weight:400; display:block; letter-spacing:1px;">PRO EDITION</span></h1>
+      <div class="logo">V⇢X</div>
+      <div>
+        <h1>VLESS ⇢ Xray Studio</h1>
+        <p class="tag">تبدیل‌گر قدرتمند و تست‌گر ساب‌اسکریپشن</p>
+      </div>
+    </div>
+    <div class="live-stats">
+      <div class="stat-box"><b id="statLines">۰</b><span>خط ورودی</span></div>
+      <div class="stat-box"><b id="statValid" style="color:var(--success)">۰</b><span>معتبر</span></div>
+      <div class="stat-box"><b id="statInvalid" style="color:var(--danger)">۰</b><span>نامعتبر</span></div>
     </div>
     <div class="controls">
-      <select id="themeSelect" onchange="setTheme(this.value)">
+      <select id="themeSelect" onchange="applyTheme(this.value)">
         <option value="theme-glass">🌙 Glass Dark</option>
         <option value="theme-cyber">🤖 Cyberpunk</option>
         <option value="theme-light">☀️ Clean Light</option>
       </select>
-      <button class="primary icon-btn" onclick="document.getElementById('fileInput').click()" title="Import File">📂</button>
-      <input type="file" id="fileInput" hidden accept=".txt,.json,.sub" onchange="handleFileImport(this)">
     </div>
   </header>
 
-  <!-- INPUT SECTION -->
-  <section class="card">
-    <div class="card-header">
-      <span class="card-title">📥 ورودی هوشمند و استخراج خودکار</span>
-      <div style="display:flex; gap:8px;">
-        <button onclick="pasteFromClipboard()" title="Paste from Clipboard">📋 Paste</button>
-        <button class="danger" onclick="clearAll()" title="Clear All">🗑 Clear</button>
-      </div>
-    </div>
-    
-    <div id="tempFileStatus">
-      <span>⏳ داده‌های موقت (ساب‌اسکریپشن) تا <b id="tempTime">05:00</b> دیگر کاملاً پاک می‌شوند.</span>
-      <button class="danger" style="padding: 4px 8px; font-size: 0.8rem; background:transparent;" onclick="deleteTempFile()">حذف فوری</button>
-    </div>
-
-    <textarea id="rawInput" placeholder="هر متنی که حاوی کانفیگ است را اینجا Paste کنید...&#10;سیستم به صورت خودکار کانفیگ‌ها را از بین متن‌های اضافه استخراج می‌کند. (پشتیبانی از Base64)" spellcheck="false"></textarea>
-    <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
-      <input type="text" id="subUrl" placeholder="https://example.com/sub" style="flex:1;" dir="ltr">
-      <button class="primary" onclick="fetchSubscription(event)">دریافت لینک ساب</button>
-    </div>
-  </section>
-
-  <!-- EXPANDED SETTINGS SECTION -->
-  <section class="card">
-    <div class="card-header"><span class="card-title">⚙️ تنظیمات پیشرفته کانفیگ</span></div>
-    
-    <div class="settings-grid">
-      <div class="setting-group">
-        <label>فرمت خروجی کانفیگ</label>
-        <select id="outputFormat">
-          <option value="xray">Xray-core JSON (V2rayN, Nekobox)</option>
-          <option value="singbox">Sing-Box JSON</option>
-        </select>
-      </div>
-      
-      <div class="setting-group">
-        <label>استراتژی مسیریابی Warp</label>
-        <select id="outboundMode">
-          <option value="direct">غیرفعال (اتصال مستقیم به اینترنت)</option>
-          <option value="warp-full">Warp کامل (عبور تمام ترافیک از وارپ)</option>
-          <option value="warp-split">Warp هوشمند (فقط سایت‌های مسدود ایران)</option>
-          <option value="warp-ipv6">Warp IPv6 (دور زدن تحریم با آی‌پی ۶)</option>
-        </select>
-      </div>
-      
-      <div class="setting-group" style="position: relative;">
-        <label>DNS Resolver (برای رفع تحریم و سرعت)</label>
-        <div style="display:flex; gap:8px;">
-          <select id="dnsPreset" style="flex:1;">
-            <optgroup label="🌐 جهانی (سرعت بالا)">
-              <option value="cloudflare">Cloudflare (1.1.1.1)</option>
-              <option value="google">Google (8.8.8.8)</option>
-              <option value="quad9">Quad9 (9.9.9.9)</option>
-              <option value="adguard">AdGuard (بدون تبلیغات)</option>
-            </optgroup>
-            <optgroup label="🇮🇷 ضد تحریم و گیمینگ (ایران)">
-              <option value="shecan">شکن - Shecan (178.22.122.100)</option>
-              <option value="electro">الکترو - Electro (78.157.42.101)</option>
-              <option value="radar">رادار بازی - Radar (10.202.10.10)</option>
-              <option value="403">سرویس 403.online (10.202.10.202)</option>
-            </optgroup>
-          </select>
-          <button id="btnPingDns" class="primary" style="padding: 0 10px; font-size: 0.8rem; white-space:nowrap;" onclick="testDnsPings()">📡 تست پینگ</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Fragment Settings -->
-    <div style="margin-top:24px; border-top:1px solid var(--glass-border); padding-top:16px;">
-      <label style="font-size:0.95rem; color:var(--text-primary); font-weight:600; display:block; margin-bottom:8px;">🧩 Fragment (دور زدن فیلترینگ شدید SNI)</label>
-      
-      <div class="fragment-modes">
-        <div class="mode-btn active" onclick="setFragmentMode('off', this)">خاموش</div>
-        <div class="mode-btn" onclick="setFragmentMode('auto_tls', this)">خودکار (TLS Hello)</div>
-        <div class="mode-btn" onclick="setFragmentMode('auto_sni', this)">خودکار (SNI Split)</div>
-        <div class="mode-btn" onclick="setFragmentMode('manual', this)">دستی پیشرفته</div>
-      </div>
-      
-      <div id="fragManualInputs" class="fragment-inputs" style="display:none;">
-        <div class="setting-group"><label>Length (Min-Max)</label><input type="text" id="fragLen" value="10-30" dir="ltr"></div>
-        <div class="setting-group"><label>Interval (Min-Max)</label><input type="text" id="fragInt" value="10-20" dir="ltr"></div>
-        <div class="setting-group">
-          <label>Packets</label>
-          <select id="fragPack">
-            <option value="tlshello">tlshello</option>
-            <option value="1-1">1-1</option>
-            <option value="1-2">1-2</option>
-            <option value="1-3">1-3</option>
-          </select>
-        </div>
-      </div>
-      <div id="fragAutoInfo" style="font-size:0.85rem; color:var(--text-secondary); padding:10px; background:rgba(0,0,0,0.1); border-radius:8px; display:none;">
-        <!-- Text injected via JS depending on auto mode -->
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS SECTION -->
-  <section class="card">
-    <div class="card-header">
-      <span class="card-title">📊 آمار زنده</span>
-      <input type="text" id="nodeFilter" placeholder="🔍 جستجو (نام، کشور، پروتکل)..." style="width:100%; max-width:250px; font-size:0.85rem;" oninput="renderNodes()">
-    </div>
-    <div class="stats-grid">
-      <div class="stat-item"><div class="stat-val" id="statTotal">0</div><div class="stat-label">کل استخراج شده</div></div>
-      <div class="stat-item"><div class="stat-val" style="color:var(--success)" id="statValid">0</div><div class="stat-label">گره‌های سالم</div></div>
-      <div class="stat-item"><div class="stat-val" style="color:var(--warning)" id="statCountries">0</div><div class="stat-label">کشورها</div></div>
-    </div>
-  </section>
-
-  <!-- NODE LIST SECTION -->
-  <section class="card">
-    <div class="toolbar">
-      <span class="card-title">📡 لیست گره‌ها (<span id="selectedCount" style="color:var(--accent)">0</span> انتخاب شده)</span>
-      <div style="display:flex; gap:8px;">
-        <button onclick="toggleSelectAll()" style="font-size:0.8rem; padding:6px 12px;">انتخاب همه/هیچ</button>
-        <button class="primary" onclick="generateConfig()" style="font-size:0.8rem; padding:6px 16px;">⚡ ساخت کانفیگ نهایی</button>
-      </div>
-    </div>
-    <div id="nodeList" class="node-grid">
-      <div style="grid-column:1/-1; text-align:center; color:var(--text-secondary); padding:40px; opacity:0.7;">
-        هنوز گره‌ای پردازش نشده است.<br>متن دارای کانفیگ را وارد کنید یا لینک ساب بدهید.
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- STICKY ACTION BAR -->
-<div id="stickyBar" class="sticky-bar" style="display:none;">
-  <div class="selection-info" style="font-size: 0.95rem;">
-    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره برای ساخت کانفیگ انتخاب شده است
+  <div class="tpl-bar">
+    <span class="tpl-lbl">🧩 قالب‌های آماده:</span>
+    <button class="tpl-chip" data-tpl="intelligent">🧠 انتخاب هوشمند (تعادل)</button>
+    <button class="tpl-chip" data-tpl="gaming">🎮 گیمینگ (پینگ کم)</button>
+    <button class="tpl-chip" data-tpl="streaming">🎬 استریمینگ</button>
+    <button class="tpl-chip" data-tpl="minimal">🪶 مینیمال (ساده)</button>
   </div>
-  <div>
-    <button onclick="copyConfig(event)">📋 کپی JSON</button>
-    <button onclick="downloadConfig()">⬇ دانلود فایل</button>
-    <button class="primary" onclick="showQrModal()">📷 نمایش QR کلی</button>
+
+  <div class="grid-layout">
+    
+    <!-- ══ INPUT & SETTINGS (LEFT) ══ -->
+    <div class="left-col">
+      <section class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="p-dot dot-in"></span> ورودی ساب‌اسکریپشن</span>
+          <div class="controls">
+            <button class="danger" id="btnClear" style="font-size:0.75rem; padding:4px 8px">🗑 پاک‌کردن</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="subUrl" dir="ltr" placeholder="https://example.com/sub" style="flex:1;">
+            <button class="primary" id="btnFetch">⬇ دریافت</button>
+          </div>
+          <textarea id="inputLinks" class="input-box" placeholder="لینک‌های vless:// یا vmess:// یا ss:// یا محتوای Base64 را اینجا وارد کنید..." spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header"><span class="card-title">⚙️ تنظیمات مسیریابی و Xray</span></div>
+        <div class="card-body" style="padding: 10px;">
+          
+          <details class="acc" open>
+            <summary>🌐 سرور DNS و تستر</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="fld">پریست DNS
+                  <div style="display:flex; gap:6px;">
+                    <select id="dnsPreset" style="flex:1;">
+                      <optgroup label="جهانی">
+                        <option value="Cloudflare">Cloudflare (1.1.1.1)</option>
+                        <option value="Google">Google (8.8.8.8)</option>
+                        <option value="Quad9">Quad9 (9.9.9.9)</option>
+                      </optgroup>
+                      <optgroup label="ایران (ضد تحریم)">
+                        <option value="Shecan">شکن (178.22.122.100)</option>
+                        <option value="Electro">الکترو (78.157.42.101)</option>
+                        <option value="Radar">رادار بازی (10.202.10.10)</option>
+                      </optgroup>
+                    </select>
+                    <button id="btnPingDns" class="primary" style="padding:4px 8px; font-size:0.75rem;" onclick="testDnsPings()">📡 تست</button>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <details class="acc" open>
+            <summary>📡 تست خودکار گره‌ها (Observatory)</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swObs" checked><span class="slider"></span></span>فعال‌سازی</label>
+                <label class="fld">استراتژی
+                  <select id="obsStrategy"><option value="leastPing" selected>leastPing (اتصال به کمترین پینگ)</option><option value="random">random (تصادفی)</option></select>
+                </label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="fld">آدرس تست (Probe)
+                  <select id="probeSel">
+                    <option value="gstatic" selected>Google gstatic 204 (استاندارد)</option>
+                    <option value="cloudflare">Cloudflare 204</option>
+                    <option value="apple">Apple Captive</option>
+                  </select>
+                </label>
+                <label class="fld">فاصله تست
+                  <select id="obsInterval"><option value="1m">۱ دقیقه</option><option value="3m" selected>۳ دقیقه</option><option value="5m">۵ دقیقه</option></select>
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <details class="acc" open>
+            <summary>🧭 قوانین مسیریابی (Routing)</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swAds" checked><span class="slider"></span></span>مسدودسازی تبلیغات</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swIR" checked><span class="slider"></span></span>ایران مستقیـم (Direct)</label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swQuic" checked><span class="slider"></span></span>بلاک QUIC (جلوگیری از نشت)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swPriv" checked><span class="slider"></span></span>شبکه خصوصی مستقیـم</label>
+              </div>
+            </div>
+          </details>
+
+          <details class="acc">
+            <summary>⚙️ تنظیمات عمومی و Inbounds</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="fld">پیشوند<input type="text" id="prefix" value="proxy-" dir="ltr"></label>
+                <label class="opt" style="margin-top:10px;"><span class="switch"><input type="checkbox" id="swMux"><span class="slider"></span></span>MUX</label>
+                <label class="opt" style="margin-top:10px;"><span class="switch"><input type="checkbox" id="swInsecure"><span class="slider"></span></span>Insecure TLS</label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="fld">پورت Socks<input type="number" id="socksPort" value="10808" dir="ltr"></label>
+                <label class="fld">پورت HTTP<input type="number" id="httpPort" value="10809" dir="ltr"></label>
+              </div>
+            </div>
+          </details>
+
+          <button class="primary" id="btnConvert" style="width:100%; padding:12px; margin-top:10px; font-size:1rem;">⚡ تولید کانفیگ نهایی</button>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- ══ OUTPUT & NODES (RIGHT) ══ -->
+    <div class="right-col">
+      <section class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته</span>
+          <div class="controls">
+            <div class="tabs">
+              <button class="tab active" id="tabPretty">کدنویسی</button>
+              <button class="tab" id="tabPlain">متن خام</button>
+              <button class="tab" id="tabDiff">مقایسه تغییرات</button>
+            </div>
+            <select id="fmtSel" style="font-size:0.75rem;">
+              <option value="xray">Xray JSON</option>
+              <option value="singbox">Sing-Box JSON</option>
+              <option value="clash">Clash Meta YAML</option>
+              <option value="v2rayn">V2rayN (Base64)</option>
+            </select>
+            <button class="primary" id="btnCopy" style="font-size:0.75rem;">📋 کپی</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:10px;">
+          <div class="out-wrap">
+            <pre id="prettyOut"><span style="color:#64748b">// کانفیگ تولید شده در اینجا نمایش داده می‌شود...</span></pre>
+            <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
+            <div id="diffOut" class="hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="p-dot dot-node"></span> مدیریت گره‌ها</span>
+          <div class="controls">
+            <input type="text" id="nodeSearch" placeholder="🔍 جستجوی گره..." style="width: 140px; font-size:0.75rem;">
+            <button id="btnPingNodes" onclick="testNodesPing()" style="font-size:0.75rem;">📡 تست پینگ جامع</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="node-grid" id="nodeList">
+            <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary); font-size:0.9rem;">
+              هنوز ورودی پردازش نشده است.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
   </div>
 </div>
 
 <!-- QR MODAL -->
-<div id="qrModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+<div id="qrModal" class="modal-overlay">
   <div class="modal">
-    <h3 style="margin-bottom:10px; color:var(--accent);" id="qrModalTitle">QR Code کانفیگ</h3>
+    <h3 style="margin-bottom:10px; color:var(--cyan);" id="qrModalTitle">اسکن QR Code</h3>
     <div id="qrcode"></div>
-    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">جهت اسکن با کلاینت‌ها (v2rayNG, Shadowrocket, NekoBox)</p>
-    <button class="primary" onclick="document.getElementById('qrModal').classList.remove('active')">بستن</button>
+    <button class="danger" style="margin-top:20px; width:100%" onclick="document.getElementById('qrModal').classList.remove('active')">بستن</button>
   </div>
 </div>
 
+<div id="toasts"></div>
+
 <script>
-/** STATE MANAGEMENT **/
-const state = {
-  nodes: [],
-  selected: new Set(),
-  configJson: null,
-  fragment: { mode: 'off' },
-  theme: 'theme-glass'
-};
+"use strict";
 const $ = id => document.getElementById(id);
 const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
-const safeHtml = str => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
-
-/** DNS PING TESTER **/
-const dnsServers = {
-  'cloudflare': { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query' },
-  'google': { name: 'Google', url: 'https://dns.google/resolve' },
-  'quad9': { name: 'Quad9', url: 'https://dns.quad9.net/dns-query' },
-  'adguard': { name: 'AdGuard', url: 'https://dns.adguard-dns.com/dns-query' },
-  'shecan': { name: 'شکن - Shecan', url: 'https://shecan.ir/favicon.ico' },
-  'electro': { name: 'الکترو - Electro', url: 'https://electrotm.org/favicon.ico' },
-  'radar': { name: 'رادار بازی - Radar', url: 'https://radar.game/favicon.ico' },
-  '403': { name: 'سرویس 403', url: 'https://403.online/favicon.ico' }
-};
-
-async function testDnsPings() {
-  const btn = $('btnPingDns');
-  btn.textContent = '⏳ در حال تست...';
-  btn.disabled = true;
-
-  // Reset texts
-  for (const key in dnsServers) {
-    const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
-    if(opt) opt.textContent = dnsServers[key].name + " (در حال تست...)";
-  }
-
-  const promises = Object.keys(dnsServers).map(async (key) => {
-    const server = dnsServers[key];
-    const start = Date.now();
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout
-      
-      // Request with no-cors so we don't get blocked, we just measure network round trip
-      await fetch(server.url + "?t=" + start, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-      clearTimeout(timeoutId);
-      
-      const ping = Date.now() - start;
-      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
-      if(opt) {
-        let color = ping < 150 ? '🟢' : (ping < 300 ? '🟡' : '🟠');
-        opt.textContent = `${server.name} (${color} ${ping}ms)`;
-      }
-    } catch (e) {
-      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
-      if(opt) opt.textContent = `${server.name} (❌ مسدود/تایم‌اوت)`;
-    }
-  });
-
-  await Promise.allSettled(promises);
-  
-  btn.textContent = '📡 تست پینگ';
-  btn.disabled = false;
-  alert('تست پینگ با موفقیت انجام شد. می‌توانید لیست DNS را باز کرده و سریع‌ترین را انتخاب کنید.');
-}
+const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /** PARTICLES BACKGROUND **/
 const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
 let W, H, particles = [];
 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
 window.addEventListener('resize', resize); resize();
-for(let i=0; i<40; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
+for(let i=0; i<40; i++) particles.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
 function animate() {
-  ctx.clearRect(0,0,W,H);
-  const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+  ctx.clearRect(0,0,W,H); const accentColor = getComputedStyle(document.body).getPropertyValue('--cyan').trim();
   particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fillStyle = accentColor; ctx.globalAlpha = p.a; ctx.fill(); ctx.globalAlpha = 1;
-  });
-  requestAnimationFrame(animate);
-}
-animate();
+    p.x += p.vx; p.y += p.vy; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = accentColor; ctx.globalAlpha = p.a; ctx.fill(); ctx.globalAlpha = 1;
+  }); requestAnimationFrame(animate);
+} animate();
 
-/** THEME & UI LOGIC **/
-function setTheme(theme) {
+/** TOAST ALERTS **/
+function toast(msg, type=''){
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = (type==='err'?'❌ ':'') + (type==='warn'?'⚠️ ':'✅ ') + msg;
+  $('toasts').appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+/** THEME **/
+function applyTheme(theme) {
   document.body.className = theme;
-  state.theme = theme;
-  localStorage.setItem('sc_theme', theme);
+  try{ localStorage.setItem('vx_theme', theme); }catch(e){}
 }
-if(localStorage.getItem('sc_theme')) {
-  const t = localStorage.getItem('sc_theme');
-  $('themeSelect').value = t;
-  setTheme(t);
+if(localStorage.getItem('vx_theme')) {
+  const t = localStorage.getItem('vx_theme');
+  $('themeSelect').value = t; applyTheme(t);
 }
 
-function setFragmentMode(mode, element) {
-  state.fragment.mode = mode;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  element.classList.add('active');
-  
-  const manual = $('fragManualInputs');
-  const autoInfo = $('fragAutoInfo');
-  
-  if(mode === 'manual') {
-    manual.style.display = 'grid';
-    autoInfo.style.display = 'none';
-  } else if (mode === 'auto_tls') {
-    manual.style.display = 'none';
-    autoInfo.style.display = 'block';
-    autoInfo.innerHTML = "⚡ <b>پیکربندی هوشمند TLS:</b> تکه‌تکه کردن هدر TLS Hello برای عبور از سیستم‌های فیلترینگ. (Length: 100-200, Packets: tlshello)";
-  } else if (mode === 'auto_sni') {
-    manual.style.display = 'none';
-    autoInfo.style.display = 'block';
-    autoInfo.innerHTML = "⚡ <b>پیکربندی هوشمند SNI:</b> شکستن درخواست در همان بسته‌های اول برای مخفی کردن نام دامنه. (Length: 10-30, Packets: 1-1)";
-  } else {
-    manual.style.display = 'none';
-    autoInfo.style.display = 'none';
-  }
+/** CONSTANTS & PRESETS **/
+const DNS_PRESETS = {
+  Cloudflare: ['1.1.1.1','1.0.0.1'], Google: ['8.8.8.8','8.8.4.4'], Quad9: ['9.9.9.9','149.112.112.112'],
+  Shecan: ['178.22.122.100','185.51.200.2'], Electro: ['78.157.42.101','78.157.42.100'], Radar: ['10.202.10.10','10.202.10.11']
+};
+const PROBES = { gstatic: 'https://www.gstatic.com/generate_204', cloudflare: 'https://cp.cloudflare.com/generate_204', apple: 'https://captive.apple.com/hotspot-detect.html' };
+
+const BUILTIN_TPLS = {
+  intelligent: { obs: { strategy: 'leastPing', interval: '3m' }, routing: { blockAds: true, blockQuic: true } },
+  gaming: { obs: { strategy: 'leastPing', interval: '1m', enabled: true }, routing: { blockQuic: true }, proxy: { mux: false } },
+  streaming: { dns: { preset: 'Google' }, routing: { blockAds: true }, obs: { interval: '5m' } },
+  minimal: { obs: { enabled: false }, routing: { blockAds: false, directIR: false, blockQuic: false }, proxy: { mux: false } }
+};
+
+/** STATE **/
+let nodes = [], invalidCount = 0, testing = false;
+let curFmt = 'xray', curTab = 'pretty';
+let textCache = {}, prevTexts = {};
+
+/** PARSER ENGINE **/
+function tryB64(raw){
+  const s = raw.replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
+  if(!s || s.length%4===1 || !/^[A-Za-z0-9+/=]+$/.test(s)) return null;
+  try { return new TextDecoder('utf-8').decode(Uint8Array.from(atob(s+'==='.slice((s.length+3)%4)), c=>c.charCodeAt(0))); } catch(e){ return null; }
 }
 
-/** TEMP FILE SYSTEM (5 MINUTE EXPIRY) **/
-let tempFileTimer = null;
-let tempFileInterval = null;
+function resolveInput(raw){
+  if(!raw) return '';
+  if(raw.includes('://')) return raw;
+  const d = tryB64(raw); return d && d.includes('://') ? d : raw;
+}
 
-function startTempFileTimer(durationMinutes = 5) {
-  const expireTime = Date.now() + durationMinutes * 60 * 1000;
-  localStorage.setItem('sc_temp_expire', expireTime.toString());
-  $('tempFileStatus').style.display = 'flex';
-  
-  clearInterval(tempFileInterval);
-  tempFileInterval = setInterval(() => {
-    const now = Date.now();
-    const left = expireTime - now;
-    if (left <= 0) deleteTempFile(true);
-    else {
-      const mins = Math.floor(left / 60000).toString().padStart(2, '0');
-      const secs = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
-      $('tempTime').textContent = `${mins}:${secs}`;
+function parseNodeLine(line){
+  try {
+    if(line.startsWith('vless://')){
+      const u = new URL(line); const p = u.searchParams;
+      return { proto: 'vless', raw: line, uuid: u.username, address: u.hostname, port: parseInt(u.port)||443, network: p.get('type')||'tcp', security: p.get('security')||'none', path: p.get('path')||'/', host: p.get('host')||'', sni: p.get('sni')||'', fp: p.get('fp')||'chrome', alpn: (p.get('alpn')||'').split(',').filter(Boolean), flow: p.get('flow')||'', pbk: p.get('pbk')||'', sid: p.get('sid')||'', spx: p.get('spx')||'', serviceName: p.get('serviceName')||'', remark: decodeURIComponent(u.hash.slice(1)) };
     }
-  }, 1000);
-}
-
-function deleteTempFile(isAuto = false) {
-  clearInterval(tempFileInterval);
-  $('tempFileStatus').style.display = 'none';
-  localStorage.removeItem('sc_temp_expire');
-  localStorage.removeItem('sc_nodes');
-  localStorage.removeItem('sc_input');
-  
-  $('rawInput').value = '';
-  state.nodes = [];
-  state.selected.clear();
-  renderNodes();
-  $('stickyBar').style.display = 'none';
-  
-  if(isAuto) alert("⏰ فایل موقت ساب‌اسکریپشن به دلیل پایان مهلت ۵ دقیقه‌ای پاک شد.");
-}
-
-function checkExistingTempFile() {
-  const expireStr = localStorage.getItem('sc_temp_expire');
-  if (expireStr) {
-    const expireTime = parseInt(expireStr);
-    if (Date.now() >= expireTime) deleteTempFile(false); 
-    else startTempFileTimer((expireTime - Date.now()) / 60000);
-  }
-}
-
-/** SMART EXTRACTION ENGINE **/
-function parseInput(text) {
-  if(!text) return [];
-  let decodedText = text;
-  
-  try {
-    const cleanText = text.replace(/\s/g, '');
-    if (/^[A-Za-z0-9+/=]+$/.test(cleanText) && cleanText.length > 30) {
-      const decoded = atob(cleanText.replace(/-/g, '+').replace(/_/g, '/'));
-      if (decoded.includes('://')) decodedText = decoded;
+    else if(line.startsWith('vmess://')){
+      const json = JSON.parse(atob(line.slice(8)));
+      return { proto: 'vmess', raw: line, uuid: json.id, address: json.add, port: parseInt(json.port), network: json.net||'tcp', security: json.tls==='tls'?'tls':'none', sni: json.sni||json.host||json.add, host: json.host||'', path: json.path||'/', remark: json.ps||'' };
     }
-  } catch(e) {}
-
-  const regex = /(vless|vmess|trojan|ss):\/\/[^\s<>'"]+/gi;
-  const matches = decodedText.match(regex) || [];
-  const results = [];
-  
-  matches.forEach((line, index) => {
-    let node = null;
-    if(line.toLowerCase().startsWith('vless://')) node = parseVless(line);
-    else if(line.toLowerCase().startsWith('vmess://')) node = parseVmess(line);
-    else if(line.toLowerCase().startsWith('trojan://')) node = parseTrojan(line);
-    else if(line.toLowerCase().startsWith('ss://')) node = parseSS(line);
-    
-    if(node) {
-      node.country = detectCountry(node.remark);
-      node.id = index;
-      results.push(node);
+    else if(line.startsWith('trojan://')){
+      const u = new URL(line); const p = u.searchParams;
+      return { proto: 'trojan', raw: line, uuid: u.username, address: u.hostname, port: parseInt(u.port)||443, network: p.get('type')||'tcp', security: 'tls', sni: p.get('sni')||u.hostname, path: p.get('path')||'/', host: p.get('host')||'', remark: decodeURIComponent(u.hash.slice(1)) };
     }
-  });
-  return results;
-}
-
-function parseVless(url) {
-  try {
-    const u = new URL(url);
-    const params = new URLSearchParams(u.search);
-    return {
-      protocol: 'vless', uuid: u.username, address: u.hostname, port: parseInt(u.port) || 443,
-      remark: decodeURIComponent(u.hash.slice(1)) || 'VLESS Node',
-      type: params.get('type') || 'tcp', security: params.get('security') || 'none',
-      sni: params.get('sni') || u.hostname, fp: params.get('fp') || 'chrome',
-      alpn: params.get('alpn'), path: params.get('path') || '/',
-      host: params.get('host') || '', pbk: params.get('pbk'), sid: params.get('sid'), flow: params.get('flow') || ''
-    };
-  } catch(e) { return null; }
-}
-
-function parseVmess(url) {
-  try {
-    const json = JSON.parse(atob(url.slice(8)));
-    return {
-      protocol: 'vmess', uuid: json.id, address: json.add, port: parseInt(json.port),
-      remark: json.ps || 'VMess Node', type: json.net || 'tcp', security: json.tls === 'tls' ? 'tls' : 'none',
-      sni: json.sni || json.host || json.add, host: json.host || '', path: json.path || '/'
-    };
-  } catch(e) { return null; }
-}
-
-function parseTrojan(url) {
-  try {
-    const u = new URL(url);
-    const params = new URLSearchParams(u.search);
-    return {
-      protocol: 'trojan', password: u.username, address: u.hostname, port: parseInt(u.port) || 443,
-      remark: decodeURIComponent(u.hash.slice(1)) || 'Trojan Node', type: params.get('type') || 'tcp',
-      security: 'tls', sni: params.get('sni') || u.hostname, path: params.get('path') || '/', host: params.get('host') || ''
-    };
-  } catch(e) { return null; }
-}
-
-function parseSS(url) {
-  try {
-    const temp = url.slice(5);
-    const hashIdx = temp.indexOf('#');
-    const remark = hashIdx > -1 ? decodeURIComponent(temp.slice(hashIdx+1)) : 'SS Node';
-    let mainPart = hashIdx > -1 ? temp.slice(0, hashIdx) : temp;
-    let auth, rest;
-    if(mainPart.includes('@')) [auth, rest] = mainPart.split('@');
-    else {
-      try {
-        const decoded = atob(mainPart);
-        if(decoded.includes('@')) [auth, rest] = decoded.split('@'); else return null;
-      } catch(e) { return null; }
+    else if(line.startsWith('ss://')){
+      const temp = line.slice(5), hashIdx = temp.indexOf('#');
+      const remark = hashIdx > -1 ? decodeURIComponent(temp.slice(hashIdx+1)) : '';
+      let main = hashIdx > -1 ? temp.slice(0, hashIdx) : temp, auth, rest;
+      if(main.includes('@')) [auth, rest] = main.split('@');
+      else { const d = atob(main); if(d.includes('@')) [auth, rest] = d.split('@'); else return {error:true}; }
+      const [method, ...pwParts] = atob(auth).split(':');
+      const [addr, port] = rest.split(':');
+      return { proto: 'ss', raw: line, method, uuid: pwParts.join(':'), address: addr, port: parseInt(port), remark };
     }
-    const methodPass = atob(auth);
-    const [method, password] = methodPass.split(':');
-    const [addr, port] = rest.split(':');
-    return { protocol: 'ss', method, password, address: addr, port: parseInt(port), remark };
-  } catch(e) { return null; }
+    return {error:true};
+  } catch(e) { return {error:true}; }
 }
 
 function detectCountry(remark) {
-  if(!remark) return { code: '🌐', name: 'Unknown' };
+  if(!remark) return '🌐';
   const r = remark.toUpperCase();
-  const flags = {
-    'IR': '🇮🇷', 'TEHRAN': '🇮🇷', 'IRAN': '🇮🇷', 'DE': '🇩🇪', 'GERMANY': '🇩🇪', 'US': '🇺🇸', 'USA': '🇺🇸',
-    'NL': '🇳🇱', 'GB': '🇬🇧', 'UK': '🇬🇧', 'FR': '🇫🇷', 'JP': '🇯🇵', 'JAPAN': '🇯🇵',
-    'SG': '🇸🇬', 'SINGAPORE': '🇸🇬', 'CA': '🇨🇦', 'RU': '🇷🇺', 'FI': '🇫🇮', 'SE': '🇸🇪', 'UA': '🇺🇦', 'TR': '🇹🇷'
-  };
-  for(const [key, flag] of Object.entries(flags)) if(r.includes(key)) return { code: flag, name: key };
-  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u);
-  if(emoji) return { code: emoji[0], name: 'Emoji' };
-  return { code: '🌐', name: 'Global' };
+  const flags = { 'IR':'🇮🇷', 'DE':'🇩🇪', 'US':'🇺🇸', 'NL':'🇳🇱', 'GB':'🇬🇧', 'FR':'🇫🇷', 'JP':'🇯🇵', 'SG':'🇸🇬', 'TR':'🇹🇷', 'CA':'🇨🇦', 'FI':'🇫🇮' };
+  for(const [k,f] of Object.entries(flags)) if(r.includes(k)) return f;
+  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u); return emoji ? emoji[0] : '🌐';
 }
 
-/** RENDER & SELECTION LOGIC **/
-function renderNodes() {
-  const filter = $('nodeFilter').value.toLowerCase();
-  const list = $('nodeList');
-  list.innerHTML = '';
+function slugTag(s, i){ return (s||'').trim().replace(/[\s:-]+/g,'_').slice(0,15) + '_' + i; }
+
+function analyzeInput(){
+  const raw = $('inputLinks').value.trim();
+  const text = resolveInput(raw);
+  const lines = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   
-  const filteredIndices = [];
-  state.nodes.forEach((n, idx) => {
-    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) filteredIndices.push(idx);
+  const keepLat = {}; nodes.forEach(o => { keepLat[o.raw] = o.latency; });
+  nodes = []; invalidCount = 0;
+  
+  lines.forEach((ln, i) => {
+    const pr = parseNodeLine(ln);
+    if(pr.error) { invalidCount++; return; }
+    pr.id = 'node_' + i;
+    pr.tag = $('prefix').value.trim() + slugTag(pr.remark, i);
+    pr.flag = detectCountry(pr.remark);
+    if(keepLat[ln] !== undefined) pr.latency = keepLat[ln];
+    nodes.push(pr);
   });
+
+  $('statLines').textContent = faNum(lines.length);
+  $('statValid').textContent = faNum(nodes.length);
+  $('statInvalid').textContent = faNum(invalidCount);
   
-  $('statTotal').textContent = faNum(state.nodes.length);
-  $('statValid').textContent = faNum(filteredIndices.length);
-  $('statCountries').textContent = faNum(new Set(state.nodes.map(n=>n.country.code)).size);
-  updateSelectionUI();
+  renderNodes();
+}
+
+/** NODE RENDERING **/
+function renderNodes(){
+  const list = $('nodeList');
+  const q = $('nodeSearch').value.toLowerCase();
   
-  if(filteredIndices.length === 0) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-secondary); padding:40px;">گره‌ای یافت نشد.</div>';
+  const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
+  
+  if(!filtered.length) {
+    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary);">هیچ گره‌ای هماهنگ با فیلتر یافت نشد.</div>';
     return;
   }
   
-  filteredIndices.forEach(idx => {
-    const n = state.nodes[idx];
-    const isSelected = state.selected.has(idx);
-    const div = document.createElement('div');
-    div.className = `node-card ${isSelected ? 'selected' : ''}`;
-    div.onclick = (e) => { if(!e.target.closest('.action-icon')) toggleNode(idx); };
-    
-    div.innerHTML = `
+  list.innerHTML = filtered.map(n => {
+    let pingHtml = '';
+    if(n.latency === undefined) pingHtml = '<span class="badge" id="ping-'+n.id+'">بدون تست</span>';
+    else if(n.latency < 0) pingHtml = '<span class="badge ping-bad" id="ping-'+n.id+'">✕ TimeOut</span>';
+    else pingHtml = `<span class="badge ${n.latency<250?'ping-good':(n.latency<600?'ping-mid':'ping-bad')}" id="ping-${n.id}">⚡ ${n.latency}ms</span>`;
+
+    const uriSafe = encodeURIComponent(n.raw);
+
+    return `
+    <div class="node-card">
       <div class="node-head">
-        <span class="node-flag">${n.country.code}</span>
-        <span class="badge ${n.protocol}">${n.protocol.toUpperCase()}</span>
+        <span class="node-flag">${n.flag}</span>
+        <span class="badge" style="border-color:var(--cyan); color:var(--cyan)">${n.proto.toUpperCase()}</span>
       </div>
-      <div class="node-remark" title="${safeHtml(n.remark)}">${safeHtml(n.remark)}</div>
+      <div class="node-remark" title="${escHtml(n.remark)}">${escHtml(n.remark||n.address)}</div>
       <div class="node-meta">
         <span class="badge">${n.address}:${n.port}</span>
-        <span class="badge ${n.type || 'tcp'}">${(n.type||'tcp').toUpperCase()}</span>
-        ${n.security === 'tls' ? '<span class="badge tls">TLS</span>' : ''}
-        ${n.security === 'reality' ? '<span class="badge reality">REALITY</span>' : ''}
+        <span class="badge b-${n.network||'tcp'}">${(n.network||'tcp').toUpperCase()}</span>
+        ${n.security==='tls'?'<span class="badge b-tls">TLS</span>':''}
+        ${n.security==='reality'?'<span class="badge b-reality">REALITY</span>':''}
+        ${pingHtml}
       </div>
-      <div class="node-actions">
-        <span class="action-icon" onclick="editNode(${idx})" title="Edit">✏️</span>
-        <span class="action-icon del" onclick="deleteNode(${idx})" title="Delete">🗑</span>
-        <span class="action-icon" onclick="showNodeQr(${idx})" title="QR Code">📷</span>
+      <div class="node-actions" style="margin-top:6px;">
+        <button class="primary" style="padding:2px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 QR</button>
+        <button class="danger" style="padding:2px 8px; font-size:0.7rem;" onclick="removeNode('${n.id}')">🗑</button>
       </div>
-    `;
-    list.appendChild(div);
-  });
+    </div>`;
+  }).join('');
 }
 
-function toggleNode(idx) {
-  if(state.selected.has(idx)) state.selected.delete(idx); else state.selected.add(idx);
-  renderNodes();
-}
+function removeNode(id) { nodes = nodes.filter(n => n.id !== id); renderNodes(); }
+$('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 500); });
+$('nodeSearch').addEventListener('input', renderNodes);
+$('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; analyzeInput(); });
 
-function toggleSelectAll() {
-  const filter = $('nodeFilter').value.toLowerCase();
-  const allVisible = [];
-  state.nodes.forEach((n, idx) => {
-    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) allVisible.push(idx);
-  });
-  
-  const allSelected = allVisible.length > 0 && allVisible.every(idx => state.selected.has(idx));
-  if(allSelected) allVisible.forEach(idx => state.selected.delete(idx));
-  else allVisible.forEach(idx => state.selected.add(idx));
-  renderNodes();
-}
-
-function updateSelectionUI() {
-  const count = state.selected.size;
-  $('selectedCount').textContent = faNum(count);
-  $('finalCount').textContent = faNum(count);
-  $('stickyBar').style.display = count > 0 ? 'flex' : 'none';
-}
-
-function deleteNode(idx) {
-  if(confirm('آیا از حذف این گره اطمینان دارید؟')) { state.nodes.splice(idx, 1); processInput(false); }
-}
-
-function editNode(idx) {
-  const n = state.nodes[idx];
-  const newRemark = prompt("نام گره را ویرایش کنید:", n.remark);
-  if(newRemark) { n.remark = newRemark; n.country = detectCountry(newRemark); renderNodes(); saveToLocal(); }
-}
-
-/** DATA HANDLING (FETCH & EXTRACT) **/
-async function fetchSubscription(e) {
-  const url = $('subUrl').value.trim();
-  if(!url) return alert('لطفا URL را وارد کنید');
-  
-  const btn = e.target;
-  const originalText = btn.textContent;
-  btn.textContent = '⏳ در حال دریافت...'; btn.disabled = true;
-  
-  const proxies = ['', 'https://api.allorigins.win/raw?url=', 'https://api.codetabs.com/v1/proxy?quest=', 'https://corsproxy.io/?'];
-  let success = false;
-
-  for (let proxy of proxies) {
+/** DNS PING TESTER (No-CORS) **/
+const dnsURLs = {
+  'Cloudflare': 'https://cloudflare-dns.com/dns-query', 'Google': 'https://dns.google/resolve', 'Quad9': 'https://dns.quad9.net/dns-query',
+  'Shecan': 'https://shecan.ir/favicon.ico', 'Electro': 'https://electrotm.org/favicon.ico', 'Radar': 'https://radar.game/favicon.ico'
+};
+async function testDnsPings() {
+  const btn = $('btnPingDns'); btn.textContent = '⏳ ...'; btn.disabled = true;
+  const promises = Object.keys(dnsURLs).map(async (key) => {
+    const start = Date.now();
     try {
-      const fetchUrl = proxy ? proxy + encodeURIComponent(url) : url;
-      let res = await fetch(fetchUrl);
-      if (!res.ok) continue; 
-      
-      let text = await res.text();
-      if (text.trim().length > 10 && !text.trim().toLowerCase().startsWith('<html') && !text.trim().toLowerCase().startsWith('<!doctype')) {
-        $('rawInput').value = text; processInput();
-        alert('✅ ساب‌اسکریپشن دریافت و کانفیگ‌ها استخراج شد.\n\n⚠️ این داده‌ها در یک فایل موقت ذخیره شده و ۵ دقیقه دیگر به طور خودکار حذف می‌شوند.');
-        startTempFileTimer(5); success = true; break; 
-      }
-    } catch (err) { console.warn("Proxy failed: ", proxy); }
+      const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 3500);
+      await fetch(dnsURLs[key] + "?t=" + start, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeoutId); const ping = Date.now() - start;
+      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+      if(opt) opt.textContent = `${key} (${ping<150?'🟢':(ping<300?'🟡':'🟠')} ${ping}ms)`;
+    } catch (e) {
+      const opt = document.querySelector(`#dnsPreset option[value="${key}"]`);
+      if(opt) opt.textContent = `${key} (❌ مسدود)`;
+    }
+  });
+  await Promise.allSettled(promises);
+  btn.textContent = '📡 تست'; btn.disabled = false; toast('تست پینگ سرورهای DNS تمام شد.');
+}
+
+/** NODE PING TESTER (WebSocket) **/
+async function pingNode(addr, port, timeout=4000){
+  return new Promise(res => {
+    let done = false; const t0 = performance.now();
+    const fin = ok => { if(done)return; done = true; res({ok, ms: ok ? Math.max(1, Math.round(performance.now()-t0)) : -1}); };
+    try { const ws = new WebSocket(`ws://${addr.includes(':')?'['+addr+']':addr}:${port}`);
+      const tm = setTimeout(()=>{ try{ws.close();}catch(e){} fin(false); }, timeout);
+      ws.onopen = ()=>{ clearTimeout(tm); try{ws.close();}catch(e){} fin(true); };
+      ws.onerror = ()=>{ clearTimeout(tm); fin(true); }; ws.onclose = ()=>{ clearTimeout(tm); fin(true); };
+    } catch(e){ fin(false); }
+  });
+}
+async function testNodesPing() {
+  if(!nodes.length) return toast('گره‌ای وجود ندارد', 'warn');
+  if(testing) return; testing = true;
+  const btn = $('btnPingNodes'); btn.textContent = '⏳ در حال تست...'; btn.disabled = true;
+  
+  nodes.forEach(n => { n.latency = undefined; const e = $('ping-'+n.id); if(e){ e.textContent='...'; e.className='badge'; } });
+  
+  const q = [...nodes], N = Math.min(8, nodes.length);
+  await Promise.all(Array.from({length:N}, async () => {
+    while(q.length){
+      const n = q.shift();
+      const r = await pingNode(n.address, n.port);
+      n.latency = r.ok ? r.ms : -1;
+      const e = $('ping-'+n.id);
+      if(e) { e.textContent = r.ok ? `⚡ ${r.ms}ms` : '✕ TimeOut'; e.className = 'badge '+(r.ok?(r.ms<250?'ping-good':'ping-mid'):'ping-bad'); }
+    }
+  }));
+  
+  // مرتب‌سازی بر اساس پینگ
+  nodes.sort((a,b) => { const pa = a.latency<0?1e9:a.latency; const pb = b.latency<0?1e9:b.latency; return pa - pb; });
+  renderNodes();
+  testing = false; btn.textContent = '📡 تست پینگ جامع'; btn.disabled = false;
+  toast('تست پینگ به پایان رسید و مرتب‌سازی شد.');
+}
+
+/** FETCH FROM URL **/
+$('btnFetch').addEventListener('click', async () => {
+  const url = $('subUrl').value.trim(); if(!url) return toast('آدرس ساب‌اسکریپشن خالی است', 'warn');
+  const btn = $('btnFetch'); btn.textContent = '⏳...'; btn.disabled = true;
+  try {
+    const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
+    if(!res.ok) throw new Error();
+    $('inputLinks').value = await res.text(); analyzeInput(); toast('ساب‌اسکریپشن دریافت شد ✓');
+  } catch(e) {
+    try {
+      const r2 = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+      $('inputLinks').value = await r2.text(); analyzeInput(); toast('ساب‌اسکریپشن دریافت شد ✓');
+    } catch(err) { toast('دریافت با خطا مواجه شد. ممکن است لینک مسدود باشد.', 'err'); }
   }
-
-  if (!success) alert('❌ دریافت لینک با خطا مواجه شد.\n\nسرور مبدا مسدود است یا اجازه دسترسی نمی‌دهد. لطفاً لینک را در مرورگر باز کنید، کل متن آن را کپی کرده و دستی Paste کنید.');
-  btn.textContent = originalText; btn.disabled = false;
-}
-
-function pasteFromClipboard() {
-  navigator.clipboard.readText().then(text => { $('rawInput').value = text; processInput(); }).catch(() => alert('دسترسی به کلیپ‌بورد مقدور نیست. لطفا دستی Paste کنید.'));
-}
-function handleFileImport(input) {
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader(); reader.onload = e => { $('rawInput').value = e.target.result; processInput(); };
-  reader.readAsText(file); input.value = '';
-}
-function clearAll() { if(confirm('تمام داده‌ها پاک شوند؟')) deleteTempFile(false); }
-
-let inputTimeout;
-function processInput(save = true) {
-  const raw = $('rawInput').value; state.nodes = parseInput(raw); state.selected.clear(); renderNodes(); if(save) saveToLocal();
-}
-$('rawInput').addEventListener('input', () => { clearTimeout(inputTimeout); inputTimeout = setTimeout(() => processInput(true), 600); });
-
-function saveToLocal() { localStorage.setItem('sc_nodes', JSON.stringify(state.nodes)); localStorage.setItem('sc_input', $('rawInput').value); }
-window.addEventListener('load', () => {
-  checkExistingTempFile();
-  if(localStorage.getItem('sc_nodes')) { state.nodes = JSON.parse(localStorage.getItem('sc_nodes')); $('rawInput').value = localStorage.getItem('sc_input') || ''; renderNodes(); }
+  btn.textContent = '⬇ دریافت'; btn.disabled = false;
 });
 
-/** CONFIG GENERATION **/
-function generateConfig() {
-  if(state.selected.size === 0) return alert('هیچ گره‌ای انتخاب نشده است!');
-  
-  const selectedNodes = Array.from(state.selected).map(idx => state.nodes[idx]);
-  const format = $('outputFormat').value;
-  const warpMode = $('outboundMode').value;
-  
-  let config = {};
-  if(format === 'xray') config = buildXrayConfig(selectedNodes, warpMode);
-  else config = buildSingBoxConfig(selectedNodes, warpMode);
-  
-  state.configJson = JSON.stringify(config, null, 2);
-  $('stickyBar').scrollIntoView({ behavior: 'smooth', block: 'end' });
+/** GENERATORS (Xray, Sing-Box, Clash) **/
+function getSettings() {
+  return {
+    prefix: $('prefix').value.trim()||'proxy-', mux: $('swMux').checked, allowInsecure: $('swInsecure').checked,
+    dns: DNS_PRESETS[$('dnsPreset').value] || DNS_PRESETS.Cloudflare,
+    inbound: { socksPort: parseInt($('socksPort').value)||10808, httpPort: parseInt($('httpPort').value)||10809 },
+    obs: { enabled: $('swObs').checked, strategy: $('obsStrategy').value, probe: PROBES[$('probeSel').value], interval: $('obsInterval').value },
+    routing: { blockAds: $('swAds').checked, directIR: $('swIR').checked, blockQuic: $('swQuic').checked, directPrivate: $('swPriv').checked }
+  };
 }
 
-function buildXrayConfig(nodes, warpMode) {
-  const outbounds = [];
+function buildXray(list, s) {
   const rules = [];
-  
-  // Apply Fragment
-  if(state.fragment.mode !== 'off') {
-    let len, interval, pack;
-    if(state.fragment.mode === 'auto_tls') { len = '100-200'; interval = '10-20'; pack = 'tlshello'; }
-    else if(state.fragment.mode === 'auto_sni') { len = '10-30'; interval = '10-20'; pack = '1-1'; }
-    else { len = $('fragLen').value; interval = $('fragInt').value; pack = $('fragPack').value; }
-    
-    outbounds.push({
-      tag: "fragment-out", protocol: "freedom",
-      settings: { domainStrategy: "AsIs", fragment: { packets: pack, length: len, interval: interval } }
-    });
-  }
+  if(s.routing.blockQuic) rules.push({network:'udp', port:'443', outboundTag:'block', type:'field'});
+  if(s.routing.blockAds) rules.push({domain:['geosite:category-ads-all'], outboundTag:'block', type:'field'});
+  rules.push({balancerTag:'proxy-round', domain:['geosite:google'], type:'field'});
+  if(s.routing.directPrivate) rules.push({ip:['geoip:private'], domain:['geosite:private'], outboundTag:'direct', type:'field'});
+  if(s.routing.directIR) rules.push({ip:['geoip:cn','geoip:ir'], domain:['geosite:cn','geosite:ir'], outboundTag:'direct', type:'field'});
+  rules.push({balancerTag:'proxy-round', network:'tcp,udp', type:'field'});
 
-  // Nodes
-  nodes.forEach((n, i) => {
-    const tag = `proxy_${i}`;
-    const ob = { tag: tag, protocol: n.protocol, settings: {}, streamSettings: { network: n.type || 'tcp', security: n.security || 'none' } };
+  const outbounds = list.map(n => {
+    const ob = { tag: n.tag, protocol: n.proto, settings: {}, streamSettings: { network: n.network||'tcp', security: n.security||'none' } };
     
-    if(n.protocol === 'vless') {
-      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, encryption: "none", flow: n.flow }] }];
-      if(n.security === 'reality') ob.streamSettings.realitySettings = { publicKey: n.pbk, shortId: n.sid, serverName: n.sni };
-      else if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, alpn: n.alpn ? n.alpn.split(',') : [] };
-      if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
-      if(n.type === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.path };
-    } else if (n.protocol === 'vmess') {
-       ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, level: 8 }] }];
-       if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni };
-       if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
-    } else if (n.protocol === 'trojan') {
-       ob.settings.servers = [{ address: n.address, port: n.port, password: n.password }];
-       if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni };
-    } else if (n.protocol === 'ss') {
-       ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.password }];
+    if(n.proto === 'vless'){
+      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, encryption: "none", flow: n.flow||"" }] }];
+      if(n.security === 'reality') ob.streamSettings.realitySettings = { publicKey: n.pbk, shortId: n.sid, serverName: n.sni, spiderX: n.spx };
+      else if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, alpn: n.alpn.length?n.alpn:undefined, fingerprint: n.fp };
+      if(n.network === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: n.host ? {Host: n.host} : {} };
+      else if(n.network === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.serviceName||'grpc' };
+    } 
+    else if(n.proto === 'vmess'){
+      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, alterId: 0 }] }];
+      if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure };
+      if(n.network === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: n.host ? {Host: n.host} : {} };
     }
-
-    if(state.fragment.mode !== 'off') ob.streamSettings.sockopt = { dialerProxy: "fragment-out" };
-    outbounds.push(ob);
+    else if(n.proto === 'trojan'){
+      ob.settings.servers = [{ address: n.address, port: n.port, password: n.uuid }];
+      ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure };
+      if(n.network === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: n.host ? {Host: n.host} : {} };
+    }
+    else if(n.proto === 'ss'){ ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.uuid }]; }
+    
+    if(s.mux) ob.mux = { enabled: true, concurrency: 8 };
+    return ob;
   });
 
-  // Warp Logic
-  if(warpMode !== 'direct') {
-    const isIPv6 = warpMode === 'warp-ipv6';
-    outbounds.push({
-      tag: "warp", protocol: "wireguard",
-      settings: {
-        secretKey: "YOUR_SECRET_KEY_HERE", 
-        address: isIPv6 ? ["2606:4700:d0::1/128"] : ["172.16.0.2/32", "2606:4700:d0::1/128"],
-        peers: [{ publicKey: "bmXOC+F1FxEMF9N1", endpoint: "engage.cloudflareclient.com:2408" }]
-      }
-    });
-    
-    if(warpMode === 'warp-full' || isIPv6) rules.push({ type: "field", outboundTag: "warp", network: "tcp,udp" });
-    else if (warpMode === 'warp-split') {
-       rules.push({ type: "field", outboundTag: "warp", ip: ["geoip:ir"] });
-       rules.push({ type: "field", outboundTag: "warp", domain: ["geosite:category-ir"] });
-    }
-  }
-
-  // Get selected DNS IPs
-  const dnsDict = {
-    'cloudflare': "1.1.1.1", 'google': "8.8.8.8", 'quad9': "9.9.9.9", 'adguard': "94.140.14.14",
-    'shecan': "178.22.122.100", 'electro': "78.157.42.101", 'radar': "10.202.10.10", '403': "10.202.10.202"
-  };
-  const selectedDns = dnsDict[$('dnsPreset').value] || "1.1.1.1";
-
-  return {
+  const cfg = {
     log: { loglevel: "warning" },
-    inbounds: [{ port: 10808, protocol: "socks", settings: { udp: true }, sniffing: { enabled: true, destOverride: ["http", "tls"] } }],
-    outbounds: [...outbounds, { tag: "direct", protocol: "freedom" }, { tag: "block", protocol: "blackhole" }],
-    routing: { rules: rules, domainStrategy: "IPIfNonMatch" },
-    dns: { servers: [selectedDns, "8.8.8.8", "localhost"] }
+    inbounds: [
+      { listen: '127.0.0.1', port: s.inbound.socksPort, protocol: 'socks', settings: { udp: true }, sniffing: { enabled: true, destOverride: ['http','tls'] }, tag: 'socks-in' },
+      { listen: '127.0.0.1', port: s.inbound.httpPort, protocol: 'http', tag: 'http-in' }
+    ],
+    outbounds: [...outbounds, {protocol:'freedom', tag:'direct'}, {protocol:'blackhole', tag:'block'}],
+    routing: { balancers: [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }], rules, domainStrategy: 'IPIfNonMatch' },
+    dns: { servers: [s.dns[0], '8.8.8.8'] }
   };
+  
+  if(s.obs.enabled) cfg.observatory = { probeUrl: s.obs.probe, probeInterval: s.obs.interval, subjectSelector: [s.prefix] };
+  return cfg;
 }
 
-function buildSingBoxConfig(nodes, warpMode) {
-  const outbounds = [];
-  nodes.forEach((n, i) => {
-    let ob = { type: n.protocol, tag: `proxy-${i}`, server: n.address, server_port: n.port };
-    if(n.protocol === 'vless' || n.protocol === 'vmess') ob.uuid = n.uuid;
-    if(n.protocol === 'trojan') ob.password = n.password;
-    if(n.protocol === 'ss') { ob.method = n.method; ob.password = n.password; }
-    outbounds.push(ob);
+function buildSingBox(list, s) {
+  const tags = list.map(n => n.tag);
+  const outbounds = list.map(n => {
+    const ob = { type: n.proto, tag: n.tag, server: n.address, server_port: n.port };
+    if(n.proto === 'vless' || n.proto === 'vmess') ob.uuid = n.uuid;
+    if(n.proto === 'trojan') ob.password = n.uuid;
+    if(n.proto === 'ss') { ob.method = n.method; ob.password = n.uuid; }
+    
+    if(n.flow) ob.flow = n.flow;
+    if(n.security === 'tls' || n.security === 'reality') {
+      ob.tls = { enabled: true, server_name: n.sni, insecure: s.allowInsecure };
+      if(n.security === 'reality') ob.tls.reality = { enabled: true, public_key: n.pbk, short_id: n.sid };
+      if(n.fp) ob.tls.utls = { enabled: true, fingerprint: n.fp };
+    }
+    if(n.network === 'ws') ob.transport = { type: 'ws', path: n.path, headers: n.host ? {Host: n.host} : undefined };
+    else if(n.network === 'grpc') ob.transport = { type: 'grpc', service_name: n.serviceName||'grpc' };
+    return ob;
   });
-  outbounds.push({ type: "direct", tag: "direct" }, { type: "block", tag: "block" });
-
-  const dnsDict = {
-    'cloudflare': "1.1.1.1", 'google': "8.8.8.8", 'quad9': "9.9.9.9", 'adguard': "94.140.14.14",
-    'shecan': "178.22.122.100", 'electro': "78.157.42.101", 'radar': "10.202.10.10", '403': "10.202.10.202"
-  };
-  const selectedDns = dnsDict[$('dnsPreset').value] || "1.1.1.1";
 
   return {
-    log: { level: "info" },
-    inbounds: [{ type: "tun", tag: "tun-in", interface_name: "tun0", inet4_address: "172.19.0.1/30", auto_route: true, strict_route: true }],
-    outbounds: outbounds,
-    route: { rules: [{ protocol: "dns", outbound: "direct" }] },
-    dns: { servers: [{ address: selectedDns, strategy: "ipv4_only"}] }
+    log: { level: "warn" },
+    dns: { servers: [{ address: s.dns[0], tag: 'dns-main' }], rules: [{ outbound: 'any', server: 'dns-main' }] },
+    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: s.inbound.socksPort }],
+    outbounds: [
+      ...outbounds,
+      { type: 'urltest', tag: 'auto', outbounds: tags, url: s.obs.probe, interval: '3m' },
+      { type: 'direct', tag: 'direct' }, { type: 'block', tag: 'block' }
+    ],
+    route: { rules: [
+      { protocol: 'dns', outbound: 'direct' },
+      ...(s.routing.blockAds ? [{ rule_set: 'geosite-category-ads-all', outbound: 'block' }] : []),
+      ...(s.routing.directIR ? [{ rule_set: ['geoip-ir', 'geosite-ir'], outbound: 'direct' }] : []),
+      { network: 'udp', port: 443, outbound: 'block' }
+    ], final: 'auto' }
   };
 }
 
-/** ACTIONS **/
-function copyConfig(e) {
-  if(!state.configJson) return generateConfig();
-  navigator.clipboard.writeText(state.configJson).then(() => {
-    const btn = e.target; const old = btn.textContent;
-    btn.textContent = '✅ کپی شد'; setTimeout(() => btn.textContent = old, 2000);
+function buildClash(list, s) {
+  const L = []; const p = x => L.push(x);
+  p('mixed-port: ' + s.inbound.socksPort); p('mode: rule'); p('allow-lan: false');
+  p('dns:\n  enable: true\n  enhanced-mode: fake-ip\n  nameserver:\n    - '+s.dns[0]);
+  p('proxies:');
+  list.forEach(n => {
+    p('  - name: "'+n.tag+'"\n    type: '+n.proto+'\n    server: '+n.address+'\n    port: '+n.port+'\n    '+(n.proto==='ss'?'password':'uuid')+': "'+n.uuid+'"');
+    if(n.proto==='vless') p('    network: '+(n.network==='grpc'?'grpc':(n.network==='ws'?'ws':'tcp')));
+    if(n.flow) p('    flow: '+n.flow);
+    if(n.security==='tls' || n.security==='reality'){
+      p('    tls: true\n    servername: "'+n.sni+'"');
+      if(s.allowInsecure) p('    skip-cert-verify: true');
+      if(n.security==='reality') p('    reality-opts:\n      public-key: '+n.pbk+(n.sid?'\n      short-id: '+n.sid:''));
+    }
+    if(n.network==='ws') p('    ws-opts:\n      path: "'+n.path+'"'+(n.host?'\n      headers:\n        Host: '+n.host:''));
+    else if(n.network==='grpc') p('    grpc-opts:\n      grpc-service-name: "'+(n.serviceName||'grpc')+'"');
   });
+  p('proxy-groups:\n  - name: AUTO\n    type: url-test\n    url: '+s.obs.probe+'\n    interval: 180\n    proxies:');
+  list.forEach(n => p('      - "'+n.tag+'"'));
+  p('rules:');
+  if(s.routing.blockAds) p('  - GEOSITE,category-ads-all,REJECT');
+  if(s.routing.directIR) { p('  - GEOIP,IR,DIRECT'); p('  - GEOSITE,IR,DIRECT'); }
+  if(s.routing.directPrivate) p('  - GEOSITE,private,DIRECT');
+  p('  - MATCH,AUTO');
+  return L.join('\n');
 }
-function downloadConfig() {
-  if(!state.configJson) return generateConfig();
-  const blob = new Blob([state.configJson], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `config_${Date.now()}.json`; a.click(); URL.revokeObjectURL(a.href);
+
+/** DIFF WORKER **/
+function lcsLocal(a,b){
+  const n=a.length, m=b.length; if(n*m>4000000) return {tooBig:true};
+  const W=m+1, dp=new Uint32Array((n+1)*W);
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i*W+j]=a[i]===b[j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
+  const out=[]; let i=0, j=0;
+  while(i<n&&j<m){ if(a[i]===b[j]){ out.push([0,a[i]]); i++; j++; } else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){ out.push([-1,a[i]]); i++; } else { out.push([1,b[j]]); j++; } }
+  while(i<n) out.push([-1,a[i++]]); while(j<m) out.push([1,b[j++]]);
+  return {rows:out};
 }
-function showQrModal() {
-  if(!state.configJson) return generateConfig();
-  $('qrModalTitle').textContent = 'QR Code کانفیگ نهایی';
-  $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
-  new QRCode($('qrcode'), { text: state.configJson, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
+function renderDiff(){
+  const box=$('diffOut'), cur=textCache[curFmt]||'', prev=prevTexts[curFmt];
+  if(!cur){ box.innerHTML = '<span class="d-ctx">// خروجی فعلی خالی است</span>'; return; }
+  if(!prev){ box.innerHTML = '<span class="d-ctx">// برای مقایسه: تنظیمات را تغییر دهید و دوباره تولید کنید. <br> <span style="color:#86efac">سبز = اضافه شده</span> | <span style="color:#fda4af">قرمز = حذف شده</span></span>'; return; }
+  if(cur === prev){ box.innerHTML = '<span style="color:#86efac">✔ هیچ تغییری نسبت به نسخه قبل وجود ندارد.</span>'; return; }
+  const res = lcsLocal(prev.split('\n'), cur.split('\n'));
+  if(res.tooBig){ box.innerHTML='<span style="color:#f59e0b">⚠ حجم فایل برای مقایسه بیش از حد بزرگ است.</span>'; return; }
+  box.innerHTML = res.rows.slice(0, 4000).map(r => {
+    const t = escHtml(r[1])||'&nbsp;';
+    return r[0]===0 ? '<span class="d-ctx">  '+t+'</span>' : (r[0]===1 ? '<span class="d-add">+ '+t+'</span>' : '<span class="d-del">- '+t+'</span>');
+  }).join('');
 }
-function showNodeQr(idx) {
-  const node = state.nodes[idx]; let uri = "";
-  if(node.protocol === 'vless') uri = `vless://${node.uuid}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}&pbk=${node.pbk||''}&sid=${node.sid||''}&fp=${node.fp||'chrome'}#${encodeURIComponent(node.remark)}`;
-  else if(node.protocol === 'vmess') {
-    const vObj = { v: "2", ps: node.remark, add: node.address, port: node.port, id: node.uuid, net: node.type, type: "none", host: node.host, path: node.path, tls: node.security === 'tls' ? 'tls' : '', sni: node.sni };
-    uri = `vmess://${btoa(JSON.stringify(vObj))}`;
-  } else if(node.protocol === 'trojan') uri = `trojan://${node.password}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}#${encodeURIComponent(node.remark)}`;
-  else if(node.protocol === 'ss') uri = `ss://${btoa(node.method + ':' + node.password)}@${node.address}:${node.port}#${encodeURIComponent(node.remark)}`;
+
+/** GENERATE & RENDER **/
+function syntaxHighlight(str, fmt) {
+  let esc = escHtml(str);
+  if(fmt==='xray' || fmt==='singbox') return esc.replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g, m => {
+    return `<span class="${m.startsWith('"') ? (/"\s*:$/.test(m) ? 'tok-key' : 'tok-str') : (/[a-z]/.test(m) ? 'tok-bool' : 'tok-num')}">${m}</span>`;
+  });
+  if(fmt==='clash') return esc.replace(/^(\s*-\s)|^([A-Za-z][\w-]*:)|(\s{2,})([A-Za-z][\w-]*:)/gm, (m,a,b,i,d) => {
+    if(a) return `<span class="tok-bool">${a}</span>`; if(b) return `<span class="tok-key">${b}</span>`; return `${i}<span class="tok-key">${d}</span>`;
+  });
+  return `<span style="color:#86efac">${esc}</span>`;
+}
+
+function processGenerate() {
+  if(!nodes.length) return toast('هیچ گره‌ای برای تبدیل وجود ندارد', 'warn');
+  const s = getSettings();
+  curFmt = $('fmtSel').value;
+  if(textCache[curFmt]) prevTexts[curFmt] = textCache[curFmt];
   
-  if(!uri) return alert('ساخت QR برای این پروتکل یا این فرمت دارای مشکل است.');
-  $('qrModalTitle').textContent = `QR Code: ${node.remark}`;
+  let outStr = '';
+  if(curFmt === 'xray') outStr = JSON.stringify(buildXray(nodes, s), null, 2);
+  else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(nodes, s), null, 2);
+  else if(curFmt === 'clash') outStr = buildClash(nodes, s);
+  else if(curFmt === 'v2rayn') outStr = btoa(nodes.map(n=>n.raw).join('\n'));
+  
+  textCache[curFmt] = outStr;
+  
+  $('prettyOut').innerHTML = syntaxHighlight(outStr, curFmt);
+  $('plainOut').value = outStr;
+  renderDiff();
+  
+  toast('کانفیگ با موفقیت تولید شد ✓');
+}
+
+$('btnConvert').addEventListener('click', processGenerate);
+$('fmtSel').addEventListener('change', processGenerate);
+
+/** TABS **/
+function setTab(t) {
+  curTab = t;
+  ['Pretty','Plain','Diff'].forEach(k => $('tab'+k).classList.remove('active'));
+  $(t==='pretty'?'tabPretty':(t==='plain'?'tabPlain':'tabDiff')).classList.add('active');
+  $('prettyOut').classList.toggle('hidden', t!=='pretty');
+  $('plainOut').classList.toggle('hidden', t!=='plain');
+  $('diffOut').classList.toggle('hidden', t!=='diff');
+}
+$('tabPretty').addEventListener('click',()=>setTab('pretty'));
+$('tabPlain').addEventListener('click',()=>setTab('plain'));
+$('tabDiff').addEventListener('click',()=>setTab('diff'));
+
+/** APPLY TEMPLATES **/
+document.querySelectorAll('[data-tpl]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tpl = BUILTIN_TPLS[btn.dataset.tpl];
+    if(tpl.obs) { $('swObs').checked = tpl.obs.enabled!==false; $('obsStrategy').value = tpl.obs.strategy||'leastPing'; $('obsInterval').value = tpl.obs.interval||'3m'; }
+    if(tpl.routing) { $('swAds').checked = !!tpl.routing.blockAds; $('swQuic').checked = !!tpl.routing.blockQuic; $('swIR').checked = tpl.routing.directIR!==false; }
+    if(tpl.dns) $('dnsPreset').value = tpl.dns.preset;
+    if(tpl.proxy) $('swMux').checked = !!tpl.proxy.mux;
+    toast(`قالب «${btn.textContent}» با موفقیت اعمال شد.`);
+  });
+});
+
+/** COPY & MODAL **/
+$('btnCopy').addEventListener('click', () => {
+  if(!textCache[curFmt]) return toast('خروجی برای کپی وجود ندارد', 'err');
+  navigator.clipboard.writeText(textCache[curFmt]).then(()=>toast('کانفیگ نهایی در کلیپ‌بورد کپی شد ✓')).catch(()=>toast('خطا در کپی', 'err'));
+});
+
+function showQrModal(uri) {
   $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
-  new QRCode($('qrcode'), { text: uri, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
+  new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
 </script>
 </body>
