@@ -65,7 +65,7 @@ body.theme-light {
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-body { font-family: var(--font-body); background: var(--bg-color); background-image: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; }
+body { font-family: var(--font-body); background: var(--bg-color); background-image: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; padding-bottom: 40px;}
 #canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -73,7 +73,7 @@ body { font-family: var(--font-body); background: var(--bg-color); background-im
 ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-.container { max-width: 1280px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+.container { max-width: 1320px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
 /* ── HEADER ── */
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px 24px; background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); flex-wrap: wrap; gap: 15px;}
@@ -94,13 +94,14 @@ body.theme-light button:not(.primary), body.theme-light select, body.theme-light
 button:hover:not(:disabled), select:hover, input:hover { border-color: var(--cyan); }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* DROPDOWN READABILITY FIX */
 select option, select optgroup { background-color: #1a1a2e; color: #e2e8f0; font-family: var(--font-body); }
 body.theme-cyber select option, body.theme-cyber select optgroup { background-color: #0a0118; color: #e0fbfc; }
 body.theme-light select option, body.theme-light select optgroup { background-color: #ffffff; color: #1e293b; }
 
 button.primary { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; border: none; font-weight: 600; }
 button.primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px rgba(34,211,238,.4); transform: translateY(-1px); }
+button.success { background: linear-gradient(135deg, var(--success), #059669); color: #fff; border: none; font-weight: 600; }
+button.success:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 15px rgba(16,185,129,.4); transform: translateY(-1px); }
 button.danger { color: var(--danger); border-color: var(--danger); background: rgba(251,113,133,.08); }
 button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
 
@@ -111,7 +112,7 @@ button.danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
 .tpl-chip:hover { border-color: var(--cyan); color: var(--cyan); }
 
 /* ── MAIN LAYOUT ── */
-.grid-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
+.grid-layout { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; align-items: start; }
 @media (max-width: 1000px) { .grid-layout { grid-template-columns: 1fr; } }
 
 .card { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--glass-shadow); margin-bottom: 20px; }
@@ -141,14 +142,14 @@ body.theme-light .acc { background: #f8fafc; }
 .switch input:checked + .slider { background: rgba(34,211,238,.2); border-color: var(--cyan); }
 .switch input:checked + .slider::before { transform: translateX(-18px); background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
 
-textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; resize: vertical; direction: ltr; line-height: 1.5; }
+textarea.input-box { width: 100%; height: 130px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; resize: vertical; direction: ltr; line-height: 1.5; }
 
 /* ── OUTPUT SECTION ── */
 .tabs { display: flex; gap: 4px; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 9px; padding: 4px; }
 .tab { font-size: 0.75rem; color: var(--text-secondary); background: transparent; border: none; border-radius: 6px; padding: 4px 12px; cursor: pointer; transition: .2s; }
 .tab.active { color: #fff; background: var(--accent); font-weight: 700; }
-.out-wrap { position: relative; min-height: 380px; flex: 1; display: flex; flex-direction: column; }
-#prettyOut, #plainOut, #diffOut { width: 100%; height: 380px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
+.out-wrap { position: relative; min-height: 280px; flex: 1; display: flex; flex-direction: column; }
+#prettyOut, #plainOut, #diffOut { width: 100%; height: 280px; margin: 0; background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.7; direction: ltr; text-align: left; overflow: auto; white-space: pre; }
 #prettyOut { color: #94a3b8; }
 #plainOut { color: var(--success); }
 .hidden { display: none !important; }
@@ -157,14 +158,15 @@ textarea.input-box { width: 100%; height: 140px; background: var(--code-bg); bor
 .d-del { background: rgba(251,113,133,.15); color: #fda4af; display: block; text-decoration: line-through; }
 .d-ctx { display: block; opacity: 0.6; }
 
-/* ── NODES GRID ── */
-.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
-.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: var(--transition); cursor: pointer; }
+/* ── NODES GRID & SELECTION ── */
+.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; max-height: 450px; overflow-y: auto; padding-right: 4px; }
+.node-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: var(--transition); cursor: pointer; position: relative; overflow: hidden; }
 body.theme-light .node-card { background: #fff; }
 .node-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15); }
-.node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); }
+.node-card.selected { border-color: var(--success); background: rgba(16,185,129,.1); box-shadow: 0 0 10px rgba(16,185,129,.2); }
+.node-card.selected::before { content: "✓"; position: absolute; top: 10px; left: 10px; color: var(--success); font-weight: bold; font-size: 0.9rem; }
 
-.node-head { display: flex; justify-content: space-between; align-items: center; }
+.node-head { display: flex; justify-content: space-between; align-items: center; padding-left: 20px;}
 .node-flag { font-size: 1.2rem; }
 .node-remark { font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
 .node-meta { display: flex; gap: 5px; flex-wrap: wrap; font-size: 0.65rem; font-family: var(--font-mono); align-items: center; }
@@ -175,7 +177,6 @@ body.theme-light .node-card { background: #fff; }
 .b-tcp { color: var(--warning); border-color: rgba(251,191,36,.4); }
 .b-tls { color: var(--success); border-color: rgba(16,185,129,.4); }
 .b-reality { color: var(--danger); border-color: rgba(251,113,133,.4); }
-
 .ping-good { color: var(--success); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.1); }
 .ping-mid { color: var(--warning); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.1); }
 .ping-bad { color: var(--danger); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.1); }
@@ -191,7 +192,7 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
 /* TOASTS */
 #toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none;}
-.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 10px 20px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; transform: translateY(15px); transition: all 0.3s; }
+.toast { background: var(--solid-bg); border: 1px solid var(--cyan); color: var(--text-primary); padding: 10px 20px; border-radius: 10px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; transform: translateY(15px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .toast.show { opacity: 1; transform: none; }
 .toast.warn { border-color: var(--warning); } .toast.err { border-color: var(--danger); }
 </style>
@@ -205,8 +206,8 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
     <div class="brand">
       <div class="logo">V⇢X</div>
       <div>
-        <h1>VLESS ⇢ Xray Studio</h1>
-        <p class="tag">تبدیل‌گر قدرتمند و تست‌گر ساب‌اسکریپشن</p>
+        <h1>Intelligent Configs Studio</h1>
+        <p class="tag">تبدیل‌گر، انتخاب‌گر و تست‌گر ساب‌اسکریپشن</p>
       </div>
     </div>
     <div class="live-stats">
@@ -341,39 +342,19 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
 
     <!-- ══ OUTPUT & NODES (RIGHT) ══ -->
     <div class="right-col">
-      <section class="card">
-        <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-out"></span> خروجی ساخت‌یافته</span>
-          <div class="controls">
-            <div class="tabs">
-              <button class="tab active" id="tabPretty">کدنویسی</button>
-              <button class="tab" id="tabPlain">متن خام</button>
-              <button class="tab" id="tabDiff">مقایسه تغییرات</button>
-            </div>
-            <select id="fmtSel" style="font-size:0.75rem;">
-              <option value="xray">Xray JSON</option>
-              <option value="singbox">Sing-Box JSON</option>
-              <option value="clash">Clash Meta YAML</option>
-              <option value="v2rayn">V2rayN (Base64)</option>
-            </select>
-            <button class="primary" id="btnCopy" style="font-size:0.75rem;">📋 کپی</button>
-          </div>
-        </div>
-        <div class="card-body" style="padding:10px;">
-          <div class="out-wrap">
-            <pre id="prettyOut"><span style="color:#64748b">// کانفیگ تولید شده در اینجا نمایش داده می‌شود...</span></pre>
-            <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
-            <div id="diffOut" class="hidden"></div>
-          </div>
-        </div>
-      </section>
 
       <section class="card">
         <div class="card-header">
-          <span class="card-title"><span class="p-dot dot-node"></span> مدیریت گره‌ها</span>
-          <div class="controls">
-            <input type="text" id="nodeSearch" placeholder="🔍 جستجوی گره..." style="width: 140px; font-size:0.75rem;">
-            <button id="btnPingNodes" onclick="testNodesPing()" style="font-size:0.75rem;">📡 تست پینگ جامع</button>
+          <span class="card-title">
+            <span class="p-dot dot-node"></span> مدیریت و انتخاب گره‌ها
+            <span style="font-size:0.8rem; color:var(--text-secondary); margin-inline-start:8px; font-weight:normal;">
+              (<span id="selectedCount" style="color:var(--cyan); font-weight:bold;">0</span> انتخاب شده)
+            </span>
+          </span>
+          <div class="controls" style="flex-wrap: wrap;">
+            <button style="font-size:0.75rem; padding: 4px 8px;" onclick="toggleSelectAll()">☑️ همه / هیچ</button>
+            <input type="text" id="nodeSearch" placeholder="🔍 جستجو..." style="width: 90px; font-size:0.75rem;">
+            <button id="btnPingNodes" onclick="testNodesPing()" style="font-size:0.75rem;">📡 تست پینگ</button>
           </div>
         </div>
         <div class="card-body">
@@ -384,6 +365,35 @@ body.theme-light .node-actions { border-color: rgba(0,0,0,0.05); }
           </div>
         </div>
       </section>
+
+      <section class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="p-dot dot-out"></span> خروجی کانفیگ نهایی</span>
+          <div class="controls">
+            <select id="fmtSel" style="font-size:0.75rem; width: 110px;">
+              <option value="xray">Xray JSON</option>
+              <option value="singbox">Sing-Box JSON</option>
+              <option value="clash">Clash Meta YAML</option>
+              <option value="v2rayn">V2rayN (Base64)</option>
+            </select>
+            <button class="primary" id="btnCopy" style="font-size:0.75rem;">📋 کپی</button>
+            <button class="success" id="btnDownload" style="font-size:0.75rem;">⬇ دانلود فایل</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:10px;">
+          <div class="tabs" style="margin-bottom: 5px; background: transparent; border: none;">
+            <button class="tab active" id="tabPretty">کدنویسی</button>
+            <button class="tab" id="tabPlain">متن خام</button>
+            <button class="tab" id="tabDiff">مقایسه تغییرات</button>
+          </div>
+          <div class="out-wrap">
+            <pre id="prettyOut"><span style="color:#64748b">// اول گره‌ها را انتخاب کرده و "تولید کانفیگ نهایی" را بزنید...</span></pre>
+            <textarea id="plainOut" readonly class="hidden" spellcheck="false"></textarea>
+            <div id="diffOut" class="hidden"></div>
+          </div>
+        </div>
+      </section>
+
     </div>
 
   </div>
@@ -427,7 +437,7 @@ function toast(msg, type=''){
   t.textContent = (type==='err'?'❌ ':'') + (type==='warn'?'⚠️ ':'✅ ') + msg;
   $('toasts').appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2600);
 }
 
 /** THEME **/
@@ -458,6 +468,7 @@ const BUILTIN_TPLS = {
 let nodes = [], invalidCount = 0, testing = false;
 let curFmt = 'xray', curTab = 'pretty';
 let textCache = {}, prevTexts = {};
+const state = { selected: new Set() };
 
 /** PARSER ENGINE **/
 function tryB64(raw){
@@ -517,6 +528,7 @@ function analyzeInput(){
   
   const keepLat = {}; nodes.forEach(o => { keepLat[o.raw] = o.latency; });
   nodes = []; invalidCount = 0;
+  state.selected.clear();
   
   lines.forEach((ln, i) => {
     const pr = parseNodeLine(ln);
@@ -525,7 +537,9 @@ function analyzeInput(){
     pr.tag = $('prefix').value.trim() + slugTag(pr.remark, i);
     pr.flag = detectCountry(pr.remark);
     if(keepLat[ln] !== undefined) pr.latency = keepLat[ln];
+    
     nodes.push(pr);
+    state.selected.add(pr.id); // یادگیری: انتخاب خودکار فایل‌های ورودی جدید
   });
 
   $('statLines').textContent = faNum(lines.length);
@@ -535,15 +549,18 @@ function analyzeInput(){
   renderNodes();
 }
 
-/** NODE RENDERING **/
+/** NODE SELECTION & RENDERING **/
 function renderNodes(){
   const list = $('nodeList');
   const q = $('nodeSearch').value.toLowerCase();
   
   const filtered = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
   
+  // به‌روزرسانی شمارشگر انتخاب بر اساس کل سیستم و فیلتر
+  $('selectedCount').textContent = faNum(state.selected.size);
+  
   if(!filtered.length) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary);">هیچ گره‌ای هماهنگ با فیلتر یافت نشد.</div>';
+    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-secondary);">گره‌ای جهت نمایش یافت نشد.</div>';
     return;
   }
   
@@ -554,9 +571,10 @@ function renderNodes(){
     else pingHtml = `<span class="badge ${n.latency<250?'ping-good':(n.latency<600?'ping-mid':'ping-bad')}" id="ping-${n.id}">⚡ ${n.latency}ms</span>`;
 
     const uriSafe = encodeURIComponent(n.raw);
+    const isSel = state.selected.has(n.id);
 
     return `
-    <div class="node-card">
+    <div class="node-card ${isSel ? 'selected' : ''}" onclick="toggleNode('${n.id}', event)">
       <div class="node-head">
         <span class="node-flag">${n.flag}</span>
         <span class="badge" style="border-color:var(--cyan); color:var(--cyan)">${n.proto.toUpperCase()}</span>
@@ -570,14 +588,38 @@ function renderNodes(){
         ${pingHtml}
       </div>
       <div class="node-actions" style="margin-top:6px;">
-        <button class="primary" style="padding:2px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}')">📷 QR</button>
-        <button class="danger" style="padding:2px 8px; font-size:0.7rem;" onclick="removeNode('${n.id}')">🗑</button>
+        <button class="primary action-btn" style="padding:2px 8px; font-size:0.7rem; flex:1;" onclick="showQrModal('${uriSafe}', event)">📷 QR</button>
+        <button class="danger action-btn" style="padding:2px 8px; font-size:0.7rem;" onclick="removeNode('${n.id}', event)">🗑</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function removeNode(id) { nodes = nodes.filter(n => n.id !== id); renderNodes(); }
+function toggleNode(id, e) {
+  if(e && e.target.closest('.action-btn')) return; // Ignore if user clicked a button
+  if(state.selected.has(id)) state.selected.delete(id);
+  else state.selected.add(id);
+  renderNodes();
+}
+
+function toggleSelectAll() {
+  const q = $('nodeSearch').value.toLowerCase();
+  const visible = nodes.filter(n => (n.remark||'').toLowerCase().includes(q) || n.address.toLowerCase().includes(q));
+  const allSelected = visible.length > 0 && visible.every(n => state.selected.has(n.id));
+  
+  if(allSelected) visible.forEach(n => state.selected.delete(n.id));
+  else visible.forEach(n => state.selected.add(n.id));
+  
+  renderNodes();
+}
+
+function removeNode(id, e) {
+  if(e) e.stopPropagation();
+  nodes = nodes.filter(n => n.id !== id);
+  state.selected.delete(id);
+  renderNodes();
+}
+
 $('inputLinks').addEventListener('input', () => { setTimeout(analyzeInput, 500); });
 $('nodeSearch').addEventListener('input', renderNodes);
 $('btnClear').addEventListener('click', () => { $('inputLinks').value = ''; analyzeInput(); });
@@ -661,6 +703,13 @@ $('btnFetch').addEventListener('click', async () => {
 });
 
 /** GENERATORS (Xray, Sing-Box, Clash) **/
+function encodeB64Safe(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for(const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
 function getSettings() {
   return {
     prefix: $('prefix').value.trim()||'proxy-', mux: $('swMux').checked, allowInsecure: $('swInsecure').checked,
@@ -821,16 +870,18 @@ function syntaxHighlight(str, fmt) {
 }
 
 function processGenerate() {
-  if(!nodes.length) return toast('هیچ گره‌ای برای تبدیل وجود ندارد', 'warn');
+  const activeNodes = nodes.filter(n => state.selected.has(n.id));
+  if(!activeNodes.length) return toast('ابتدا گره‌هایی را از لیست انتخاب کنید', 'warn');
+  
   const s = getSettings();
   curFmt = $('fmtSel').value;
   if(textCache[curFmt]) prevTexts[curFmt] = textCache[curFmt];
   
   let outStr = '';
-  if(curFmt === 'xray') outStr = JSON.stringify(buildXray(nodes, s), null, 2);
-  else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(nodes, s), null, 2);
-  else if(curFmt === 'clash') outStr = buildClash(nodes, s);
-  else if(curFmt === 'v2rayn') outStr = btoa(nodes.map(n=>n.raw).join('\n'));
+  if(curFmt === 'xray') outStr = JSON.stringify(buildXray(activeNodes, s), null, 2);
+  else if(curFmt === 'singbox') outStr = JSON.stringify(buildSingBox(activeNodes, s), null, 2);
+  else if(curFmt === 'clash') outStr = buildClash(activeNodes, s);
+  else if(curFmt === 'v2rayn') outStr = encodeB64Safe(activeNodes.map(n=>n.raw).join('\n'));
   
   textCache[curFmt] = outStr;
   
@@ -865,17 +916,49 @@ document.querySelectorAll('[data-tpl]').forEach(btn => {
     if(tpl.routing) { $('swAds').checked = !!tpl.routing.blockAds; $('swQuic').checked = !!tpl.routing.blockQuic; $('swIR').checked = tpl.routing.directIR!==false; }
     if(tpl.dns) $('dnsPreset').value = tpl.dns.preset;
     if(tpl.proxy) $('swMux').checked = !!tpl.proxy.mux;
-    toast(`قالب «${btn.textContent}» با موفقیت اعمال شد.`);
+    toast(`قالب «${btn.textContent}» اعمال شد.`);
   });
 });
 
-/** COPY & MODAL **/
-$('btnCopy').addEventListener('click', () => {
-  if(!textCache[curFmt]) return toast('خروجی برای کپی وجود ندارد', 'err');
-  navigator.clipboard.writeText(textCache[curFmt]).then(()=>toast('کانفیگ نهایی در کلیپ‌بورد کپی شد ✓')).catch(()=>toast('خطا در کپی', 'err'));
+/** COPY & DOWNLOAD (FALLBACK INCLUDED) & MODAL **/
+async function copyResult() {
+  const t = textCache[curFmt];
+  if(!t) return toast('خروجی برای کپی وجود ندارد', 'warn');
+  try {
+    await navigator.clipboard.writeText(t);
+    toast('کانفیگ نهایی در کلیپ‌بورد کپی شد ✓');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = t;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toast('کانفیگ کپی شد ✓'); }
+    catch(_) { toast('مرورگر اجازه دسترسی به کلیپ‌بورد را نمی‌دهد', 'err'); }
+    ta.remove();
+  }
+}
+$('btnCopy').addEventListener('click', copyResult);
+
+$('btnDownload').addEventListener('click', () => {
+  const t = textCache[curFmt];
+  if(!t) return toast('ابتدا کانفیگ را تولید کنید', 'warn');
+  
+  const extMap = { 'xray': 'json', 'singbox': 'json', 'clash': 'yaml', 'v2rayn': 'txt' };
+  const ext = extMap[curFmt] || 'txt';
+  
+  const blob = new Blob([t], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Intelligent configs.${ext}`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast(`فایل به عنوان Intelligent configs.${ext} در حال دانلود است`);
 });
 
-function showQrModal(uri) {
+function showQrModal(uri, e) {
+  if(e) e.stopPropagation();
   $('qrModal').classList.add('active'); $('qrcode').innerHTML = '';
   new QRCode($('qrcode'), { text: decodeURIComponent(uri), width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
