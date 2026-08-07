@@ -6,831 +6,158 @@
 <title>Sub-Collector | تبدیلگر پیشرفته ساب‌اسکریپشن</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/* متغیرهای CSS برای تم‌ها */
+/* ═══ CSS VARIABLES ═══ */
 :root {
-  --font-body: 'Vazirmatn', sans-serif;
+  --font-body: 'Vazirmatn', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* تم پیش‌فرض: شیشه‌ای تیره */
+
 body.theme-glass {
-  --bg: #0f0f1e;
+  --bg-color: rgba(15, 15, 30, 0.6);
   --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #0f0f1e 100%);
-  --card-bg: rgba(30, 30, 45, 0.6);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --text-main: #e2e8f0;
-  --text-muted: #94a3b8;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
   --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.4);
   --success: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --glass-blur: blur(20px);
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
-/* تم سایبرپانک */
+
 body.theme-cyber {
-  --bg: #0a0118;
+  --bg-color: rgba(10, 1, 24, 0.7);
   --bg-gradient: linear-gradient(180deg, #0a0118 0%, #1a0b2e 100%);
-  --card-bg: rgba(10, 1, 24, 0.7);
-  --card-border: rgba(0, 255, 159, 0.3);
-  --text-main: #e0fbfc;
-  --text-muted: #98f5e1;
+  --glass-border: rgba(0, 255, 159, 0.3);
+  --text-primary: #e0fbfc;
+  --text-secondary: #98f5e1;
   --accent: #00ff9f;
-  --accent-glow: rgba(0, 255, 159, 0.5);
   --success: #00ff9f;
   --danger: #ff0080;
   --warning: #ffee00;
-  --glass-blur: blur(4px);
-  --shadow: 0 0 15px rgba(0, 255, 159, 0.2);
+  --glass-shadow: 0 0 15px rgba(0, 255, 159, 0.2);
 }
-/* تم ساده روشن */
+
 body.theme-light {
-  --bg: #f8fafc;
+  --bg-color: rgba(255, 255, 255, 0.85);
   --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --card-border: rgba(0, 0, 0, 0.05);
-  --text-main: #1e293b;
-  --text-muted: #64748b;
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
   --accent: #3b82f6;
-  --accent-glow: rgba(59, 130, 246, 0.3);
   --success: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --glass-blur: blur(12px);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
 body {
   font-family: var(--font-body);
-  background: var(--bg);
+  background: var(--bg-color);
   background-image: var(--bg-gradient);
-  color: var(--text-main);
+  color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-  transition: var(--transition);
   position: relative;
 }
-#particles {
-  position: fixed;
-  top: 0; left: 0;
+
+#canvas-bg {
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: -1;
-  pointer-events: none;
+  z-index: -1; pointer-events: none;
 }
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 20px;
-  position: relative;
-  z-index: 1;
-}
+
+.container { max-width: 1280px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding: 16px 24px;
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; padding: 16px 24px;
+  background: var(--bg-color);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border); border-radius: 16px;
+  box-shadow: var(--glass-shadow);
 }
 .brand { display: flex; align-items: center; gap: 12px; }
 .logo {
-  width: 40px; height: 40px;
+  width: 40px; height: 40px; border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--success));
-  border-radius: 10px;
-  display: grid; place-items: center;
-  font-weight: bold; color: #fff; font-size: 1.2rem;
-  box-shadow: 0 0 15px var(--accent-glow);
+  display: grid; place-items: center; font-weight: bold; color: #fff;
 }
-.brand h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; }
+.brand h1 { font-size: 1.2rem; font-weight: 700; line-height: 1.2; }
+
 .controls { display: flex; gap: 10px; }
 button, select, input[type="text"], input[type="number"] {
   font-family: var(--font-body);
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--card-border);
-  color: var(--text-main);
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: var(--transition);
+  background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
+  color: var(--text-primary); padding: 8px 16px; border-radius: 8px;
+  cursor: pointer; transition: var(--transition);
 }
-button:hover, select:hover, input:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-button.primary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  font-weight: 600;
-}
-button.primary:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 0 20px var(--accent-glow);
-}
-button.danger { border-color: var(--danger); color: var(--danger); background: transparent; }
-button.danger:hover { background: var(--danger); color: #fff; }
+body.theme-light button:not(.primary), body.theme-light select, body.theme-light input { background: #fff; }
+button:hover, select:hover, input:hover { border-color: var(--accent); }
+
+button.primary { background: var(--accent); color: #fff; border: none; font-weight: 600; }
+button.primary:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--accent); }
+button.danger { color: var(--danger); }
+button.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.icon-btn { padding: 8px 12px; font-size: 1.1rem; }
+
 .card {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
+  background: var(--bg-color); backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border); border-radius: 16px;
+  padding: 20px; margin-bottom: 20px; box-shadow: var(--glass-shadow);
 }
-.card-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 16px; padding-bottom: 12px;
-  border-bottom: 1px solid var(--card-border);
-}
-.card-title { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border); }
+.card-title { font-weight: 700; font-size: 1.1rem; }
+
 textarea {
-  width: 100%;
-  height: 150px;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 12px;
-  color: var(--text-main);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  resize: vertical;
-  direction: ltr;
+  width: 100%; height: 120px; background: rgba(0,0,0,0.15);
+  border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px;
+  color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;
+  resize: vertical; direction: ltr;
 }
-textarea:focus { border-color: var(--accent); }
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 12px;
-}
-.stat-item {
-  text-align: center;
-  padding: 12px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 10px;
-  border: 1px solid var(--card-border);
-}
-.stat-val { font-size: 1.4rem; font-weight: bold; color: var(--accent); font-family: var(--font-mono); }
-.stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-.setting-group label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-.setting-group input, .setting-group select {
-  width: 100%;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--card-border);
-  color: var(--text-main);
-  padding: 8px;
-  border-radius: 6px;
-}
-.fragment-modes {
-  display: flex; gap: 10px; margin-bottom: 12px;
-  background: rgba(0,0,0,0.2);
-  padding: 4px; border-radius: 8px;
-}
-.mode-btn {
-  flex: 1; padding: 6px; text-align: center;
-  border-radius: 6px; cursor: pointer;
-  font-size: 0.8rem; transition: var(--transition);
-  opacity: 0.6;
-}
-.mode-btn.active {
-  background: var(--accent); color: #fff; opacity: 1;
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-.fragment-inputs {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-  animation: slideDown 0.3s ease;
-}
-@keyframes slideDown { from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:none} }
-.node-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 4px;
-}
+body.theme-light textarea { background: #fff; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+.stat-item { text-align: center; padding: 12px; background: rgba(0,0,0,0.1); border-radius: 10px; border: 1px solid var(--glass-border); }
+.stat-val { font-size: 1.5rem; font-weight: bold; color: var(--accent); font-family: var(--font-mono); }
+.stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+
+.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.setting-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; }
+.setting-group input, .setting-group select { width: 100%; }
+
+.fragment-modes { display: flex; gap: 10px; margin-bottom: 12px; background: rgba(0,0,0,0.1); padding: 4px; border-radius: 8px; }
+.mode-btn { flex: 1; padding: 6px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: var(--transition); opacity: 0.7; }
+.mode-btn.active { background: var(--accent); color: #fff; opacity: 1; }
+.fragment-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
 .node-card {
-  background: rgba(0,0,0,0.15);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 12px;
-  display: flex; flex-direction: column; gap: 8px;
-  position: relative;
-  transition: var(--transition);
+  background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+  border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  transition: var(--transition); cursor: pointer;
 }
-.node-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+body.theme-light .node-card { background: #fff; }
+.node-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+/* طراحی ویژه حالت انتخاب شده گره‌ها */
+.node-card.selected {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 }
-.node-head { display: flex; justify-content: space-between; align-items: center; }
-.node-flag { font-size: 1.2rem; }
-.node-remark {
-  font-weight: 600; font-size: 0.9rem;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 180px;
-}
-.node-meta {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  font-size: 0.7rem; font-family: var(--font-mono);
-}
-.badge {
-  padding: 2px 6px; border-radius: 4px;
-  background: rgba(255,255,255,0.1);
-  color: var(--text-muted);
-}
-.badge.vless { color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
-.badge.vmess { color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
-.badge.trojan { color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
-.badge.ss { color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
-.badge.ws { color: #4ade80; }
-.badge.grpc { color: #f87171; }
-.badge.tcp { color: #94a3b8; }
-.badge.tls { color: #22d3ee; }
-.badge.reality { color: #fb7185; }
-.node-actions {
-  display: flex; gap: 6px; margin-top: 4px;
-}
-.action-icon {
-  font-size: 0.9rem; cursor: pointer;
-  padding: 4px; border-radius: 4px;
-  color: var(--text-muted);
-}
-.action-icon:hover { color: var(--accent); background: rgba(255,255,255,0.1); }
-.action-icon.del:hover { color: var(--danger); }
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(5px);
-  z-index: 100;
-  display: none;
-  place-items: center;
-}
-.modal-overlay.active { display: grid; }
-.modal {
-  background: var(--bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 24px;
-  width: 90%; max-width: 400px;
-  text-align: center;
-  box-shadow: var(--shadow);
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes popIn { from{transform:scale(0.8); opacity:0} to{transform:scale(1); opacity:1} }
-#qrcode { margin: 20px auto; display: flex; justify-content: center; }
-#qrcode img { border: 4px solid #fff; border-radius: 8px; }
-@media (max-width: 768px) {
-  header { flex-direction: column; gap: 16px; }
-  .controls { width: 100%; justify-content: space-between; }
-  .fragment-inputs { grid-template-columns: 1fr; }
-}
-</style>
-</head>
-<body class="theme-glass">
-<canvas id="particles"></canvas>
-<div class="container">
-  <header>
-    <div class="brand">
-      <div class="logo">SC</div>
-      <h1>Sub-Collector <span style="font-size:0.7em; color:var(--text-muted); font-weight:400">v2.0</span></h1>
-    </div>
-    <div class="controls">
-      <select id="themeSelect" onchange="setTheme(this.value)">
-        <option value="theme-glass">Glassmorphism</option>
-        <option value="theme-cyber">Cyberpunk</option>
-        <option value="theme-light">Clean Light</option>
-      </select>
-      <button class="primary" onclick="document.getElementById('fileInput').click()">📂 Import File</button>
-      <input type="file" id="fileInput" hidden accept=".txt,.json,.sub" onchange="handleFileImport(this)">
-    </div>
-  </header>
-  <section class="card">
-    <div class="card-header">
-      <span class="card-title">📥 ورودی ساب‌اسکریپشن</span>
-      <div style="display:flex; gap:8px;">
-        <button onclick="pasteFromClipboard()">📋 Paste</button>
-        <button class="danger" onclick="clearInput()">🗑 Clear</button>
-      </div>
-    </div>
-    <textarea id="rawInput" placeholder="لینک ساب‌اسکریپشن (http/https) یا لینک‌های vless/vmess/trojan/ss را اینجا وارد کنید...&#10;پشتیبانی از Base64 خودکار." spellcheck="false"></textarea>
-    <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
-      <input type="text" id="subUrl" placeholder="https://example.com/sub" style="flex:1;" dir="ltr">
-      <button class="primary" onclick="fetchSubscription()">Load URL</button>
-    </div>
-  </section>
-  <section class="card">
-    <div class="card-header">
-      <span class="card-title">⚙️ تنظیمات پیشرفته</span>
-    </div>
-    <div class="settings-grid">
-      <div class="setting-group">
-        <label>فرمت خروجی</label>
-        <select id="outputFormat">
-          <option value="xray">Xray-core JSON</option>
-          <option value="singbox">Sing-Box JSON</option>
-        </select>
-      </div>
-      
-      <div class="setting-group">
-        <label>حالت Outbound</label>
-        <select id="outboundMode">
-          <option value="direct">مستقیم (Direct)</option>
-          <option value="warp-full">Cloudflare Warp (Full)</option>
-          <option value="warp-split">Warp (فقط ایران)</option>
-        </select>
-      </div>
-      <div class="setting-group">
-        <label>DNS Server</label>
-        <select id="dnsPreset">
-          <option value="cloudflare">Cloudflare (1.1.1.1)</option>
-          <option value="google">Google (8.8.8.8)</option>
-          <option value="shecan">Shecan (IR)</option>
-          <option value="custom">Custom...</option>
-        </select>
-      </div>
-    </div>
-    <div style="margin-top:20px; border-top:1px solid var(--card-border); paddingTop:16px;">
-      <label style="font-size:0.9rem; color:var(--text-muted); margin-bottom:8px; display:block;">🧩 Fragment Settings</label>
-      <div class="fragment-modes">
-        <div class="mode-btn active" onclick="setFragmentMode('off')">Off</div>
-        <div class="mode-btn" onclick="setFragmentMode('auto')">Auto</div>
-        <div class="mode-btn" onclick="setFragmentMode('manual')">Manual</div>
-      </div>
-      
-      <div id="fragManualInputs" class="fragment-inputs" style="display:none;">
-        <div class="setting-group">
-          <label>Length (Min-Max)</label>
-          <input type="text" id="fragLen" value="100-200" dir="ltr">
-        </div>
-        <div class="setting-group">
-          <label>Interval (Min-Max)</label>
-          <input type="text" id="fragInt" value="10-20" dir="ltr">
-        </div>
-        <div class="setting-group">
-          <label>Packets</label>
-          <select id="fragPack">
-            <option value="tlshello">tlshello</option>
-            <option value="1-1">1-1</option>
-            <option value="1-2">1-2</option>
-            <option value="rand">rand</option>
-          </select>
-        </div>
-      </div>
-      <div id="fragAutoInfo" style="font-size:0.8rem; color:var(--text-muted); padding:8px; display:none;">
-        Auto: Length 100-200, Interval 10-20, Packets tlshello
-      </div>
-    </div>
-  </section>
-  <section class="card">
-    <div class="card-header">
-      <span class="card-title">📊 آمار زنده</span>
-      <input type="text" id="nodeFilter" placeholder="🔍 جستجو بر اساس کشور یا نام..." style="width:200px; font-size:0.8rem;" oninput="renderNodes()">
-    </div>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-val" id="statTotal">0</div>
-        <div class="stat-label">کل خطوط</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" style="color:var(--success)" id="statValid">0</div>
-        <div class="stat-label">گره‌های سالم</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" style="color:var(--danger)" id="statInvalid">0</div>
-        <div class="stat-label">نامعتبر</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val" style="color:var(--warning)" id="statCountries">0</div>
-        <div class="stat-label">کشورها</div>
-      </div>
-    </div>
-  </section>
-  <section class="card">
-    <div class="card-header">
-      <span class="card-title">📡 لیست گره‌ها</span>
-      <button class="primary" style="font-size:0.8rem; padding:4px 12px;" onclick="generateConfig()">⚡ تولید کانفیگ</button>
-    </div>
-    <div id="nodeList" class="node-grid">
-      <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:20px;">
-        هنوز گره‌ای پردازش نشده است. ورودی را وارد کنید.
-      </div>
-    </div>
-  </section>
-  <section class="card" style="position:sticky; bottom:20px; z-index:10; border-color:var(--accent);">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-      <div style="font-family:var(--font-mono); font-size:0.9rem; color:var(--text-muted);">
-        وضعیت: <span id="statusText" style="color:var(--success)">آماده</span>
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button onclick="copyConfig()">📋 کپی JSON</button>
-        <button onclick="downloadConfig()">⬇ دانلود فایل</button>
-        <button class="primary" onclick="showQrModal()">📷 نمایش QR</button>
-      </div>
-    </div>
-  </section>
-</div>
-<div id="qrModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
-  <div class="modal">
-    <h3 style="margin-bottom:10px;">QR Code کانفیگ</h3>
-    <div id="qrcode"></div>
-    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">اسکن کنید یا عکس را ذخیره نمایید</p>
-    <button class="primary" onclick="document.getElementById('qrModal').classList.remove('active')">بستن</button>
-  </div>
-</div>
-<script>
-const state = {
-  nodes: [],
-  configJson: null,
-  fragment: { mode: 'off', len: '100-200', int: '10-20', pack: 'tlshello' },
-  theme: 'theme-glass'
-};
-const $ = id => document.getElementById(id);
-const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
-const safeHtml = str => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
-const canvas = $('particles'), ctx = canvas.getContext('2d');
-let W, H, particles = [];
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-window.addEventListener('resize', resize); resize();
-for(let i=0; i<40; i++) particles.push({
-  x: Math.random()*W, y: Math.random()*H,
-  vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
-  r: Math.random()*2+1, a: Math.random()*0.5+0.1
-});
-function animate() {
-  ctx.clearRect(0,0,W,H);
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    if(p.x<0||p.x>W) p.vx*=-1;
-    if(p.y<0||p.y>H) p.vy*=-1;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent').trim() + Math.floor(p.a*255).toString(16).padStart(2,'0');
-    ctx.fill();
-  });
-  requestAnimationFrame(animate);
-}
-animate();
-function setTheme(theme) {
-  document.body.className = theme;
-  state.theme = theme;
-  localStorage.setItem('sc_theme', theme);
-}
-if(localStorage.getItem('sc_theme')) setTheme(localStorage.getItem('sc_theme'));
-function setFragmentMode(mode) {
-  state.fragment.mode = mode;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  const manualDiv = $('fragManualInputs');
-  const autoDiv = $('fragAutoInfo');
-  
-  if(mode === 'manual') {
-    manualDiv.style.display = 'grid';
-    autoDiv.style.display = 'none';
-  } else if (mode === 'auto') {
-    manualDiv.style.display = 'none';
-    autoDiv.style.display = 'block';
-    $('fragLen').value = '100-200';
-    $('fragInt').value = '10-20';
-    $('fragPack').value = 'tlshello';
-  } else {
-    manualDiv.style.display = 'none';
-    autoDiv.style.display = 'none';
-  }
-}
-function parseInput(text) {
-  if(!text) return [];
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  const results = [];
-  
-  if(lines.length === 1 && /^[A-Za-z0-9+/=]+$/.test(lines[0]) && lines[0].length > 50) {
-    try {
-      const decoded = atob(lines[0].replace(/-/g,'+').replace(/_/g,'/'));
-      if(decoded.includes('://')) {
-        return parseInput(decoded);
-      }
-    } catch(e) {}
-  }
-  lines.forEach(line => {
-    let node = null;
-    if(line.startsWith('vless://')) node = parseVless(line);
-    else if(line.startsWith('vmess://')) node = parseVmess(line);
-    else if(line.startsWith('trojan://')) node = parseTrojan(line);
-    else if(line.startsWith('ss://')) node = parseSS(line);
-    
-    if(node) {
-      node.country = detectCountry(node.remark);
-      results.push(node);
-    }
-  });
-  return results;
-}
-function parseVless(url) {
-  try {
-    const u = new URL(url);
-    const params = new URLSearchParams(u.search);
-    return {
-      protocol: 'vless',
-      uuid: u.username,
-      address: u.hostname,
-      port: parseInt(u.port) || 443,
-      remark: decodeURIComponent(u.hash.slice(1)) || 'VLESS Node',
-      type: params.get('type') || 'tcp',
-      security: params.get('security') || 'none',
-      sni: params.get('sni') || u.hostname,
-      fp: params.get('fp') || 'chrome',
-      alpn: params.get('alpn'),
-      path: params.get('path') || '/',
-      host: params.get('host') || '',
-      pbk: params.get('pbk'),
-      sid: params.get('sid'),
-      flow: params.get('flow') || ''
-    };
-  } catch(e) { return null; }
-}
-function parseVmess(url) {
-  try {
-    const json = JSON.parse(atob(url.slice(8)));
-    return {
-      protocol: 'vmess',
-      uuid: json.id,
-      address: json.add,
-      port: parseInt(json.port),
-      remark: json.ps || 'VMess Node',
-      type: json.net || 'tcp',
-      security: json.tls === 'tls' ? 'tls' : 'none',
-      sni: json.sni || json.host || json.add,
-      host: json.host || '',
-      path: json.path || '/'
-    };
-  } catch(e) { return null; }
-}
-function parseTrojan(url) {
-  try {
-    const u = new URL(url);
-    const params = new URLSearchParams(u.search);
-    return {
-      protocol: 'trojan',
-      password: u.username,
-      address: u.hostname,
-      port: parseInt(u.port) || 443,
-      remark: decodeURIComponent(u.hash.slice(1)) || 'Trojan Node',
-      type: params.get('type') || 'tcp',
-      security: 'tls',
-      sni: params.get('sni') || u.hostname,
-      path: params.get('path') || '/',
-      host: params.get('host') || ''
-    };
-  } catch(e) { return null; }
-}
-function parseSS(url) {
-  try {
-    const temp = url.slice(5);
-    const hashIdx = temp.indexOf('#');
-    const remark = hashIdx > -1 ? decodeURIComponent(temp.slice(hashIdx+1)) : 'SS Node';
-    const mainPart = hashIdx > -1 ? temp.slice(0, hashIdx) : temp;
-    
-    let auth, rest;
-    if(mainPart.includes('@')) {
-      [auth, rest] = mainPart.split('@');
-    } else {
-      const decoded = atob(mainPart);
-      const hIdx = decoded.indexOf('#');
-      if(hIdx > -1) {
-         remark = decodeURIComponent(decoded.slice(hIdx+1));
-         mainPart = decoded.slice(0, hIdx);
-      }
-      [auth, rest] = mainPart.split('@');
-    }
-    
-    const methodPass = atob(auth);
-    const [method, password] = methodPass.split(':');
-    const [addr, port] = rest.split(':');
-    
-    return {
-      protocol: 'ss',
-      method, password,
-      address: addr,
-      port: parseInt(port),
-      remark
-    };
-  } catch(e) { return null; }
-}
-function detectCountry(remark) {
-  if(!remark) return { code: '🌐', name: 'Unknown' };
-  const r = remark.toUpperCase();
-  const flags = {
-    'IR': '🇮🇷', 'TEHRAN': '🇮🇷',
-    'DE': '🇩🇪', 'GERMANY': '🇩🇪', 'FRANKFURT': '🇩🇪',
-    'US': '🇺🇸', 'USA': '🇺🇸', 'NEW YORK': '🇺🇸',
-    'NL': '🇳🇱', 'NETHERLANDS': '🇳🇱',
-    'GB': '🇬🇧', 'UK': '🇬🇧', 'LONDON': '🇬🇧',
-    'FR': '🇫🇷', 'FRANCE': '🇫🇷',
-    'JP': '🇯🇵', 'JAPAN': '🇯🇵', 'TOKYO': '🇯🇵',
-    'SG': '🇸🇬', 'SINGAPORE': '🇸🇬',
-    'CA': '🇨🇦', 'CANADA': '🇨🇦',
-    'RU': '🇷🇺', 'RUSSIA': '🇷🇺',
-    'FI': '🇫🇮', 'FINLAND': '🇫🇮',
-    'SE': '🇸🇪', 'SWEDEN': '🇸🇪',
-    'UA': '🇺🇦', 'UKRAINE': '🇺🇦'
-  };
-  for(const [key, flag] of Object.entries(flags)) {
-    if(r.includes(key)) return { code: flag, name: key };
-  }
-  const emoji = remark.match(/[\u{1F1E0}-\u{1F1FF}]{2}/u);
-  if(emoji) return { code: emoji[0], name: 'Emoji' };
-  
-  return { code: '🌐', name: 'Global' };
-}
-function renderNodes() {
-  const filter = $('nodeFilter').value.toLowerCase();
-  const list = $('nodeList');
-  list.innerHTML = '';
-  
-  const filtered = state.nodes.filter(n => 
-    n.remark.toLowerCase().includes(filter) || 
-    n.country.name.toLowerCase().includes(filter) ||
-    n.country.code === filter
-  );
-  $('statTotal').textContent = faNum(state.nodes.length);
-  $('statValid').textContent = faNum(filtered.length);
-  $('statCountries').textContent = faNum(new Set(state.nodes.map(n=>n.country.code)).size);
-  if(filtered.length === 0) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:20px;">گره‌ای یافت نشد.</div>';
-    return;
-  }
-  filtered.forEach((n, idx) => {
-    const div = document.createElement('div');
-    div.className = 'node-card';
-    div.innerHTML = `
-      <div class="node-head">
-        <span class="node-flag">${n.country.code}</span>
-        <span class="badge ${n.protocol}">${n.protocol.toUpperCase()}</span>
-      </div>
-      <div class="node-remark" title="${safeHtml(n.remark)}">${safeHtml(n.remark)}</div>
-      <div class="node-meta">
-        <span class="badge">${n.address}:${n.port}</span>
-        <span class="badge ${n.type || 'tcp'}">${(n.type||'tcp').toUpperCase()}</span>
-        ${n.security === 'tls' ? '<span class="badge tls">TLS</span>' : ''}
-        ${n.security === 'reality' ? '<span class="badge reality">REALITY</span>' : ''}
-      </div>
-      <div class="node-actions">
-        <span class="action-icon" onclick="editNode(${idx})" title="Edit">✏️</span>
-        <span class="action-icon" onclick="deleteNode(${idx})" title="Delete">🗑</span>
-        <span class="action-icon" onclick="showNodeQr('${encodeURIComponent(JSON.stringify(n))}')" title="QR">📷</span>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-async function fetchSubscription() {
-  const url = $('subUrl').value.trim();
-  if(!url) return alert('لطفا URL را وارد کنید');
-  
-  $('statusText').textContent = 'در حال دریافت...';
-  $('statusText').style.color = 'var(--warning)';
-  
-  try {
-    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-    if(!res.ok) throw new Error('Primary failed');
-    let text = await res.text();
-    
-    if(text.length < 10) {
-      res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-      text = await res.text();
-    }
-    
-    $('rawInput').value = text;
-    processInput();
-    $('statusText').textContent = 'دریافت موفق';
-    $('statusText').style.color = 'var(--success)';
-  } catch(e) {
-    alert('خطا در دریافت لینک. ممکن است محدودیت CORS وجود داشته باشد.');
-    $('statusText').textContent = 'خطا';
-    $('statusText').style.color = 'var(--danger)';
-  }
-}
-function pasteFromClipboard() {
-  navigator.clipboard.readText().then(text => {
-    $('rawInput').value = text;
-    processInput();
-  }).catch(err => alert('دسترسی به کلیپ‌بورد ممکن نیست.'));
-}
-function handleFileImport(input) {
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    $('rawInput').value = e.target.result;
-    processInput();
-  };
-  reader.readAsText(file);
-}
-function clearInput() {
-  $('rawInput').value = '';
-  state.nodes = [];
-  renderNodes();
-  $('statInvalid').textContent = '0';
-}
-function processInput() {
-  const raw = $('rawInput').value;
-  const parsed = parseInput(raw);
-  state.nodes = parsed;
-  $('statInvalid').textContent = faNum(raw.split('\n').length - parsed.length);
-  renderNodes();
-  saveToLocal();
-}
-let timeout;
-$('rawInput').addEventListener('input', () => {
-  clearTimeout(timeout);
-  timeout = setTimeout(processInput, 500);
-});
-function deleteNode(idx) {
-  const filter = $('nodeFilter').value.toLowerCase();
-  if(filter) {
-     alert("برای حذف، فیلتر را پاک کنید.");
-     return;
-  }
-  state.nodes.splice(idx, 1);
-  renderNodes();
-  saveToLocal();
-}
-function editNode(idx) {
-  const n = state.nodes[idx];
-  const newRemark = prompt("نام گره را ویرایش کنید:", n.remark);
-  if(newRemark) {
-    n.remark = newRemark;
-    n.country = detectCountry(newRemark);
-    renderNodes();
-    saveToLocal();
-  }
-}
-function saveToLocal() {
-  localStorage.setItem('sc_nodes', JSON.stringify(state.nodes));
-  localStorage.setItem('sc_input', $('rawInput').value);
-}
-window.addEventListener('load', () => {
-  if(localStorage.getItem('sc_nodes')) {
-    state.nodes = JSON.parse(localStorage.getItem('sc_nodes'));
-    $('rawInput').value = localStorage.getItem('sc_input') || '';
-    renderNodes();
-  }
-});
-function generateConfig() {
-  if(state.nodes.length === 0) return alert('گره‌ای موجود نیست!');
-  
-  const format = $('outputFormat').value;
-  const warpMode = $('outboundMode').value;
-  const dns = $('dnsPreset').value;
-  
-  let config = {};
-  
-  if(format === 'xray') {
-    config = buildXrayConfig(state.nodes, warpMode, dns);
-  } else {
-    config = buildSingBoxConfig(state.nodes, warpMode, dns);
-  }
-  
-  state.configJson = JSON.stringify(config, null, 2);
-  $('statusText').textContent = 'کانفیگ تولید شد (' + format + ')';
-}
-function buildXrayConfig(nodes, warpMode, dns) {
-  const outbounds = [];
-  const rules = [];
-  
-  if(state.fragment.mode !== 'off') {
-    let len = '100-200', interval = '1...accent); color: #fff;
-  width: 20px; height: 20px; border-radius: 50%;
-  display: grid; place-items: center; font-size: 0.8rem; font-weight: bold;
-}
+
 .node-head { display: flex; justify-content: space-between; align-items: center; }
 .node-flag { font-size: 1.4rem; line-height: 1; }
-.node-remark {
-  font-weight: 700; font-size: 0.95rem;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 180px; color: var(--text-primary);
-}
+.node-remark { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
 .node-meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.7rem; font-family: var(--font-mono); }
 .badge { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.1); }
 .badge.vless { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
@@ -839,31 +166,30 @@ function buildXrayConfig(nodes, warpMode, dns) {
 .badge.ss { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
 .badge.ws { color: #4ade80; }
 .badge.grpc { color: #f87171; }
-.badge.tcp { color: #94a3b8; }
 .badge.tls { color: #22d3ee; }
 .badge.reality { color: #fb7185; }
-.node-actions { display: flex; gap: 6px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.05); paddingTop: 8px; }
-.action-icon { font-size: 1rem; cursor: pointer; padding: 4px; border-radius: 6px; color: var(--text-secondary); transition: var(--transition); }
+
+.node-actions { display: flex; gap: 6px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
+body.theme-light .node-actions { border-top-color: rgba(0,0,0,0.05); }
+.action-icon { font-size: 1rem; cursor: pointer; padding: 4px 6px; border-radius: 6px; color: var(--text-secondary); transition: var(--transition); }
 .action-icon:hover { color: var(--accent); background: rgba(255,255,255,0.1); }
 .action-icon.del:hover { color: var(--danger); }
-/* ═══ STICKY ACTION BAR ═══ */
+
+/* STICKY BAR */
 .sticky-bar {
   position: sticky; bottom: 20px; z-index: 50;
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--accent);
-  border-radius: 16px; padding: 12px 20px;
+  background: var(--bg-color); backdrop-filter: blur(20px);
+  border: 1px solid var(--accent); border-radius: 16px; padding: 12px 20px;
   display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
 @keyframes slideUp { from{transform:translateY(100%); opacity:0} to{transform:none; opacity:1} }
-/* ═══ MODAL ═══ */
+
+/* MODAL */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(8px); z-index: 100;
-  display: none; place-items: center; padding: 20px;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  z-index: 100; display: none; place-items: center; padding: 20px;
 }
 .modal-overlay.active { display: grid; }
 .modal {
@@ -874,7 +200,7 @@ body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
 }
 @keyframes popIn { from{transform:scale(0.8); opacity:0} to{transform:scale(1); opacity:1} }
 #qrcode { margin: 20px auto; display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 10px; }
-/* ═══ RESPONSIVE ═══ */
+
 @media (max-width: 768px) {
   header { flex-direction: column; align-items: stretch; }
   .controls { justify-content: space-between; }
@@ -903,24 +229,26 @@ body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
       <input type="file" id="fileInput" hidden accept=".txt,.json,.sub" onchange="handleFileImport(this)">
     </div>
   </header>
+
   <!-- INPUT SECTION -->
   <section class="card">
     <div class="card-header">
       <span class="card-title">📥 ورودی هوشمند</span>
       <div style="display:flex; gap:8px;">
-        <button onclick="pasteFromClipboard()" title="Paste from Clipboard">📋</button>
-        <button class="danger" onclick="clearAll()" title="Clear All">🗑</button>
+        <button onclick="pasteFromClipboard()" title="Paste from Clipboard">📋 Paste</button>
+        <button class="danger" onclick="clearAll()" title="Clear All">🗑 Clear</button>
       </div>
     </div>
-    <textarea id="rawInput" placeholder="لینک ساب‌اسکریپشن (http/https) یا لیست لینک‌های vless/vmess/trojan/ss را اینجا وارد کنید...&#10;پشتیبانی خودکار از Base64." spellcheck="false"></textarea>
+    <textarea id="rawInput" placeholder="لینک ساب‌اسکریپشن (http/https) یا لیست لینک‌های vless/vmess/trojan/ss را اینجا وارد کنید...&#10;پشتیبانی خودکار از فرمت Base64." spellcheck="false"></textarea>
     <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
       <input type="text" id="subUrl" placeholder="https://example.com/sub" style="flex:1;" dir="ltr">
-      <button class="primary" onclick="fetchSubscription()">دریافت لینک</button>
+      <button class="primary" onclick="fetchSubscription(event)">دریافت لینک</button>
     </div>
   </section>
+
   <!-- SETTINGS SECTION -->
   <section class="card">
-    <div class="card-header"><span class="card-title">⚙️ تنظیمات پیشرفته</span></div>
+    <div class="card-header"><span class="card-title">⚙️ تنظیمات پیشرفته کانفیگ</span></div>
     <div class="settings-grid">
       <div class="setting-group">
         <label>فرمت خروجی</label>
@@ -943,18 +271,15 @@ body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
           <option value="cloudflare">Cloudflare (1.1.1.1)</option>
           <option value="google">Google (8.8.8.8)</option>
           <option value="shecan">Shecan (IR)</option>
-          <option value="custom">Custom...</option>
         </select>
       </div>
     </div>
     <div style="margin-top:24px; border-top:1px solid var(--glass-border); padding-top:16px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <label style="font-size:0.95rem; color:var(--text-primary); font-weight:600;">🧩 Fragment Settings</label>
-      </div>
+      <label style="font-size:0.95rem; color:var(--text-primary); font-weight:600; display:block; margin-bottom:8px;">🧩 Fragment Settings</label>
       <div class="fragment-modes">
-        <div class="mode-btn active" onclick="setFragmentMode('off')">خاموش</div>
-        <div class="mode-btn" onclick="setFragmentMode('auto')">خودکار</div>
-        <div class="mode-btn" onclick="setFragmentMode('manual')">دستی</div>
+        <div class="mode-btn active" onclick="setFragmentMode('off', this)">خاموش</div>
+        <div class="mode-btn" onclick="setFragmentMode('auto', this)">خودکار</div>
+        <div class="mode-btn" onclick="setFragmentMode('manual', this)">دستی</div>
       </div>
       
       <div id="fragManualInputs" class="fragment-inputs" style="display:none;">
@@ -981,6 +306,7 @@ body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
       </div>
     </div>
   </section>
+
   <!-- STATS SECTION -->
   <section class="card">
     <div class="card-header">
@@ -1006,6 +332,7 @@ body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
       </div>
     </div>
   </section>
+
   <!-- NODE LIST SECTION -->
   <section class="card">
     <div class="toolbar">
@@ -1022,52 +349,55 @@ body.theme-light .sticky-bar { background: rgba(255, 255, 255, 0.9); }
     </div>
   </section>
 </div>
+
 <!-- STICKY ACTION BAR -->
 <div id="stickyBar" class="sticky-bar" style="display:none;">
-  <div class="selection-info">
-    ✅ <b id="finalCount">0</b> گره برای ساخت کانفیگ انتخاب شده است
+  <div class="selection-info" style="font-size: 0.95rem;">
+    ✅ <b id="finalCount" style="color:var(--success)">0</b> گره برای ساخت کانفیگ انتخاب شده است
   </div>
   <div>
-    <button onclick="copyConfig()">📋 کپی JSON</button>
+    <button onclick="copyConfig(event)">📋 کپی JSON</button>
     <button onclick="downloadConfig()">⬇ دانلود فایل</button>
-    <button class="primary" onclick="showQrModal()">📷 نمایش QR</button>
+    <button class="primary" onclick="showQrModal()">📷 نمایش QR کلی</button>
   </div>
 </div>
+
 <!-- QR MODAL -->
 <div id="qrModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
   <div class="modal">
-    <h3 style="margin-bottom:10px; color:var(--accent);">QR Code کانفیگ نهایی</h3>
+    <h3 style="margin-bottom:10px; color:var(--accent);" id="qrModalTitle">QR Code کانفیگ</h3>
     <div id="qrcode"></div>
-    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">مناسب برای اسکن سریع در کلاینت‌ها</p>
+    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">جهت اسکن با کلاینت‌ها (v2rayNG, Shadowrocket)</p>
     <button class="primary" onclick="document.getElementById('qrModal').classList.remove('active')">بستن</button>
   </div>
 </div>
+
 <script>
 /** STATE MANAGEMENT **/
 const state = {
-  nodes: [], // All parsed nodes
-  selected: new Set(), // Set of indices of selected nodes
+  nodes: [],
+  selected: new Set(),
   configJson: null,
-  fragment: { mode: 'off', len: '100-200', int: '10-20', pack: 'tlshello' },
+  fragment: { mode: 'off' },
   theme: 'theme-glass'
 };
 const $ = id => document.getElementById(id);
 const faNum = n => new Intl.NumberFormat('fa-IR').format(n);
 const safeHtml = str => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
+
 /** PARTICLES BACKGROUND **/
 const canvas = $('canvas-bg'), ctx = canvas.getContext('2d');
 let W, H, particles = [];
 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
 window.addEventListener('resize', resize); resize();
-for(let i=0; i<50; i++) particles.push({
+for(let i=0; i<40; i++) particles.push({
   x: Math.random()*W, y: Math.random()*H,
-  vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4,
+  vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
   r: Math.random()*2+1, a: Math.random()*0.5+0.1
 });
 function animate() {
   ctx.clearRect(0,0,W,H);
   const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-  // Simple hex to rgba converter for particle color if needed, or just use globalAlpha
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy;
     if(p.x<0||p.x>W) p.vx*=-1;
@@ -1082,51 +412,50 @@ function animate() {
   requestAnimationFrame(animate);
 }
 animate();
+
 /** THEME & UI LOGIC **/
 function setTheme(theme) {
   document.body.className = theme;
   state.theme = theme;
   localStorage.setItem('sc_theme', theme);
 }
-if(localStorage.getItem('sc_theme')) setTheme(localStorage.getItem('sc_theme'));
-function setFragmentMode(mode) {
+if(localStorage.getItem('sc_theme')) {
+  const t = localStorage.getItem('sc_theme');
+  $('themeSelect').value = t;
+  setTheme(t);
+}
+
+function setFragmentMode(mode, element) {
   state.fragment.mode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  const manualDiv = $('fragManualInputs');
-  const autoDiv = $('fragAutoInfo');
+  element.classList.add('active');
   
   if(mode === 'manual') {
-    manualDiv.style.display = 'grid';
-    autoDiv.style.display = 'none';
+    $('fragManualInputs').style.display = 'grid';
+    $('fragAutoInfo').style.display = 'none';
   } else if (mode === 'auto') {
-    manualDiv.style.display = 'none';
-    autoDiv.style.display = 'block';
-    $('fragLen').value = '100-200';
-    $('fragInt').value = '10-20';
-    $('fragPack').value = 'tlshello';
+    $('fragManualInputs').style.display = 'none';
+    $('fragAutoInfo').style.display = 'block';
   } else {
-    manualDiv.style.display = 'none';
-    autoDiv.style.display = 'none';
+    $('fragManualInputs').style.display = 'none';
+    $('fragAutoInfo').style.display = 'none';
   }
 }
+
 /** PARSING ENGINE **/
 function parseInput(text) {
   if(!text) return [];
   const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
   const results = [];
   
-  // Auto-detect Base64 Subscription
   if(lines.length === 1 && /^[A-Za-z0-9+/=]+$/.test(lines[0]) && lines[0].length > 50) {
     try {
       const decoded = atob(lines[0].replace(/-/g,'+').replace(/_/g,'/'));
-      if(decoded.includes('://')) {
-        return parseInput(decoded);
-      }
+      if(decoded.includes('://')) return parseInput(decoded);
     } catch(e) {}
   }
-  lines.forEach(line => {
+
+  lines.forEach((line, index) => {
     let node = null;
     if(line.startsWith('vless://')) node = parseVless(line);
     else if(line.startsWith('vmess://')) node = parseVmess(line);
@@ -1135,12 +464,13 @@ function parseInput(text) {
     
     if(node) {
       node.country = detectCountry(node.remark);
-      node.id = Date.now() + Math.random(); // Unique ID
+      node.id = index;
       results.push(node);
     }
   });
   return results;
 }
+
 function parseVless(url) {
   try {
     const u = new URL(url);
@@ -1156,6 +486,7 @@ function parseVless(url) {
     };
   } catch(e) { return null; }
 }
+
 function parseVmess(url) {
   try {
     const json = JSON.parse(atob(url.slice(8)));
@@ -1167,6 +498,7 @@ function parseVmess(url) {
     };
   } catch(e) { return null; }
 }
+
 function parseTrojan(url) {
   try {
     const u = new URL(url);
@@ -1180,6 +512,7 @@ function parseTrojan(url) {
     };
   } catch(e) { return null; }
 }
+
 function parseSS(url) {
   try {
     const temp = url.slice(5);
@@ -1191,7 +524,6 @@ function parseSS(url) {
     if(mainPart.includes('@')) {
       [auth, rest] = mainPart.split('@');
     } else {
-      // Legacy format handling might be needed here for complex cases
       try {
         const decoded = atob(mainPart);
         if(decoded.includes('@')) { [auth, rest] = decoded.split('@'); }
@@ -1202,17 +534,17 @@ function parseSS(url) {
     const methodPass = atob(auth);
     const [method, password] = methodPass.split(':');
     const [addr, port] = rest.split(':');
-    
     return { protocol: 'ss', method, password, address: addr, port: parseInt(port), remark };
   } catch(e) { return null; }
 }
+
 function detectCountry(remark) {
   if(!remark) return { code: '🌐', name: 'Unknown' };
   const r = remark.toUpperCase();
   const flags = {
-    'IR': '🇮🇷', 'TEHRAN': '🇮🇷', 'iran': '🇮🇷',
+    'IR': '🇮🇷', 'TEHRAN': '🇮🇷', 'IRAN': '🇮🇷',
     'DE': '🇩🇪', 'GERMANY': '🇩🇪', 'FRANKFURT': '🇩🇪',
-    'US': '🇺🇸', 'USA': '🇺🇸', 'NEW YORK': '🇺🇸', 'DALLAS': '🇺🇸',
+    'US': '🇺🇸', 'USA': '🇺🇸', 'NEW YORK': '🇺🇸',
     'NL': '🇳🇱', 'NETHERLANDS': '🇳🇱',
     'GB': '🇬🇧', 'UK': '🇬🇧', 'LONDON': '🇬🇧',
     'FR': '🇫🇷', 'FRANCE': '🇫🇷',
@@ -1223,7 +555,7 @@ function detectCountry(remark) {
     'FI': '🇫🇮', 'FINLAND': '🇫🇮',
     'SE': '🇸🇪', 'SWEDEN': '🇸🇪',
     'UA': '🇺🇦', 'UKRAINE': '🇺🇦',
-    'AU': '🇦🇺', 'AUSTRALIA': '🇦🇺'
+    'TR': '🇹🇷', 'TURKEY': '🇹🇷'
   };
   for(const [key, flag] of Object.entries(flags)) {
     if(r.includes(key)) return { code: flag, name: key };
@@ -1232,6 +564,7 @@ function detectCountry(remark) {
   if(emoji) return { code: emoji[0], name: 'Emoji' };
   return { code: '🌐', name: 'Global' };
 }
+
 /** RENDER & SELECTION LOGIC **/
 function renderNodes() {
   const filter = $('nodeFilter').value.toLowerCase();
@@ -1240,31 +573,28 @@ function renderNodes() {
   
   const filteredIndices = [];
   state.nodes.forEach((n, idx) => {
-    if(
-      n.remark.toLowerCase().includes(filter) || 
-      n.country.name.toLowerCase().includes(filter) ||
-      n.country.code === filter ||
-      n.protocol.toLowerCase().includes(filter)
-    ) {
+    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) {
       filteredIndices.push(idx);
     }
   });
+  
   $('statTotal').textContent = faNum(state.nodes.length);
   $('statValid').textContent = faNum(filteredIndices.length);
   $('statCountries').textContent = faNum(new Set(state.nodes.map(n=>n.country.code)).size);
   updateSelectionUI();
+  
   if(filteredIndices.length === 0) {
     list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-secondary); padding:40px;">گره‌ای یافت نشد.</div>';
     return;
   }
+  
   filteredIndices.forEach(idx => {
     const n = state.nodes[idx];
     const isSelected = state.selected.has(idx);
     const div = document.createElement('div');
     div.className = `node-card ${isSelected ? 'selected' : ''}`;
     div.onclick = (e) => {
-      // Prevent toggle when clicking actions
-      if(e.target.closest('.action-icon')) return;
+      if(e.target.closest('.action-icon')) return; // Ignore click if on actions
       toggleNode(idx);
     };
     
@@ -1289,47 +619,44 @@ function renderNodes() {
     list.appendChild(div);
   });
 }
+
 function toggleNode(idx) {
   if(state.selected.has(idx)) state.selected.delete(idx);
   else state.selected.add(idx);
-  renderNodes(); // Re-render to show selection state
-  updateSelectionUI();
+  renderNodes();
 }
+
 function toggleSelectAll() {
   const filter = $('nodeFilter').value.toLowerCase();
   const allVisible = [];
   state.nodes.forEach((n, idx) => {
-    if(
-      n.remark.toLowerCase().includes(filter) || 
-      n.country.name.toLowerCase().includes(filter) ||
-      n.protocol.toLowerCase().includes(filter)
-    ) allVisible.push(idx);
+    if(n.remark.toLowerCase().includes(filter) || n.country.name.toLowerCase().includes(filter) || n.protocol.toLowerCase().includes(filter)) {
+      allVisible.push(idx);
+    }
   });
-  // If all visible are selected, deselect them. Otherwise select all.
-  const allSelected = allVisible.every(idx => state.selected.has(idx));
   
-  if(allSelected && allVisible.length > 0) {
-    allVisible.forEach(idx => state.selected.delete(idx));
-  } else {
-    allVisible.forEach(idx => state.selected.add(idx));
-  }
+  const allSelected = allVisible.length > 0 && allVisible.every(idx => state.selected.has(idx));
+  
+  if(allSelected) allVisible.forEach(idx => state.selected.delete(idx));
+  else allVisible.forEach(idx => state.selected.add(idx));
+  
   renderNodes();
-  updateSelectionUI();
 }
+
 function updateSelectionUI() {
   const count = state.selected.size;
   $('selectedCount').textContent = faNum(count);
   $('finalCount').textContent = faNum(count);
   $('stickyBar').style.display = count > 0 ? 'flex' : 'none';
 }
+
 function deleteNode(idx) {
   if(confirm('آیا از حذف این گره اطمینان دارید؟')) {
     state.nodes.splice(idx, 1);
-    // Adjust selected set indices if needed (simpler to clear selection for now or re-map)
-    state.selected.clear(); 
-    processInput(false); // Re-process to reset indices safely
+    processInput(false);
   }
 }
+
 function editNode(idx) {
   const n = state.nodes[idx];
   const newRemark = prompt("نام گره را ویرایش کنید:", n.remark);
@@ -1340,12 +667,13 @@ function editNode(idx) {
     saveToLocal();
   }
 }
+
 /** DATA HANDLING **/
-async function fetchSubscription() {
+async function fetchSubscription(e) {
   const url = $('subUrl').value.trim();
   if(!url) return alert('لطفا URL را وارد کنید');
   
-  const btn = event.target;
+  const btn = e.target;
   const originalText = btn.textContent;
   btn.textContent = '⏳...';
   btn.disabled = true;
@@ -1363,19 +691,21 @@ async function fetchSubscription() {
     $('rawInput').value = text;
     processInput();
     alert('ساب‌اسکریپشن با موفقیت بارگذاری شد.');
-  } catch(e) {
-    alert('خطا در دریافت لینک. ممکن است محدودیت CORS وجود داشته باشد یا لینک خراب باشد.');
+  } catch(err) {
+    alert('خطا در دریافت لینک. ممکن است محدودیت CORS وجود داشته باشد.');
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;
   }
 }
+
 function pasteFromClipboard() {
   navigator.clipboard.readText().then(text => {
     $('rawInput').value = text;
     processInput();
-  }).catch(err => alert('دسترسی به کلیپ‌بورد ممکن نیست. مرورگر شما اجازه نمی‌دهد.'));
+  }).catch(() => alert('دسترسی به کلیپ‌بورد مقدور نیست. لطفا دستی وارد کنید.'));
 }
+
 function handleFileImport(input) {
   const file = input.files[0];
   if(!file) return;
@@ -1385,8 +715,9 @@ function handleFileImport(input) {
     processInput();
   };
   reader.readAsText(file);
-  input.value = ''; // Reset
+  input.value = '';
 }
+
 function clearAll() {
   if(confirm('تمام داده‌ها پاک شوند؟')) {
     $('rawInput').value = '';
@@ -1398,24 +729,28 @@ function clearAll() {
     saveToLocal();
   }
 }
-let timeout;
+
+let inputTimeout;
 function processInput(save = true) {
   const raw = $('rawInput').value;
   const parsed = parseInput(raw);
   state.nodes = parsed;
-  state.selected.clear(); // Clear selection on new parse
+  state.selected.clear();
   $('statInvalid').textContent = faNum(raw.split('\n').filter(l=>l.trim()).length - parsed.length);
   renderNodes();
   if(save) saveToLocal();
 }
+
 $('rawInput').addEventListener('input', () => {
-  clearTimeout(timeout);
-  timeout = setTimeout(() => processInput(true), 600);
+  clearTimeout(inputTimeout);
+  inputTimeout = setTimeout(() => processInput(true), 600);
 });
+
 function saveToLocal() {
   localStorage.setItem('sc_nodes', JSON.stringify(state.nodes));
   localStorage.setItem('sc_input', $('rawInput').value);
 }
+
 window.addEventListener('load', () => {
   if(localStorage.getItem('sc_nodes')) {
     state.nodes = JSON.parse(localStorage.getItem('sc_nodes'));
@@ -1423,6 +758,7 @@ window.addEventListener('load', () => {
     renderNodes();
   }
 });
+
 /** CONFIG GENERATION **/
 function generateConfig() {
   if(state.selected.size === 0) return alert('هیچ گره‌ای انتخاب نشده است!');
@@ -1432,20 +768,18 @@ function generateConfig() {
   const warpMode = $('outboundMode').value;
   
   let config = {};
-  if(format === 'xray') {
-    config = buildXrayConfig(selectedNodes, warpMode);
-  } else {
-    config = buildSingBoxConfig(selectedNodes, warpMode);
-  }
+  if(format === 'xray') config = buildXrayConfig(selectedNodes, warpMode);
+  else config = buildSingBoxConfig(selectedNodes, warpMode);
   
   state.configJson = JSON.stringify(config, null, 2);
   $('stickyBar').scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
+
 function buildXrayConfig(nodes, warpMode) {
   const outbounds = [];
   const rules = [];
   
-  // Fragment Logic
+  // Fragment Definition
   if(state.fragment.mode !== 'off') {
     let len = '100-200', interval = '10-20', pack = 'tlshello';
     if(state.fragment.mode === 'manual') {
@@ -1462,6 +796,7 @@ function buildXrayConfig(nodes, warpMode) {
       }
     });
   }
+
   // Node Outbounds
   nodes.forEach((n, i) => {
     const tag = `proxy_${i}`;
@@ -1474,70 +809,87 @@ function buildXrayConfig(nodes, warpMode) {
     
     if(n.protocol === 'vless') {
       ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, encryption: "none", flow: n.flow }] }];
-      if(n.security === 'reality') {
-        ob.streamSettings.realitySettings = { publicKey: n.pbk, shortId: n.sid, serverName: n.sni };
-      } else if (n.security === 'tls') {
-        ob.streamSettings.tlsSettings = { serverName: n.sni, alpn: n.alpn ? n.alpn.split(',') : [] };
-      }
+      if(n.security === 'reality') ob.streamSettings.realitySettings = { publicKey: n.pbk, shortId: n.sid, serverName: n.sni };
+      else if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, alpn: n.alpn ? n.alpn.split(',') : [] };
       if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
       if(n.type === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.path };
-    } else if (n.protocol === 'vmess') {
+    } 
+    else if (n.protocol === 'vmess') {
        ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, level: 8 }] }];
        if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni };
        if(n.type === 'ws') ob.streamSettings.wsSettings = { path: n.path, headers: { Host: n.host } };
-    } else if (n.protocol === 'trojan') {
+    } 
+    else if (n.protocol === 'trojan') {
        ob.settings.servers = [{ address: n.address, port: n.port, password: n.password }];
        if(n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni };
-    } else if (n.protocol === 'ss') {
+    } 
+    else if (n.protocol === 'ss') {
        ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.password }];
     }
-    if(state.fragment.mode !== 'off') {
-      ob.streamSettings.sockopt = { dialerProxy: "fragment-out" };
-    }
+
+    if(state.fragment.mode !== 'off') ob.streamSettings.sockopt = { dialerProxy: "fragment-out" };
     outbounds.push(ob);
   });
-  // Warp Logic
+
+  // Warp Mode Rules
   if(warpMode !== 'direct') {
-    const warpOb = {
+    outbounds.push({
       tag: "warp",
       protocol: "wireguard",
       settings: {
-        secretKey: "YFYu4C2pNR8...", // Placeholder keys
+        secretKey: "YOUR_SECRET_KEY_HERE", // Replace if real warp integration is needed
         address: ["162.159.192.1/32", "2606:4700:d0::1/128"],
-        peers: [{ publicKey: "bmXOC+F1Fx...", endpoint: "engage.cloudflareclient.com:2408" }]
+        peers: [{ publicKey: "bmXOC+F1FxEMF9N1", endpoint: "engage.cloudflareclient.com:2408" }]
       }
-    };
-    outbounds.push(warpOb);
+    });
     
-    if(warpMode === 'warp-full') {
-       rules.push({ type: "field", outboundTag: "warp", network: "tcp,udp" });
-    } else if (warpMode === 'warp-split') {
+    if(warpMode === 'warp-full') rules.push({ type: "field", outboundTag: "warp", network: "tcp,udp" });
+    else if (warpMode === 'warp-split') {
        rules.push({ type: "field", outboundTag: "warp", ip: ["geoip:ir"] });
        rules.push({ type: "field", outboundTag: "warp", domain: ["geosite:category-ir"] });
     }
   }
+
   return {
     log: { loglevel: "warning" },
     inbounds: [{ port: 10808, protocol: "socks", settings: { udp: true }, sniffing: { enabled: true, destOverride: ["http", "tls"] } }],
     outbounds: [...outbounds, { tag: "direct", protocol: "freedom" }, { tag: "block", protocol: "blackhole" }],
     routing: { rules: rules, domainStrategy: "IPIfNonMatch" },
-    dns: { servers: ["1.1.1.1", "8.8.8.8"] }
+    dns: { servers: [ $('dnsPreset').value === 'shecan' ? "178.22.122.100" : ($('dnsPreset').value === 'google' ? "8.8.8.8" : "1.1.1.1") ] }
   };
 }
+
 function buildSingBoxConfig(nodes, warpMode) {
-  // Simplified placeholder for SingBox
-  return { log: { level: "info" }, inbounds: [], outbounds: [], route: { rules: [] } };
+  // Basic Output structure for Sing-Box
+  const outbounds = [];
+  nodes.forEach((n, i) => {
+    let ob = { type: n.protocol, tag: `proxy-${i}`, server: n.address, server_port: n.port };
+    if(n.protocol === 'vless' || n.protocol === 'vmess') ob.uuid = n.uuid;
+    if(n.protocol === 'trojan') ob.password = n.password;
+    if(n.protocol === 'ss') { ob.method = n.method; ob.password = n.password; }
+    outbounds.push(ob);
+  });
+  outbounds.push({ type: "direct", tag: "direct" }, { type: "block", tag: "block" });
+
+  return {
+    log: { level: "info" },
+    inbounds: [{ type: "tun", tag: "tun-in", interface_name: "tun0", inet4_address: "172.19.0.1/30", auto_route: true, strict_route: true }],
+    outbounds: outbounds,
+    route: { rules: [{ protocol: "dns", outbound: "direct" }] }
+  };
 }
+
 /** ACTIONS **/
-function copyConfig() {
+function copyConfig(e) {
   if(!state.configJson) return generateConfig();
   navigator.clipboard.writeText(state.configJson).then(() => {
-    const btn = event.target;
+    const btn = e.target;
     const old = btn.textContent;
     btn.textContent = '✅ کپی شد';
     setTimeout(() => btn.textContent = old, 2000);
   });
 }
+
 function downloadConfig() {
   if(!state.configJson) return generateConfig();
   const blob = new Blob([state.configJson], { type: 'application/json' });
@@ -1547,25 +899,36 @@ function downloadConfig() {
   a.click();
   URL.revokeObjectURL(a.href);
 }
+
 function showQrModal() {
   if(!state.configJson) return generateConfig();
+  $('qrModalTitle').textContent = 'QR Code کانفیگ نهایی';
   $('qrModal').classList.add('active');
   $('qrcode').innerHTML = '';
   new QRCode($('qrcode'), { text: state.configJson, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
+
 function showNodeQr(idx) {
   const node = state.nodes[idx];
-  // Construct URI string (simplified)
   let uri = "";
-  if(node.protocol === 'vless') uri = `vless://${node.uuid}@${node.address}:${node.port}?type=${node.type}&security=${node.security}#${encodeURIComponent(node.remark)}`;
-  // Add other protocols as needed
   
-  if(!uri) return alert('ساخت QR برای این پروتکل هنوز پیاده‌سازی نشده است.');
+  if(node.protocol === 'vless') {
+    uri = `vless://${node.uuid}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}&pbk=${node.pbk||''}&sid=${node.sid||''}&fp=${node.fp||'chrome'}#${encodeURIComponent(node.remark)}`;
+  } else if(node.protocol === 'vmess') {
+    const vObj = { v: "2", ps: node.remark, add: node.address, port: node.port, id: node.uuid, net: node.type, type: "none", host: node.host, path: node.path, tls: node.security === 'tls' ? 'tls' : '', sni: node.sni };
+    uri = `vmess://${btoa(JSON.stringify(vObj))}`;
+  } else if(node.protocol === 'trojan') {
+    uri = `trojan://${node.password}@${node.address}:${node.port}?type=${node.type}&security=${node.security}&sni=${node.sni}#${encodeURIComponent(node.remark)}`;
+  } else if(node.protocol === 'ss') {
+    uri = `ss://${btoa(node.method + ':' + node.password)}@${node.address}:${node.port}#${encodeURIComponent(node.remark)}`;
+  }
   
+  if(!uri) return alert('ساخت QR برای این پروتکل یا این فرمت دارای مشکل است.');
+  
+  $('qrModalTitle').textContent = `QR Code: ${node.remark}`;
   $('qrModal').classList.add('active');
   $('qrcode').innerHTML = '';
-  new QRCode($('qrcode'), { text: uri, width: 220, height: 220 });
-  document.querySelector('#qrModal h3').textContent = `QR Code: ${node.remark}`;
+  new QRCode($('qrcode'), { text: uri, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff" });
 }
 </script>
 </body>
