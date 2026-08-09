@@ -194,7 +194,7 @@
       "statsOutboundDownlink": true
     }
   },
-  "remarks": "ATOMIC-iran-DOH",
+  "remarks": "JAVIDNS",
   "routing": {
     "domainStrategy": "IPIfNonMatch",
     "rules": [
