@@ -252,3 +252,121 @@ test('تولید بدون گره، پیام می‌دهد و نمی‌شکند',
   assert.equal(out, '');
   assert.equal(a.calls.copies.length, 0);
 });
+
+/* ─────────────── بهینه‌سازی سرعت ─────────────── */
+
+test('sockopt با کلیدهای معتبر Xray ساخته می‌شود', () => {
+  const a = withInput(app(), CONFIGS.slice(0, 3).join('\n'));
+  const cfg = a.sandbox.buildXray(a.get('nodes'), a.sandbox.getSettings());
+  const so = cfg.outbounds[0].streamSettings.sockopt;
+  assert.ok(so, 'sockopt باید وجود داشته باشد');
+  assert.equal(so.tcpFastOpen, true);
+  assert.equal(so.tcpMptcp, true);
+  assert.equal(so.tcpKeepAliveIdle, 60);
+  assert.equal(so.tcpKeepAliveInterval, 30);
+  // کلیدی که در سورس Xray وجود ندارد نباید نوشته شود
+  assert.equal(so.tcpNoDelay, undefined);
+});
+
+test('خاموش‌کردن کلیدها sockopt را حذف می‌کند', () => {
+  const a = withInput(app(), CONFIGS.slice(0, 3).join('\n'));
+  el(a, 'swTfo').checked = false;
+  el(a, 'swMptcp').checked = false;
+  el(a, 'swKeepAlive').checked = false;
+  const cfg = a.sandbox.buildXray(a.get('nodes'), a.sandbox.getSettings());
+  assert.equal(cfg.outbounds[0].streamSettings.sockopt, undefined);
+});
+
+test('bufferSize بر حسب کیلوبایت در policy می‌نشیند', () => {
+  const a = withInput(app(), CONFIGS.slice(0, 2).join('\n'));
+  el(a, 'bufferSel').value = '4096';
+  let cfg = a.sandbox.buildXray(a.get('nodes'), a.sandbox.getSettings());
+  assert.equal(cfg.policy.levels['8'].bufferSize, 4096);
+
+  el(a, 'bufferSel').value = '0';
+  cfg = a.sandbox.buildXray(a.get('nodes'), a.sandbox.getSettings());
+  assert.equal(cfg.policy.levels['8'].bufferSize, undefined, 'در حالت پیش‌فرض نباید نوشته شود');
+});
+
+test('Clean IP جای address را می‌گیرد ولی SNI و Host دست‌نخورده می‌مانند', () => {
+  const a = withInput(app(), CONFIGS.slice(0, 3).join('\n'));
+  const nodes = a.get('nodes');
+  const originalHost = nodes[0].address;
+
+  el(a, 'cleanIp').value = '104.16.132.229';
+  const s = a.sandbox.getSettings();
+  assert.equal(s.perf.cleanIp, '104.16.132.229');
+
+  const xray = a.sandbox.buildXray(nodes, s);
+  assert.equal(xray.outbounds[0].settings.vnext[0].address, '104.16.132.229');
+  assert.equal(xray.outbounds[0].streamSettings.wsSettings.headers.Host, originalHost);
+  assert.notEqual(xray.outbounds[0].streamSettings.tlsSettings.serverName, '104.16.132.229');
+
+  const sing = a.sandbox.buildSingBox(nodes, s);
+  assert.equal(sing.outbounds[0].server, '104.16.132.229');
+  assert.equal(sing.outbounds[0].tls.server_name, originalHost);
+  assert.equal(sing.outbounds[0].tcp_fast_open, true);
+  assert.equal(sing.outbounds[0].tcp_multi_path, true);
+
+  const clash = a.sandbox.buildClash(nodes, s);
+  assert.match(clash, /server: "104\.16\.132\.229"/);
+  assert.match(clash, /servername: "zr-wasm\.mahdijavid3700\.workers\.dev"/);
+  assert.match(clash, /tfo: true/);
+  assert.match(clash, /mptcp: true/);
+});
+
+test('Clean IP نامعتبر رد می‌شود تا کانفیگ نشکند', () => {
+  const { sandbox } = app();
+  assert.equal(sandbox.normalizeCleanIp('104.16.132.229'), '104.16.132.229');
+  assert.equal(sandbox.normalizeCleanIp('  1.2.3.4  '), '1.2.3.4');
+  assert.equal(sandbox.normalizeCleanIp('2606:4700::1'), '2606:4700::1');
+  assert.equal(sandbox.normalizeCleanIp('999.1.1.1'), '');
+  assert.equal(sandbox.normalizeCleanIp('example.com'), '');
+  assert.equal(sandbox.normalizeCleanIp('<script>'), '');
+  assert.equal(sandbox.normalizeCleanIp(''), '');
+});
+
+test('گره‌های سریع‌تر بر پایه تأخیر سنجیده‌شده انتخاب می‌شوند', () => {
+  const a = withInput(app(), CONFIGS.slice(0, 6).join('\n'));
+  const list = a.get('nodes');
+  const map = a.get('latencyMap');
+  const nodeKeyFn = a.get('nodeKey');
+
+  // سه میزبان با تأخیر متفاوت
+  map.set(nodeKeyFn(list[0]), { state: 'ok', ms: 320 });
+  map.set(nodeKeyFn(list[1]), { state: 'ok', ms: 90 });
+  map.set(nodeKeyFn(list[2]), { state: 'ok', ms: 210 });
+  map.set(nodeKeyFn(list[3]), { state: 'timeout', ms: null });
+
+  const best = a.sandbox.fastestNodes(2);
+  assert.equal(best.length, 2);
+  assert.equal(best[0].raw, list[1].raw, 'کم‌تأخیرترین باید اول باشد');
+  assert.equal(best[1].raw, list[2].raw);
+
+  a.sandbox.selectFastest(2);
+  assert.equal(a.sandbox.selectedNodes().length, 2);
+  assert.equal(el(a, 'finalCount').textContent, '۲');
+});
+
+test('گره بدون TLS از صفحه HTTPS قابل سنجش نیست', () => {
+  const a = app();
+  const isTlsFn = a.get('isTlsNode');
+  const canProbeFn = a.get('canProbe');
+  const tlsNode = { address: 'a.example', port: 2096, security: 'tls' };
+  const plainNode = { address: 'b.example', port: 8880, security: 'none' };
+  assert.equal(isTlsFn(tlsNode), true);
+  assert.equal(canProbeFn(tlsNode), true);
+  // هارنس روی https اجرا می‌شود
+  assert.equal(canProbeFn(plainNode), false);
+});
+
+test('early data از path خوانده می‌شود و دست‌نخورده می‌ماند', () => {
+  const withEd = CONFIGS.find((c) => c.includes('ed%3D') || c.includes('ed='));
+  assert.ok(withEd, 'داده واقعی باید گره دارای ed داشته باشد');
+  const a = withInput(app(), withEd);
+  const nodes = a.get('nodes');
+  assert.equal(nodes.length, 1);
+  const cfg = a.sandbox.buildXray(nodes, a.sandbox.getSettings());
+  // Xray خودش ?ed= را از path می‌خواند؛ ما نباید path را تغییر دهیم
+  assert.match(cfg.outbounds[0].streamSettings.wsSettings.path, /ed=\d+/);
+});

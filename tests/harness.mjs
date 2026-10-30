@@ -193,6 +193,8 @@ export function createSandbox({ extra = {}, clipboard = {}, width = 1280, htmlPa
     innerHeight: 900,
     devicePixelRatio: 1,
     isSecureContext: true,
+    location: { protocol: 'https:', host: 'example.test', href: 'https://example.test/', origin: 'https://example.test' },
+    performance: globalThis.performance || { now: () => Date.now() },
     matchMedia: (q) => ({ matches: false, media: q, addEventListener() {}, addListener() {}, removeEventListener() {} }),
     getComputedStyle: () => ({ getPropertyValue: () => '#22d3ee' }),
     requestAnimationFrame: (fn) => { rafQueue.push(fn); return rafQueue.length; },
