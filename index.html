@@ -462,6 +462,33 @@ footer.site-foot kbd { font-family: var(--font-mono); background: var(--code-bg)
             </div>
           </details>
 
+          <details class="acc" open>
+            <summary>🚀 بهینه‌سازی سرعت اتصال</summary>
+            <div class="acc-body">
+              <div class="setting-row">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swTfo" checked><span class="slider"></span></span>TCP Fast Open (یک رفت‌وبرگشت کمتر)</label>
+                <label class="opt"><span class="switch"><input type="checkbox" id="swMptcp" checked><span class="slider"></span></span>MPTCP (ترکیب وای‌فای + دیتا)</label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="opt"><span class="switch"><input type="checkbox" id="swKeepAlive" checked><span class="slider"></span></span>Keep-Alive (جلوگیری از قطع شدن)</label>
+                <label class="fld">بافر هر اتصال
+                  <select id="bufferSel">
+                    <option value="0">پیش‌فرض Xray</option>
+                    <option value="2048">۲ مگابایت</option>
+                    <option value="4096" selected>۴ مگابایت</option>
+                    <option value="8192">۸ مگابایت</option>
+                  </select>
+                </label>
+              </div>
+              <div class="setting-row" style="margin-top:10px;">
+                <label class="fld">IP جایگزین / Clean IP (اختیاری — بیشترین اثر روی سرعت)
+                  <input type="text" id="cleanIp" dir="ltr" autocomplete="off" placeholder="مثلاً 104.16.132.229">
+                </label>
+              </div>
+              <p class="hint" id="cleanIpHint">اگر گره‌ها پشت Cloudflare هستند، سرعت به IP لبه‌ای که دامنه به آن resolve می‌شود بستگی دارد. یک IP سریع را از یک اسکنر «IP تمیز» بگیرید و اینجا بگذارید؛ SNI و هدر Host دست‌نخورده می‌مانند.</p>
+            </div>
+          </details>
+
           <details class="acc">
             <summary>⚙️ تنظیمات تکمیلی Inbounds و MUX</summary>
             <div class="acc-body">
@@ -533,6 +560,12 @@ footer.site-foot kbd { font-family: var(--font-mono); background: var(--code-bg)
             <button type="button" id="btnSelAll" class="ghost">✅ همه</button>
             <button type="button" id="btnSelNone" class="ghost">⬜ هیچ</button>
           </div>
+          <div class="node-toolbar">
+            <button type="button" id="btnPingNodes" class="primary">📡 سنجش تأخیر گره‌ها</button>
+            <button type="button" id="btnSelectFast" class="ghost" disabled>⚡ انتخاب ۱۰ گره سریع‌تر</button>
+          </div>
+          <p class="hint" id="pingHint">سنجش، زمان دست‌یابی مرورگر تا سرور را <b>بدون VPN</b> اندازه می‌گیرد — معیار خوبی برای مقایسه گره‌هاست ولی تضمین سرعت نیست. توجه: این تست IP شما را مستقیم به سرور نشان می‌دهد.</p>
+          <p class="hint" id="pingStatus" role="status"></p>
           <div class="node-grid" id="nodeList">
             <p class="node-empty">لطفاً متن ساب‌اسکریپشن را وارد کنید.</p>
           </div>
@@ -1076,6 +1109,10 @@ function buildNodeCard(node) {
   meta.appendChild(makeBadge((node.network || 'tcp').toUpperCase(), 'b-' + (node.network || 'tcp')));
   if (node.security === 'tls') meta.appendChild(makeBadge('TLS', 'b-tls'));
   if (node.security === 'reality') meta.appendChild(makeBadge('REALITY', 'b-reality'));
+  const lat = latencyMap.get(nodeKey(node));
+  if (lat && lat.state === 'ok') meta.appendChild(makeBadge(faNum(lat.ms) + 'ms', 'b-tls'));
+  else if (lat && lat.state === 'timeout') meta.appendChild(makeBadge('بدون پاسخ', 'b-reality'));
+  else if (lat && lat.state === 'fail') meta.appendChild(makeBadge('خطا', 'b-reality'));
   card.appendChild(meta);
 
   const actions = document.createElement('div');
@@ -1372,8 +1409,27 @@ function getSettings() {
       directIR: $('swIR').checked,
       blockQuic: $('swQuic').checked,
       directPrivate: $('swPriv').checked
+    },
+    perf: {
+      tfo: $('swTfo').checked,
+      mptcp: $('swMptcp').checked,
+      keepAlive: $('swKeepAlive').checked,
+      /* واحد bufferSize در لایه conf ایکس‌ری کیلوبایت است (bs = value * 1024) */
+      bufferKb: clampInt($('bufferSel').value, 0, 65536, 0),
+      cleanIp: normalizeCleanIp($('cleanIp').value)
     }
   };
+}
+
+/* فقط IPv4/IPv6 معتبر بپذیر، وگرنه کانفیگ بی‌اعتبار می‌شود */
+function normalizeCleanIp(value) {
+  const v = String(value || '').trim().replace(/^\[|\]$/g, '');
+  if (!v) return '';
+  const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  const m = v.match(v4);
+  if (m) return m.slice(1).every((o) => parseInt(o, 10) <= 255) ? m[0] : '';
+  if (/^[0-9a-f:]+$/i.test(v) && v.includes(':')) return v;
+  return '';
 }
 
 function buildXray(list, s) {
@@ -1398,6 +1454,21 @@ function buildXray(list, s) {
   rules.push({ balancerTag: 'proxy-round', network: 'tcp,udp', type: 'field' });
 
   const primaryDns = s.dns[0] || '1.1.1.1';
+  const cleanIp = s.perf.cleanIp;
+
+  const levelPolicy = { connIdle: 300, downlinkOnly: 1, handshake: 4, uplinkOnly: 1 };
+  /* bufferSize در لایه conf بر حسب کیلوبایت است؛ بافر بزرگ‌تر = توان بیشتر روی لینک پرتأخیر */
+  if (s.perf.bufferKb > 0) levelPolicy.bufferSize = s.perf.bufferKb;
+
+  /* با Clean IP به لبه سریع وصل می‌شویم ولی SNI/Host همان دامنه اصلی می‌ماند */
+  const addr = (n) => cleanIp || n.address;
+  const sniOf = (n) => n.sni || n.host || n.address;
+
+  const sockopt = {};
+  if (s.perf.tfo) sockopt.tcpFastOpen = true;
+  if (s.perf.mptcp) sockopt.tcpMptcp = true;
+  if (s.perf.keepAlive) { sockopt.tcpKeepAliveIdle = 60; sockopt.tcpKeepAliveInterval = 30; }
+  const hasSockopt = Object.keys(sockopt).length > 0;
 
   const outbounds = list.map((n, i) => {
     const ob = {
@@ -1407,27 +1478,28 @@ function buildXray(list, s) {
       streamSettings: { network: n.network || 'tcp', security: n.security || 'none' },
       tag: s.prefix + (i + 1)
     };
+    if (hasSockopt) ob.streamSettings.sockopt = Object.assign({}, sockopt);
 
     if (n.proto === 'vless') {
-      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ encryption: 'none', id: n.uuid, level: 8 }] }];
+      ob.settings.vnext = [{ address: addr(n), port: n.port, users: [{ encryption: 'none', id: n.uuid, level: 8 }] }];
       if (n.flow) ob.settings.vnext[0].users[0].flow = n.flow;
       if (n.security === 'reality') {
-        ob.streamSettings.realitySettings = { show: false, serverName: n.sni, fingerprint: n.fp || 'chrome', publicKey: n.pbk, shortId: n.sid, spiderX: n.spx };
+        ob.streamSettings.realitySettings = { show: false, serverName: sniOf(n), fingerprint: n.fp || 'chrome', publicKey: n.pbk, shortId: n.sid, spiderX: n.spx };
       } else if (n.security === 'tls') {
-        ob.streamSettings.tlsSettings = { allowInsecure: s.allowInsecure, show: false, serverName: n.sni, fingerprint: n.fp || 'chrome', alpn: n.alpn && n.alpn.length ? n.alpn : ['http/1.1'] };
+        ob.streamSettings.tlsSettings = { allowInsecure: s.allowInsecure, show: false, serverName: sniOf(n), fingerprint: n.fp || 'chrome', alpn: n.alpn && n.alpn.length ? n.alpn : ['http/1.1'] };
       }
       if (n.network === 'ws') ob.streamSettings.wsSettings = { headers: { Host: n.host || n.sni || n.address }, path: n.path || '/' };
       else if (n.network === 'grpc') ob.streamSettings.grpcSettings = { serviceName: n.serviceName || 'grpc' };
     } else if (n.proto === 'vmess') {
-      ob.settings.vnext = [{ address: n.address, port: n.port, users: [{ id: n.uuid, alterId: 0, security: 'auto', level: 8 }] }];
-      if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp || 'chrome' };
+      ob.settings.vnext = [{ address: addr(n), port: n.port, users: [{ id: n.uuid, alterId: 0, security: 'auto', level: 8 }] }];
+      if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: sniOf(n), allowInsecure: s.allowInsecure, fingerprint: n.fp || 'chrome' };
       if (n.network === 'ws') ob.streamSettings.wsSettings = { headers: { Host: n.host || n.sni || n.address }, path: n.path || '/' };
     } else if (n.proto === 'trojan') {
-      ob.settings.servers = [{ address: n.address, port: n.port, password: n.uuid, level: 8 }];
-      if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: n.sni, allowInsecure: s.allowInsecure, fingerprint: n.fp || 'chrome' };
+      ob.settings.servers = [{ address: addr(n), port: n.port, password: n.uuid, level: 8 }];
+      if (n.security === 'tls') ob.streamSettings.tlsSettings = { serverName: sniOf(n), allowInsecure: s.allowInsecure, fingerprint: n.fp || 'chrome' };
       if (n.network === 'ws') ob.streamSettings.wsSettings = { headers: { Host: n.host || n.sni || n.address }, path: n.path || '/' };
     } else if (n.proto === 'ss') {
-      ob.settings.servers = [{ address: n.address, port: n.port, method: n.method, password: n.uuid, level: 8 }];
+      ob.settings.servers = [{ address: addr(n), port: n.port, method: n.method, password: n.uuid, level: 8 }];
     }
 
     return ob;
@@ -1461,7 +1533,7 @@ function buildXray(list, s) {
       { protocol: 'freedom', settings: { domainStrategy: 'UseIP' }, tag: 'direct' },
       { protocol: 'blackhole', settings: { response: { type: 'http' } }, tag: 'block' }
     ]),
-    policy: { levels: { '8': { connIdle: 300, downlinkOnly: 1, handshake: 4, uplinkOnly: 1 } }, system: { statsOutboundDownlink: true, statsOutboundUplink: true } },
+    policy: { levels: { '8': levelPolicy }, system: { statsOutboundDownlink: true, statsOutboundUplink: true } },
     remarks: 'V⇢X Config',
     routing: { balancers: [{ selector: [s.prefix], strategy: { type: s.obs.strategy }, tag: 'proxy-round' }], domainStrategy: 'AsIs', rules },
     stats: {}
@@ -1479,8 +1551,14 @@ const SING_RULE_SETS = {
 
 function buildSingBox(list, s) {
   const tags = list.map((n, i) => s.prefix + (i + 1));
+  const cleanIp = s.perf.cleanIp;
+  const addr = (n) => cleanIp || n.address;
+  const sniOf = (n) => n.sni || n.host || n.address;
+
   const outbounds = list.map((n, i) => {
-    const ob = { type: n.proto, tag: s.prefix + (i + 1), server: n.address, server_port: n.port };
+    const ob = { type: n.proto, tag: s.prefix + (i + 1), server: addr(n), server_port: n.port };
+    if (s.perf.tfo) ob.tcp_fast_open = true;
+    if (s.perf.mptcp) ob.tcp_multi_path = true;
     if (n.proto === 'vless' || n.proto === 'vmess') ob.uuid = n.uuid;
     if (n.proto === 'vmess') ob.security = 'auto';
     if (n.proto === 'trojan') ob.password = n.uuid;
@@ -1488,7 +1566,7 @@ function buildSingBox(list, s) {
 
     if (n.flow && n.proto === 'vless') ob.flow = n.flow;
     if (n.security === 'tls' || n.security === 'reality') {
-      ob.tls = { enabled: true, server_name: n.sni, insecure: s.allowInsecure };
+      ob.tls = { enabled: true, server_name: sniOf(n), insecure: s.allowInsecure };
       if (n.security === 'reality') ob.tls.reality = { enabled: true, public_key: n.pbk, short_id: n.sid };
       if (n.fp) ob.tls.utls = { enabled: true, fingerprint: n.fp };
     }
@@ -1547,13 +1625,19 @@ function buildClash(list, s) {
   p('dns:\n  enable: true\n  enhanced-mode: fake-ip\n  nameserver:\n    - ' + s.dns[0]);
   p('proxies:');
 
+  const cleanIp = s.perf.cleanIp;
+  const addr = (n) => cleanIp || n.address;
+  const sniOf = (n) => n.sni || n.host || n.address;
+
   list.forEach((n, i) => {
     const tag = s.prefix + (i + 1);
     p('  - name: ' + yq(tag));
     p('    type: ' + n.proto);
-    p('    server: ' + yq(n.address));
+    p('    server: ' + yq(addr(n)));
     p('    port: ' + n.port);
     p('    udp: true');
+    if (s.perf.tfo) p('    tfo: true');
+    if (s.perf.mptcp) p('    mptcp: true');
 
     if (n.proto === 'ss') { p('    cipher: ' + yq(n.method)); p('    password: ' + yq(n.uuid)); }
     else if (n.proto === 'trojan') { p('    password: ' + yq(n.uuid)); }
@@ -1567,7 +1651,7 @@ function buildClash(list, s) {
     }
     if (n.security === 'tls' || n.security === 'reality') {
       p('    tls: true');
-      p('    servername: ' + yq(n.sni));
+      p('    servername: ' + yq(sniOf(n)));
       if (s.allowInsecure) p('    skip-cert-verify: true');
       if (n.security === 'reality') {
         p('    reality-opts:\n      public-key: ' + yq(n.pbk) + (n.sid ? '\n      short-id: ' + yq(n.sid) : ''));
@@ -1897,6 +1981,133 @@ async function testDnsPings() {
   toast('تست پینگ سرورهای DNS تمام شد.', 'ok');
 }
 
+/* ═══════════════════════ سنجش تأخیر گره‌ها ═══════════════════════ */
+/*
+ * این تست زمان دسترسی مرورگر تا سرور را «بدون VPN» اندازه می‌گیرد.
+ * معیار مقایسه گره‌هاست، نه تضمین سرعت واقعی تونل.
+ */
+const latencyMap = new Map();   /* "host:port" → { state, ms } */
+const PROBE_TIMEOUT = 6000;
+const PROBE_BATCH = 8;
+
+const isTlsNode = (n) => n.security === 'tls' || n.security === 'reality';
+const nodeKey = (n) => n.address + ':' + n.port;
+
+function probeUrl(n) {
+  return (isTlsNode(n) ? 'wss://' : 'ws://') + n.address + ':' + n.port + (n.path || '/');
+}
+
+/* از صفحه HTTPS مرورگر اجازه ws:// نمی‌دهد (mixed content) */
+function canProbe(n) {
+  if (isTlsNode(n)) return true;
+  return String(location.protocol) !== 'https:';
+}
+
+function measureOne(n, timeoutMs) {
+  return new Promise((resolve) => {
+    if (typeof WebSocket === 'undefined') { resolve({ state: 'skip', ms: null }); return; }
+    if (!canProbe(n)) { resolve({ state: 'skip', ms: null }); return; }
+
+    const start = performance.now();
+    let done = false;
+    let ws = null;
+
+    const finish = (state) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      try { if (ws) ws.close(); } catch (e) { /* بسته نشد، مهم نیست */ }
+      const ms = Math.round(performance.now() - start);
+      resolve({ state, ms: state === 'timeout' ? null : ms });
+    };
+
+    try { ws = new WebSocket(probeUrl(n)); }
+    catch (e) { resolve({ state: 'fail', ms: 0 }); return; }
+
+    const timer = setTimeout(() => finish('timeout'), timeoutMs || PROBE_TIMEOUT);
+    ws.onopen = () => finish('ok');
+    ws.onerror = () => finish('fail');
+    ws.onclose = () => { if (!done) finish('fail'); };
+  });
+}
+
+/* اجرای دسته‌ای تا مرورگر با ۱۹۱ اتصال همزمان قفل نکند */
+async function measureInBatches(items, size, worker, onProgress) {
+  let index = 0, finished = 0;
+  const runners = Array.from({ length: Math.min(size, items.length) }, async () => {
+    while (index < items.length) {
+      const my = index++;
+      await worker(items[my], my);
+      finished++;
+      if (onProgress) onProgress(finished, items.length);
+    }
+  });
+  await Promise.all(runners);
+}
+
+async function runLatencyTest() {
+  const btn = $('btnPingNodes');
+  const status = $('pingStatus');
+  if (!nodes.length) { toast('ابتدا لینک‌ها را وارد کنید', 'warn'); return; }
+
+  btn.disabled = true;
+  $('btnSelectFast').disabled = true;
+  const startLabel = btn.textContent;
+  btn.innerHTML = '<span class="spin" aria-hidden="true"></span>در حال سنجش...';
+
+  /* گره‌های هم‌میزبان فقط یک‌بار سنجیده می‌شوند */
+  const unique = [];
+  const seen = new Set();
+  for (const n of nodes) {
+    const k = nodeKey(n);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    unique.push(n);
+  }
+
+  let done = 0;
+  await measureInBatches(unique, PROBE_BATCH, async (n) => {
+    const res = await measureOne(n);
+    latencyMap.set(nodeKey(n), res);
+  }, (finished, total) => {
+    done = finished;
+    status.textContent = 'سنجش ' + faNum(finished) + ' از ' + faNum(total) + ' میزبان...';
+    btn.innerHTML = '<span class="spin" aria-hidden="true"></span>' + faNum(finished) + '/' + faNum(total);
+  });
+
+  const ok = unique.filter((n) => (latencyMap.get(nodeKey(n)) || {}).state === 'ok').length;
+  const skipped = unique.filter((n) => (latencyMap.get(nodeKey(n)) || {}).state === 'skip').length;
+  const failed = unique.length - ok - skipped;
+
+  status.textContent = 'پاسخ دادند: ' + faNum(ok) + ' · بدون پاسخ: ' + faNum(failed) +
+    (skipped ? ' · غیرقابل سنجش از این صفحه: ' + faNum(skipped) : '');
+  btn.textContent = startLabel;
+  btn.disabled = false;
+  $('btnSelectFast').disabled = ok === 0;
+  renderNodes();
+  toast('سنجش ' + faNum(unique.length) + ' میزبان تمام شد (' + faNum(ok) + ' پاسخ داد)', ok ? 'ok' : 'warn');
+}
+
+function fastestNodes(count) {
+  const scored = nodes.filter((n) => {
+    const r = latencyMap.get(nodeKey(n));
+    return r && r.state === 'ok' && typeof r.ms === 'number';
+  });
+  scored.sort((a, b) => latencyMap.get(nodeKey(a)).ms - latencyMap.get(nodeKey(b)).ms);
+  return scored.slice(0, count);
+}
+
+function selectFastest(count) {
+  const best = fastestNodes(count);
+  if (!best.length) { toast('ابتدا گره‌ها را بسنجید', 'warn'); return; }
+  const keep = new Set(best.map((n) => n.raw));
+  deselected.clear();
+  nodes.forEach((n) => { if (!keep.has(n.raw)) deselected.add(n.raw); });
+  renderNodes();
+  markOutputStale();
+  toast(faNum(best.length) + ' گره سریع‌تر انتخاب شد (بهترین: ' + faNum(latencyMap.get(nodeKey(best[0])).ms) + 'ms)', 'ok');
+}
+
 /* ═══════════════════════ رویدادها ═══════════════════════ */
 function removeNode(id) {
   const node = nodeIndex.get(id);
@@ -1954,6 +2165,8 @@ function wireEvents() {
     renderNodes();
     markOutputStale();
   });
+  $('btnPingNodes').addEventListener('click', runLatencyTest);
+  $('btnSelectFast').addEventListener('click', () => selectFastest(10));
   $('btnSelNone').addEventListener('click', () => {
     nodes.forEach((n) => deselected.add(n.raw));
     renderNodes();
